@@ -1,5 +1,7 @@
 {
   "expo": {
+    "scheme": "my-app", 
+    "deepLinking": true,
     "name": "my-app",
     "slug": "my-app",
     "version": "1.0.0",
@@ -20,7 +22,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+       "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "https",
+            "host": "ecoquest.app"
+          },
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

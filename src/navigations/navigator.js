@@ -10,6 +10,9 @@ import WelcomeScreen from "../screens/LoginRegister/Welcome";
 import LoginScreen from "../screens/LoginRegister/Login";
 import HomeScreen from "../screens/CustomerScreen/HomeScreen";
 import RegisterScreen from "../screens/LoginRegister/Register";
+import ProfileScreen from "../screens/CustomerScreen/ProfileScreen";
+import VerifyByLinkScreen from "../screens/LoginRegister/VerifyScreen";
+import VerifyModal from "../screens/LoginRegister/VerifyScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -33,9 +36,14 @@ function AuthStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="Verify"
+        component={VerifyModal}
+        options={{ presentation: "modal", headerShown: false }}
+      />
+      <Stack.Screen
         name="Home"
         component={AppTabs}
-        options={{ headerShown: true }}
+        // options={{ headerShown: true }}
       />
     </Stack.Navigator>
   );
@@ -63,8 +71,8 @@ function AppTabs() {
             iconName = focused ? "calendar" : "calendar-outline";
           else if (route.name === "Notifications")
             iconName = focused ? "notifications" : "notifications-outline";
-          else if (route.name === "Account")
-            iconName = focused ? "settings" : "settings-outline";
+          else if (route.name === "Profile")
+            iconName = focused ? "person" : "person-outline";
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#007AFF",
@@ -72,10 +80,10 @@ function AppTabs() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={HomeScreen} />
+      <Tab.Screen name="Account" component={HomeScreen} />
       <Tab.Screen name="Schedule" component={HomeScreen} />
       <Tab.Screen name="Notifications" component={HomeScreen} />
-      <Tab.Screen name="Account" component={HomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

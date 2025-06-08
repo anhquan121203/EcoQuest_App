@@ -36,7 +36,7 @@ export default function RegisterScreen({ navigation }) {
       console.log(userData)
       if (response.status === 200 || response.status === 201) {
         Alert.alert("Success", "Registered successfully!", [
-          { text: "OK", onPress: () => navigation.navigate("Login") },
+          { text: "OK", onPress: () => navigation.navigate("Verify") },
         ]);
       } else {
         Alert.alert("Error", "Registration failed. Please try again.");

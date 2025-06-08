@@ -28,3 +28,12 @@ export const registerUser = async (userData) => {
   });
   return response;
 };
+
+export const verifyUser = async (key) => {
+  const response = await apiClient.post(API.VERIFY, { key }, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response;
+};
