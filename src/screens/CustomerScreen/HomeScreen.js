@@ -9,17 +9,18 @@ import {
   TouchableOpacity,
 } from "react-native";
 import useAttraction from "../../hooks/useAttraction";
+import { useNavigation } from "@react-navigation/native";
 
 const HomeScreen = () => {
   const { attractions, loading, error, fetchAttractions } = useAttraction();
 
-  
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchAttractions();
   }, []);
 
-  console.log(fetchAttractions)
+  console.log(fetchAttractions);
 
   return (
     <ScrollView style={styles.container}>
@@ -77,21 +78,29 @@ const HomeScreen = () => {
         style={styles.cardScroll}
       >
         {attractions && attractions.length > 0 ? (
-          attractions.map((item, index) => (
-            <View key={index} style={styles.card}>
-              <Image
-                source={{ uri: item.imageUrl }} // Assuming imageUrl is a property in the attraction object
-                style={styles.cardImage}
-              />
-              <Text style={styles.cardTitle}>{item.attractionName}</Text>
-              <Text style={styles.cardSubtitle}>{item.attractionType} mỗi người</Text>
-            </View>
-          ))
-        ) : (
-          <Text>Loading...</Text>
-        )}
+          attractions.map((item, index) => {
+            const imageUrl =
+              item.attractionImages.length > 0
+                ? item.attractionImages[0]
+                : "https://via.placeholder.com/160x100.png?text=No+Image";
 
-        
+            return (
+              <View key={index} style={styles.card}>
+                <Image source={{ uri: imageUrl }} style={styles.cardImage} />
+                <Text style={styles.cardTitle}>{item.attractionName}</Text>
+                <Text style={styles.cardSubtitle}>
+                  {item.attractionType} mỗi người
+                </Text>
+              </View>
+            );
+          })
+        ) : loading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text>Đã xảy ra lỗi: {error}</Text>
+        ) : (
+          <Text>Không có địa điểm nào để hiển thị.</Text>
+        )}
       </ScrollView>
 
       {/* Gợi ý khám phá */}
@@ -100,7 +109,10 @@ const HomeScreen = () => {
         <Text style={styles.seeMore}>Xem thêm</Text>
       </View>
 
-      <View style={styles.exploreCard}>
+      <TouchableOpacity
+        style={styles.exploreCard}
+        onPress={() => navigation.navigate("AttractionDetails")}
+      >
         <Image
           source={require("../../../assets/images/home/mekong.png")}
           style={styles.exploreImage}
@@ -112,7 +124,8 @@ const HomeScreen = () => {
           </Text>
           <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
         </View>
-      </View>
+      </TouchableOpacity>
+
       <View style={styles.exploreCard}>
         <Image
           source={require("../../../assets/images/home/mekong.png")}

@@ -13,6 +13,7 @@ import RegisterScreen from "../screens/LoginRegister/Register";
 import ProfileScreen from "../screens/CustomerScreen/ProfileScreen";
 import VerifyByLinkScreen from "../screens/LoginRegister/VerifyScreen";
 import VerifyModal from "../screens/LoginRegister/VerifyScreen";
+import AtractionDetails from "../screens/CustomerScreen/AtractionDetails";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,7 +44,13 @@ function AuthStack() {
       <Stack.Screen
         name="Home"
         component={AppTabs}
-        // options={{ headerShown: true }}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="AttractionDetails"
+        component={AtractionDetails}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

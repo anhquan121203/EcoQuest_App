@@ -9,8 +9,8 @@ const useAttraction = () => {
   const dispatch = useDispatch();
 
   const fetchAttractions = useCallback(
-    (searchPayload) => {
-      dispatch(listAttraction(searchPayload));
+    () => {
+      dispatch(listAttraction());
     },
     [dispatch]
   );

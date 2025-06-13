@@ -70,7 +70,7 @@ export default function VerifyModal({ visible, onClose, onSuccess }) {
           )}
           {!loading && status === "error" && (
             <>
-              <Text style={styles.title}>❌ Xác minh thất bại!</Text>
+              <Text style={styles.title}>Xác minh thất bại!</Text>
               <CustomButton title="Đóng" onPress={onClose} type="secondary" />
             </>
           )}

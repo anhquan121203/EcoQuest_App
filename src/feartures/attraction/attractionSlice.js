@@ -5,10 +5,9 @@ import API from "../../api/apiConfig";
 // Async thunks
 export const listAttraction = createAsyncThunk(
   "attraction/listAttraction",
-  async (searchPayload, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await apiClient.get(API.ATTRACTION, {
-        params: searchPayload,
         headers: {
           "Content-Type": "application/json",
         },
@@ -38,7 +37,7 @@ const attractionSlice = createSlice({
       })
       .addCase(listAttraction.fulfilled, (state, action) => {
         state.loading = false;
-        state.attractions = action.payload;
+        state.attractions = action.payload?.response || []; 
       })
       .addCase(listAttraction.rejected, (state, action) => {
         state.loading = false;
