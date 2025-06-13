@@ -5,6 +5,9 @@ const API = {
   LOGIN: `${BASE_URL}/connect/token`,
   REGISTER: `${BASE_URL}/api/v1/Ecq010InsertUser`,
   VERIFY: `${BASE_URL}/api/v1/Ecq010InsertUserVerify`,
+
+  // api home
+  ATTRACTION: `${BASE_URL}/api/v1/Ecq230SelectAttractions`,
 };
 
 export default API;

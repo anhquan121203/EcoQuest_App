@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,19 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import useAttraction from "../../hooks/useAttraction";
 
 const HomeScreen = () => {
+  const { attractions, loading, error, fetchAttractions } = useAttraction();
+
+  
+
+  useEffect(() => {
+    fetchAttractions();
+  }, []);
+
+  console.log(fetchAttractions)
+
   return (
     <ScrollView style={styles.container}>
       {/* Vị trí hiện tại */}
@@ -65,46 +76,22 @@ const HomeScreen = () => {
         showsHorizontalScrollIndicator={false}
         style={styles.cardScroll}
       >
-        <View style={styles.card}>
-          <Image
-            source={require("../../../assets/images/home/ho-guom.jpg")}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Hồ Gươm</Text>
-          <Text style={styles.cardSubtitle}>215k mỗi người</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../../assets/images/home/sapa.jpg")}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Sapa</Text>
-          <Text style={styles.cardSubtitle}>450k mỗi người</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../../assets/images/home/sapa.jpg")}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Sapa</Text>
-          <Text style={styles.cardSubtitle}>450k mỗi người</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../../assets/images/home/sapa.jpg")}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Sapa</Text>
-          <Text style={styles.cardSubtitle}>450k mỗi người</Text>
-        </View>
-        <View style={styles.card}>
-          <Image
-            source={require("../../../assets/images/home/sapa.jpg")}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>Sapa</Text>
-          <Text style={styles.cardSubtitle}>450k mỗi người</Text>
-        </View>
+        {attractions && attractions.length > 0 ? (
+          attractions.map((item, index) => (
+            <View key={index} style={styles.card}>
+              <Image
+                source={{ uri: item.imageUrl }} // Assuming imageUrl is a property in the attraction object
+                style={styles.cardImage}
+              />
+              <Text style={styles.cardTitle}>{item.attractionName}</Text>
+              <Text style={styles.cardSubtitle}>{item.attractionType} mỗi người</Text>
+            </View>
+          ))
+        ) : (
+          <Text>Loading...</Text>
+        )}
+
+        
       </ScrollView>
 
       {/* Gợi ý khám phá */}
