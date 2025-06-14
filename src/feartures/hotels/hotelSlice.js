@@ -3,11 +3,11 @@ import apiClient from "../../api/apiClient";
 import API from "../../api/apiConfig";
 
 // Async thunks
-export const listAttraction = createAsyncThunk(
-  "attraction/listAttraction",
+export const listHotel = createAsyncThunk(
+  "hotel/listHotel",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(API.ATTRACTION, {
+      const response = await apiClient.get(API.HOTEL, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -20,12 +20,12 @@ export const listAttraction = createAsyncThunk(
 );
 
 // get attraction by ID
-export const getAttractionById = createAsyncThunk(
-  "attraction/getAttractionById",
-  async (attractionId, { rejectWithValue }) => {
+export const getHotelById = createAsyncThunk(
+  "hotel/getHotelById",
+  async (hotelId, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(API.ATTRACTION_BY_ID, {
-        params: { AttractionId: attractionId },
+      const response = await apiClient.get(API.HOTEL_BY_ID, {
+        params: { HotelId: hotelId },
         headers: {
           "Content-Type": "application/json",
         },
@@ -37,35 +37,35 @@ export const getAttractionById = createAsyncThunk(
   }
 );
 
-const attractionSlice = createSlice({
-  name: "ATTRACTION",
+const hotelSlice = createSlice({
+  name: "HOTEL",
   initialState: {
-    attractions: [],
-    selectedAttraction: [],
+    hotels: [],
+    selectedHotel: [],
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(listAttraction.pending, (state) => {
+      .addCase(listHotel.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(listAttraction.fulfilled, (state, action) => {
+      .addCase(listHotel.fulfilled, (state, action) => {
         state.loading = false;
-        state.attractions = action.payload?.response || [];
+        state.hotels = action.payload?.response || [];
       })
-      .addCase(listAttraction.rejected, (state, action) => {
+      .addCase(listHotel.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch accounts";
       })
 
-      .addCase(getAttractionById.fulfilled, (state, action) => {
-        state.selectedAttraction = action.payload?.response || [];
+      .addCase(getHotelById.fulfilled, (state, action) => {
+        state.selectedHotel = action.payload?.response || [];
         state.loading = false;
       });
   },
 });
 
-export default attractionSlice;
+export default hotelSlice;

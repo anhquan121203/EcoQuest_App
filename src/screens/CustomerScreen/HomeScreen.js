@@ -10,17 +10,27 @@ import {
 } from "react-native";
 import useAttraction from "../../hooks/useAttraction";
 import { useNavigation } from "@react-navigation/native";
+import useHotel from "../../hooks/useHotel";
 
 const HomeScreen = () => {
   const { attractions, loading, error, fetchAttractions } = useAttraction();
+
+  const { hotels, fetchHotels } = useHotel();
 
   const navigation = useNavigation();
 
   useEffect(() => {
     fetchAttractions();
+    fetchHotels();
   }, []);
 
-  console.log(fetchAttractions);
+  const handleAttractionDetails = (id) => {
+    navigation.navigate("AttractionDetails", { id });
+  };
+
+  const handleHotelDetails = (id) => {
+    navigation.navigate("HotelDetails", { id });
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -77,21 +87,26 @@ const HomeScreen = () => {
         showsHorizontalScrollIndicator={false}
         style={styles.cardScroll}
       >
-        {attractions && attractions.length > 0 ? (
+        {attractions && attractions?.length > 0 ? (
           attractions.map((item, index) => {
             const imageUrl =
-              item.attractionImages.length > 0
+              item.attractionImages?.length > 0
                 ? item.attractionImages[0]
                 : "https://via.placeholder.com/160x100.png?text=No+Image";
 
             return (
-              <View key={index} style={styles.card}>
-                <Image source={{ uri: imageUrl }} style={styles.cardImage} />
-                <Text style={styles.cardTitle}>{item.attractionName}</Text>
-                <Text style={styles.cardSubtitle}>
-                  {item.attractionType} mỗi người
-                </Text>
-              </View>
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleAttractionDetails(item.attractionId)}
+              >
+                <View key={index} style={styles.card}>
+                  <Image source={{ uri: imageUrl }} style={styles.cardImage} />
+                  <Text style={styles.cardTitle}>{item.attractionName}</Text>
+                  <Text style={styles.cardSubtitle}>
+                    {item.attractionType} mỗi người
+                  </Text>
+                </View>
+              </TouchableOpacity>
             );
           })
         ) : loading ? (
@@ -103,7 +118,51 @@ const HomeScreen = () => {
         )}
       </ScrollView>
 
-      {/* Gợi ý khám phá */}
+      {/* TAB KHÁCH SẠN */}
+      <View style={styles.tabsContainer}>
+        <Text style={styles.sectionTitle}>Lựa chọn cho phút chót</Text>
+        <Text style={styles.seeMore} onPress={() => navigation.navigate("HotelMore")}>Xem thêm</Text>
+      </View>
+      
+
+      {/* Danh sách khách sạn nổi bật */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.cardScroll}
+      >
+        {hotels && hotels?.length == 3 ? (
+          hotels.map((item, index) => {
+            const imageUrl =
+              item.attractionImages?.length > 0
+                ? item.attractionImages[0]
+                : "https://via.placeholder.com/160x100.png?text=No+Image";
+
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handleHotelDetails(item.hotelId)}
+              >
+                <View key={index} style={styles.card}>
+                  <Image source={{ uri: imageUrl }} style={styles.cardImage} />
+                  <Text style={styles.cardTitle}>{item.name}</Text>
+                  <Text style={styles.cardSubtitle}>
+                    {item.addressLine} mỗi người
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        ) : loading ? (
+          <Text>Loading...</Text>
+        ) : error ? (
+          <Text>Đã xảy ra lỗi: {error}</Text>
+        ) : (
+          <Text>Không có địa điểm nào để hiển thị.</Text>
+        )}
+      </ScrollView>
+
+      {/* Gợi ý khách sạn */}
       <View style={styles.tabsContainer}>
         <Text style={styles.sectionTitle}>Khám phá</Text>
         <Text style={styles.seeMore}>Xem thêm</Text>

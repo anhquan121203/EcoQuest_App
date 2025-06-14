@@ -10,10 +10,12 @@ import WelcomeScreen from "../screens/LoginRegister/Welcome";
 import LoginScreen from "../screens/LoginRegister/Login";
 import HomeScreen from "../screens/CustomerScreen/HomeScreen";
 import RegisterScreen from "../screens/LoginRegister/Register";
-import ProfileScreen from "../screens/CustomerScreen/ProfileScreen";
 import VerifyByLinkScreen from "../screens/LoginRegister/VerifyScreen";
 import VerifyModal from "../screens/LoginRegister/VerifyScreen";
-import AtractionDetails from "../screens/CustomerScreen/AtractionDetails";
+import AtractionDetails from "../screens/CustomerScreen/AttractionScreen/AtractionDetails";
+import ProfileScreen from "../screens/CustomerScreen/ProfileScreen/ProfileScreen";
+import HotelDetails from "../screens/CustomerScreen/HotelScreen/HotelDetails";
+import HotelMore from "../screens/CustomerScreen/HotelScreen/HotelMore";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -52,17 +54,22 @@ function AuthStack() {
         component={AtractionDetails}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen
+        name="HotelDetails"
+        component={HotelDetails}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="HotelMore"
+        component={HotelMore}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
 
-// function HomeStack() {
-//   return (
-//     <Stack.Navigator initialRouteName="Home">
-//       <Stack.Screen name="Home" component={HomeScreen} />
-//     </Stack.Navigator>
-//   );
-// }
 
 function AppTabs() {
   return (

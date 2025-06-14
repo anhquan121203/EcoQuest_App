@@ -8,6 +8,11 @@ const API = {
 
   // api home
   ATTRACTION: `${BASE_URL}/api/v1/Ecq230SelectAttractions`,
+  ATTRACTION_BY_ID: `${BASE_URL}/api/v1/Ecq230SelectAttraction`,
+
+  // api hotel
+  HOTEL: `${BASE_URL}/api/v1/Ecq210SelectHotels`, 
+  HOTEL_BY_ID: `${BASE_URL}/api/v1/Ecq210SelectHotel`,
 };
 
 export default API;
