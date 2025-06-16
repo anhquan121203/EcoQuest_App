@@ -2,7 +2,6 @@ import apiClient from "./apiClient";
 import API from "./apiConfig";
 
 export const loginUser = async (email, password) => {
-  console.log("Logging in with:", { email, password });
 
   const data = new URLSearchParams();
   data.append("grant_type", "password");
@@ -10,7 +9,6 @@ export const loginUser = async (email, password) => {
   data.append("password", password);
   data.append("Email", email);
 
-  console.log(data.toString());
 
   const response = await apiClient.post(API.LOGIN, data.toString(), {
     headers: {
@@ -29,8 +27,8 @@ export const registerUser = async (userData) => {
   return response;
 };
 
-export const verifyUser = async (key) => {
-  const response = await apiClient.post(API.VERIFY, { key }, {
+export const verifyUser = async (email, key) => {
+  const response = await apiClient.post(API.VERIFY, { email, key }, {
     headers: {
       "Content-Type": "application/json",
     },

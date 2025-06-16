@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: width - 40,
-    height: width - 40,
+    height: width - 0,
     borderRadius: 20,
     marginTop: 60,
   },
@@ -66,9 +66,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logo: {
-    width: 120,
-    height: 40,
-    marginBottom: 20,
+    width: 150,
+    height: 150,
+    marginTop: -40,
+    // marginBottom: 20,
   },
   title: {
     fontSize: 22,

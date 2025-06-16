@@ -16,6 +16,9 @@ import AtractionDetails from "../screens/CustomerScreen/AttractionScreen/Atracti
 import ProfileScreen from "../screens/CustomerScreen/ProfileScreen/ProfileScreen";
 import HotelDetails from "../screens/CustomerScreen/HotelScreen/HotelDetails";
 import HotelMore from "../screens/CustomerScreen/HotelScreen/HotelMore";
+import ChatbotScreen from "../screens/CustomerScreen/ChatbotScreen/ChatbotScreen";
+import BlogScreen from "../screens/CustomerScreen/BlogScreen/BlogScreen";
+import TripPlannerScreen from "../screens/CustomerScreen/TripPlannerScreen/TripPlannerScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,10 +69,22 @@ function AuthStack() {
         component={HotelMore}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen
+        name="ChatbotScreen"
+        component={ChatbotScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="BlogScreen"
+        component={BlogScreen}
+        options={{ headerShown: false }}
+      />
+      
     </Stack.Navigator>
   );
 }
-
 
 function AppTabs() {
   return (
@@ -79,8 +94,8 @@ function AppTabs() {
           let iconName;
           if (route.name === "Home")
             iconName = focused ? "home" : "home-outline";
-          else if (route.name === "Profile")
-            iconName = focused ? "person" : "person-outline";
+          else if (route.name === "Search")
+            iconName = focused ? "search" : "search-outline";
           else if (route.name === "Schedule")
             iconName = focused ? "calendar" : "calendar-outline";
           else if (route.name === "Notifications")
@@ -93,11 +108,11 @@ function AppTabs() {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Account" component={HomeScreen} />
-      <Tab.Screen name="Schedule" component={HomeScreen} />
-      <Tab.Screen name="Notifications" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
+      <Tab.Screen name="Search" component={HomeScreen} options={{ headerShown: false }}/>
+      <Tab.Screen name="Schedule" component={TripPlannerScreen} options={{ headerShown: false }}/>
+      <Tab.Screen name="Notifications" component={HomeScreen} options={{ headerShown: false }}/>
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
     </Tab.Navigator>
   );
 }

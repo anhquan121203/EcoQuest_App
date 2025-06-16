@@ -11,9 +11,12 @@ import {
 import useAttraction from "../../hooks/useAttraction";
 import { useNavigation } from "@react-navigation/native";
 import useHotel from "../../hooks/useHotel";
+import useLocation from "../../hooks/useLocation";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const HomeScreen = () => {
   const { attractions, loading, error, fetchAttractions } = useAttraction();
+  const { addressNow } = useLocation();
 
   const { hotels, fetchHotels } = useHotel();
 
@@ -33,185 +36,208 @@ const HomeScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Vị trí hiện tại */}
-      <View style={styles.locationContainer}>
-        <Text style={styles.locationText}>
-          📍 <Text style={{ color: "#FF6C00" }}>Ha Noi, Viet Nam</Text>
-        </Text>
-        <TouchableOpacity>
-          <Text style={styles.bell}>🔔</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1, position: "relative" }}>
+      <ScrollView style={styles.container}>
+        {/* Vị trí hiện tại */}
+        <View style={styles.locationContainer}>
+          <Text style={styles.locationText}>
+          <Text style={{ color: "#FF6C00" }}>{addressNow}</Text>
+          </Text>
+          <TouchableOpacity>
+            <Text style={styles.bell}>🔔</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Chào người dùng */}
-      <View style={styles.greeting}>
-        <Text style={styles.helloText}>
-          Xin chào, <Text style={{ fontWeight: "bold" }}>Ecoquest 👋</Text>
-        </Text>
-        <Text style={styles.subText}>
-          Chúng ta hãy cùng <Text style={styles.highlight}>khám phá nhé!</Text>
-        </Text>
-      </View>
+        {/* Chào người dùng */}
+        <View style={styles.greeting}>
+          <Text style={styles.helloText}>
+            Xin chào, <Text style={{ fontWeight: "bold" }}>Ecoquest 👋</Text>
+          </Text>
+          <Text style={styles.subText}>
+            Chúng ta hãy cùng{" "}
+            <Text style={styles.highlight}>khám phá nhé!</Text>
+          </Text>
+        </View>
 
-      {/* Ô tìm kiếm */}
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Bạn muốn đi đâu?"
-          style={styles.searchInput}
-          placeholderTextColor="#999"
-        />
-      </View>
+        {/* tìm kiếm */}
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Bạn muốn đi đâu?"
+            style={styles.searchInput}
+            placeholderTextColor="#999"
+          />
+        </View>
 
-      {/* Tabs chủ đề */}
-      <View style={styles.tabsContainer}>
-        <Text style={styles.sectionTitle}>Khám phá đất nước</Text>
-        <Text style={styles.seeMore}>Xem thêm</Text>
-      </View>
-      <View style={styles.tabList}>
-        {["Tự nhiên", "Biển", "Núi", "Phố cổ"].map((tab, index) => (
-          <View
-            key={index}
-            style={[styles.tabItem, index === 0 && styles.activeTab]}
+        {/* Tabs chủ đề */}
+        <View style={styles.tabsContainer}>
+          <Text style={styles.sectionTitle}>Khám phá đất nước</Text>
+          <Text style={styles.seeMore}>Xem thêm</Text>
+        </View>
+        <View style={styles.tabList}>
+          {["Tự nhiên", "Biển", "Núi", "Phố cổ"].map((tab, index) => (
+            <View
+              key={index}
+              style={[styles.tabItem, index === 0 && styles.activeTab]}
+            >
+              <Text style={index === 0 ? styles.activeTabText : styles.tabText}>
+                {tab}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Danh sách địa điểm nổi bật */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.cardScroll}
+        >
+          {attractions && attractions?.length > 0 ? (
+            attractions.map((item, index) => {
+              const imageUrl =
+                item.attractionImages?.length > 0
+                  ? item.attractionImages[0]
+                  : "https://static.vinwonders.com/production/ho-hoan-kiem-2.jpg";
+
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleAttractionDetails(item.attractionId)}
+                >
+                  <View key={index} style={styles.card}>
+                    <Image
+                      source={{ uri: imageUrl }}
+                      style={styles.cardImage}
+                    />
+                    <Text style={styles.cardTitle}>{item.attractionName}</Text>
+                    <Text style={styles.cardSubtitle}>
+                      {item.attractionType} mỗi người
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          ) : loading ? (
+            <Text>Loading...</Text>
+          ) : error ? (
+            <Text>Đã xảy ra lỗi: {error}</Text>
+          ) : (
+            <Text>Không có địa điểm nào để hiển thị.</Text>
+          )}
+        </ScrollView>
+
+        {/* TAB KHÁCH SẠN */}
+        <View style={styles.tabsContainer}>
+          <Text style={styles.sectionTitle}>Lựa chọn cho phút chót</Text>
+          <Text
+            style={styles.seeMore}
+            onPress={() => navigation.navigate("HotelMore")}
           >
-            <Text style={index === 0 ? styles.activeTabText : styles.tabText}>
-              {tab}
+            Xem thêm
+          </Text>
+        </View>
+
+        {/* Danh sách khách sạn nổi bật */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.cardScroll}
+        >
+          {hotels && hotels?.length == 3 ? (
+            hotels.map((item, index) => {
+              const imageUrl =
+                item.hotelImages?.length > 0
+                  ? item.hotelImages[0]
+                  : "https://via.placeholder.com/160x100.png?text=No+Image";
+
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleHotelDetails(item.hotelId)}
+                >
+                  <View key={index} style={styles.card}>
+                    <Image
+                      source={{ uri: imageUrl }}
+                      style={styles.cardImage}
+                    />
+                    <Text style={styles.cardTitle}>{item.name}</Text>
+                    <Text style={styles.cardSubtitle}>
+                      {item.addressLine} mỗi người
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          ) : loading ? (
+            <Text>Loading...</Text>
+          ) : error ? (
+            <Text>Đã xảy ra lỗi: {error}</Text>
+          ) : (
+            <Text>Không có địa điểm nào để hiển thị.</Text>
+          )}
+        </ScrollView>
+
+        {/* Gợi ý khách sạn */}
+        <View style={styles.tabsContainer}>
+          <Text style={styles.sectionTitle}>Khám phá</Text>
+          <Text style={styles.seeMore}>Xem thêm</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.exploreCard}
+          onPress={() => navigation.navigate("AttractionDetails")}
+        >
+          <Image
+            source={require("../../../assets/images/home/mekong.png")}
+            style={styles.exploreImage}
+          />
+          <View style={styles.exploreInfo}>
+            <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
+            <Text style={styles.exploreSubtitle}>
+              Cà Mau · Thiên nhiên · Nắng đẹp
             </Text>
+            <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
           </View>
-        ))}
-      </View>
+        </TouchableOpacity>
 
-      {/* Danh sách địa điểm nổi bật */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.cardScroll}
-      >
-        {attractions && attractions?.length > 0 ? (
-          attractions.map((item, index) => {
-            const imageUrl =
-              item.attractionImages?.length > 0
-                ? item.attractionImages[0]
-                : "https://via.placeholder.com/160x100.png?text=No+Image";
-
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleAttractionDetails(item.attractionId)}
-              >
-                <View key={index} style={styles.card}>
-                  <Image source={{ uri: imageUrl }} style={styles.cardImage} />
-                  <Text style={styles.cardTitle}>{item.attractionName}</Text>
-                  <Text style={styles.cardSubtitle}>
-                    {item.attractionType} mỗi người
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })
-        ) : loading ? (
-          <Text>Loading...</Text>
-        ) : error ? (
-          <Text>Đã xảy ra lỗi: {error}</Text>
-        ) : (
-          <Text>Không có địa điểm nào để hiển thị.</Text>
-        )}
+        <View style={styles.exploreCard}>
+          <Image
+            source={require("../../../assets/images/home/mekong.png")}
+            style={styles.exploreImage}
+          />
+          <View style={styles.exploreInfo}>
+            <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
+            <Text style={styles.exploreSubtitle}>
+              Cà Mau · Thiên nhiên · Nắng đẹp
+            </Text>
+            <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
+          </View>
+        </View>
+        <View style={styles.exploreCard}>
+          <Image
+            source={require("../../../assets/images/home/mekong.png")}
+            style={styles.exploreImage}
+          />
+          <View style={styles.exploreInfo}>
+            <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
+            <Text style={styles.exploreSubtitle}>
+              Cà Mau · Thiên nhiên · Nắng đẹp
+            </Text>
+            <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
+          </View>
+        </View>
       </ScrollView>
-
-      {/* TAB KHÁCH SẠN */}
-      <View style={styles.tabsContainer}>
-        <Text style={styles.sectionTitle}>Lựa chọn cho phút chót</Text>
-        <Text style={styles.seeMore} onPress={() => navigation.navigate("HotelMore")}>Xem thêm</Text>
-      </View>
-      
-
-      {/* Danh sách khách sạn nổi bật */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.cardScroll}
-      >
-        {hotels && hotels?.length == 3 ? (
-          hotels.map((item, index) => {
-            const imageUrl =
-              item.attractionImages?.length > 0
-                ? item.attractionImages[0]
-                : "https://via.placeholder.com/160x100.png?text=No+Image";
-
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handleHotelDetails(item.hotelId)}
-              >
-                <View key={index} style={styles.card}>
-                  <Image source={{ uri: imageUrl }} style={styles.cardImage} />
-                  <Text style={styles.cardTitle}>{item.name}</Text>
-                  <Text style={styles.cardSubtitle}>
-                    {item.addressLine} mỗi người
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })
-        ) : loading ? (
-          <Text>Loading...</Text>
-        ) : error ? (
-          <Text>Đã xảy ra lỗi: {error}</Text>
-        ) : (
-          <Text>Không có địa điểm nào để hiển thị.</Text>
-        )}
-      </ScrollView>
-
-      {/* Gợi ý khách sạn */}
-      <View style={styles.tabsContainer}>
-        <Text style={styles.sectionTitle}>Khám phá</Text>
-        <Text style={styles.seeMore}>Xem thêm</Text>
-      </View>
 
       <TouchableOpacity
-        style={styles.exploreCard}
-        onPress={() => navigation.navigate("AttractionDetails")}
+        style={styles.chatbotButton}
+        onPress={() => navigation.navigate("ChatbotScreen")}
       >
         <Image
-          source={require("../../../assets/images/home/mekong.png")}
-          style={styles.exploreImage}
+          source={require("../../../assets/chatbot.png")} // Thay bằng icon của bạn
+          style={styles.chatbotIcon}
         />
-        <View style={styles.exploreInfo}>
-          <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
-          <Text style={styles.exploreSubtitle}>
-            Cà Mau · Thiên nhiên · Nắng đẹp
-          </Text>
-          <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
-        </View>
       </TouchableOpacity>
-
-      <View style={styles.exploreCard}>
-        <Image
-          source={require("../../../assets/images/home/mekong.png")}
-          style={styles.exploreImage}
-        />
-        <View style={styles.exploreInfo}>
-          <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
-          <Text style={styles.exploreSubtitle}>
-            Cà Mau · Thiên nhiên · Nắng đẹp
-          </Text>
-          <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
-        </View>
-      </View>
-      <View style={styles.exploreCard}>
-        <Image
-          source={require("../../../assets/images/home/mekong.png")}
-          style={styles.exploreImage}
-        />
-        <View style={styles.exploreInfo}>
-          <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
-          <Text style={styles.exploreSubtitle}>
-            Cà Mau · Thiên nhiên · Nắng đẹp
-          </Text>
-          <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
-        </View>
-      </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -224,16 +250,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     top: 0,
   },
+
   locationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 12,
+    marginTop: 60,
     alignItems: "center",
   },
+
   locationText: {
-    fontSize: 14,
+    fontSize: 20,
     color: "#444",
   },
+
   bell: {
     fontSize: 18,
   },
@@ -297,12 +326,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
   },
+
   cardScroll: {
     marginTop: 16,
   },
+
   card: {
     marginRight: 14,
+    marginBottom: 10,
     width: 160,
+    height: 200,
     borderRadius: 12,
     backgroundColor: "#fff",
     elevation: 2,
@@ -310,6 +343,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
   },
   cardImage: {
     width: "100%",
@@ -356,5 +390,28 @@ const styles = StyleSheet.create({
   exploreDate: {
     fontSize: 12,
     color: "#FF6C00",
+  },
+
+  chatbotButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#fff",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 100,
+  },
+
+  chatbotIcon: {
+    width: 30,
+    height: 30,
   },
 });

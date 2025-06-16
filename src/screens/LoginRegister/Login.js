@@ -6,16 +6,19 @@ import { theme } from "../../themes/theme";
 import { CustomButton } from "../../components/Button";
 import { login } from "../../feartures/auth/authSlice";
 import { loginUser } from "../../api/apiAuth";
+import useAuth from "../../hooks/useAuth";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
 
+  const { firstName, lastName } = useAuth();
+
   const handleLogin = async () => {
     try {
       const response = await loginUser(email, password);
-      console.log(response.data);
+      
       const accessToken = response.data.access_token;
       const refreshToken = response.data.refresh_token;
       if (accessToken && refreshToken) {
@@ -24,7 +27,7 @@ export default function LoginScreen({ navigation }) {
         dispatch(login({accessToken, refreshToken}));
         Alert.alert(
           "Đăng nhập thành công!",
-          `Chào mừng: ${response.data.user?.name || "người dùng"}`
+          `Chào mừng: ${firstName} ${lastName} || "người dùng"}`
         );
         navigation.navigate("Home");
       } else {

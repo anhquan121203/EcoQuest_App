@@ -1,43 +1,93 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuIcon}>
-          <Icon name="more-vert" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Image
-          source={{ uri: 'https://i.imgur.com/your-image.jpg' }} // Replace with your avatar URL
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>Eco Quest</Text>
-        <Text style={styles.phone}>+84 93847263478</Text>
-      </View>
+      {/* <ImageBackground
+        source={{
+          uri: "https://letsflytravel.vn/wp-content/uploads/2024/08/nha-trang-2.webp",
+        }}
+        style={styles.header}
+        resizeMode="cover"
+      > */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.menuIcon}>
+            <Icon name="more-vert" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Image
+            source={{
+              uri: "https://cdn.dribbble.com/userupload/14028171/file/original-3a31127b9b84f9bc5f75737a4720f699.jpg?resize=752x&vertical=center",
+            }} // Replace with your avatar URL
+            style={styles.avatar}
+          />
+          <Text style={styles.name}>Eco Quest</Text>
+          <Text style={styles.phone}>+84 93847263478</Text>
+        </View>
+      {/* </ImageBackground> */}
 
       {/* Info Section */}
       <View style={styles.infoContainer}>
         <Text style={styles.infoTitle}>Thông tin</Text>
 
         <TouchableOpacity style={styles.infoItem}>
-          <Icon name="person" size={24} color="#FF7A00" />
+          <Icon name="person" size={24} color="#2a9df4" />
           <Text style={styles.infoText}>Hồ sơ</Text>
-          <Icon name="chevron-right" size={24} color="#777" style={styles.arrowIcon} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#777"
+            style={styles.arrowIcon}
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.infoItem}>
-          <Icon name="group" size={24} color="#FF7A00" />
+        <TouchableOpacity style={styles.infoItem} onPress={() => navigation.navigate("BlogScreen")}>
+          <Icon name="group" size={24} color="#2a9df4" />
           <Text style={styles.infoText}>Cộng đồng du lịch</Text>
-          <Icon name="chevron-right" size={24} color="#777" style={styles.arrowIcon} />
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#777"
+            style={styles.arrowIcon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.infoItem}>
-          <Icon name="settings" size={24} color="#FF7A00" />
-          <Text style={styles.infoText}>Cài đặt</Text>
-          <Icon name="chevron-right" size={24} color="#777" style={styles.arrowIcon} />
+          <Icon name="schedule" size={24} color="#2a9df4" />
+          <Text style={styles.infoText}>Lịch trình chuyến đi</Text>
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#777"
+            style={styles.arrowIcon}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.infoItem}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Icon name="logout" size={24} color="#2a9df4" />
+          <Text style={styles.infoText}>Đăng xuất</Text>
+          <Icon
+            name="chevron-right"
+            size={24}
+            color="#777"
+            style={styles.arrowIcon}
+          />
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -46,71 +96,84 @@ const ProfileScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
+
   header: {
-    backgroundColor: '#FFA726',
-    alignItems: 'center',
+    backgroundColor: "#2a9df4",
+    alignItems: "center",
     paddingVertical: 30,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    position: 'relative',
+      // borderBottomLeftRadius: 30,
+      // borderBottomRightRadius: 30,
+    position: "relative",
+    height: 350,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
+
   menuIcon: {
-    position: 'absolute',
+    position: "absolute",
     top: 15,
     right: 20,
   },
+
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
     borderWidth: 4,
-    borderColor: '#fff',
+    borderColor: "#fff",
     marginBottom: 10,
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   phone: {
     fontSize: 16,
-    color: '#fff',
+    color: "#fff",
   },
+
   infoContainer: {
-    backgroundColor: '#F7F7F7',
+    backgroundColor: "#F7F7F7",
     paddingHorizontal: 20,
     paddingVertical: 30,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: -20,
+    marginTop: -30,
   },
+
   infoTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FF7A00',
+    fontWeight: "bold",
+    color: "#2a9df4",
     marginBottom: 20,
   },
+  
   infoItem: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
   },
+
   infoText: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
   },
+
   arrowIcon: {
-    marginLeft: 'auto',
+    marginLeft: "auto",
+    color: "#2a9df4",
   },
 });
 

@@ -1,6 +1,14 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { useSelector } from "react-redux";
 import useHotel from "../../../hooks/useHotel";
 
@@ -10,7 +18,7 @@ import Swiper from "react-native-swiper";
 const HotelDetails = () => {
   const route = useRoute();
   const { id } = route.params;
-
+  const navigation = useNavigation();
   const { selectedHotel, hotelById, loading, error } = useHotel();
 
   useEffect(() => {
@@ -51,22 +59,31 @@ const HotelDetails = () => {
   return (
     <ScrollView style={styles.container}>
       <View>
-        <Swiper
-          style={styles.swiper}
-          // showsButtons={true}
-          autoplay={true}
-          dotColor="#ccc"
-          activeDotColor="#000"
-        >
-          {hotelImages.map((img, index) => (
-            <Image
-              key={index}
-              source={{ uri: img }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-          ))}
-        </Swiper>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Text>🔙</Text>
+          </TouchableOpacity>
+
+          <Swiper
+            style={styles.swiper}
+            // showsButtons={true}
+            autoplay={true}
+            dotColor="#ccc"
+            activeDotColor="#000"
+          >
+            {hotelImages.map((img, index) => (
+              <Image
+                key={index}
+                source={{ uri: img }}
+                style={styles.image}
+                resizeMode="cover"
+              />
+            ))}
+          </Swiper>
+        </View>
 
         <View style={styles.content}>
           <Text style={styles.title}>{selectedHotel?.hotelName}</Text>
@@ -98,7 +115,6 @@ const HotelDetails = () => {
               />
             </MapView>
 
-            
             <Text style={styles.distance}>Điểm đến gần nhất</Text>
             <Text style={styles.distanceItem}>⛳ Lăng Bác - 2.7 km</Text>
             <Text style={styles.distanceItem}>
@@ -112,19 +128,62 @@ const HotelDetails = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", marginBottom: 10},
+  container: { flex: 1, backgroundColor: "#fff", marginBottom: 10 },
+  
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    borderRadius: 50,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    cursor: "pointer",
+  },
+
   swiper: { height: 350 },
+
   image: { width: "100%", height: 350 },
+
   content: { padding: 10 },
+
   title: { fontSize: 24, fontWeight: "bold" },
+  
   subtitle: { fontSize: 16, color: "#555", marginVertical: 5 },
+
   description: { fontSize: 14, color: "#666", marginBottom: 10 },
+
   mapContainer: { marginTop: 10 },
-  mapTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 5 },
-  mapImage: { width: "100%", height: 150, marginBottom: 5 },
-  address: { fontSize: 14, color: "#666" },
-  distance: { fontSize: 16, fontWeight: "bold", marginTop: 10 },
-  distanceItem: { fontSize: 14, color: "#666" },
+
+  mapTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5
+  },
+
+  mapImage: {
+    width: "100%",
+    height: 150,
+    marginBottom: 5,
+  },
+
+  address: {
+    fontSize: 14,
+    color: "#666",
+  },
+
+  distance: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+  },
+
+  distanceItem: {
+    fontSize: 14,
+    color: "#666",
+  },
   map: {
     width: "100%",
     height: 200,

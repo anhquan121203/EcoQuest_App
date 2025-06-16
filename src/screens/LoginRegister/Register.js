@@ -1,24 +1,28 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, StyleSheet } from "react-native";
+import { View, Text, TextInput, Alert, StyleSheet, Modal } from "react-native";
 import { theme } from "../../themes/theme";
 import { CustomButton } from "../../components/Button";
-import { registerUser } from "../../api/apiAuth";
+import { registerUser, verifyUser } from "../../api/apiAuth";
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [verifyModalVisible, setVerifyModalVisible] = useState(false);
+  const [verifyCode, setVerifyCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("Lỗi", "Vui lòng nhập đầy đủ thông tin");
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
+      Alert.alert("Lỗi", "Mật khẩu không khớp");
       return;
     }
 
@@ -33,21 +37,49 @@ export default function RegisterScreen({ navigation }) {
 
     try {
       const response = await registerUser(userData);
-      console.log(userData)
-      if (response.status === 200 || response.status === 201) {
-        Alert.alert("Success", "Registered successfully!", [
-          { text: "OK", onPress: () => navigation.navigate("Verify") },
-        ]);
+      console.log("Register API response:", response);
+    
+      if ((response.status === 200 || response.status === 201) && response.data?.success) {
+        Alert.alert("Đăng ký thành công", "Vui lòng nhập mã xác minh email");
+        setVerifyModalVisible(true);
       } else {
-        Alert.alert("Error", "Registration failed. Please try again.");
+        Alert.alert("Lỗi", response.data?.message || "Đăng ký thất bại");
       }
     } catch (error) {
-      console.error("Register error:", error);
-      const errorMessage =
-        error.response?.data?.message || error.message || "An error occurred.";
-      Alert.alert("Error", errorMessage);
+      console.error("Register error:", error?.message);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || error.message || "Có lỗi xảy ra. Vui lòng thử lại."
+      );
+    }
+  };
+
+  const handleVerify = async () => {
+    if (!verifyCode) {
+      Alert.alert("Lỗi", "Vui lòng nhập mã xác minh");
+      return;
+    }
+
+    setVerifying(true);
+    try {
+      const response = await verifyUser({ email, key: verifyCode });
+
+      if (response.status === 200) {
+        Alert.alert("✅ Thành công", "Tài khoản đã được xác minh", [
+          { text: "Đăng nhập", onPress: () => navigation.navigate("Login") },
+        ]);
+        setVerifyModalVisible(false);
+      } else {
+        Alert.alert("Lỗi", "Mã xác minh không đúng hoặc đã hết hạn.");
+      }
+    } catch (error) {
+      console.error("Verify error:", error);
+      Alert.alert(
+        "Lỗi",
+        error.response?.data?.message || "Có lỗi xảy ra khi xác minh."
+      );
     } finally {
-      setLoading(false);
+      setVerifying(false);
     }
   };
 
@@ -60,7 +92,6 @@ export default function RegisterScreen({ navigation }) {
         value={firstName}
         onChangeText={setFirstName}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Last Name"
@@ -89,6 +120,7 @@ export default function RegisterScreen({ navigation }) {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
+
       <View style={styles.buttonContainer}>
         <CustomButton
           title={loading ? "Đang đăng ký..." : "ĐĂNG KÝ"}
@@ -104,6 +136,35 @@ export default function RegisterScreen({ navigation }) {
           disabled={loading}
         />
       </View>
+
+      {/* Verify Code Modal */}
+      <Modal visible={verifyModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Nhập mã xác minh (6 chữ số)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Mã xác minh"
+              value={verifyCode}
+              onChangeText={setVerifyCode}
+              keyboardType="number-pad"
+              maxLength={6}
+            />
+            <CustomButton
+              title={verifying ? "Đang xác minh..." : "XÁC MINH"}
+              onPress={handleVerify}
+              type="primary"
+              disabled={verifying}
+            />
+            <View style={styles.buttonSpacer} />
+            <CustomButton
+              title="Đóng"
+              onPress={() => setVerifyModalVisible(false)}
+              type="secondary"
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -121,6 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: theme.colors.text,
     marginBottom: theme.spacing.large,
+    textAlign: "center",
   },
   input: {
     width: "100%",
@@ -129,6 +191,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     borderRadius: 5,
     marginBottom: theme.spacing.medium,
+    backgroundColor: "white",
   },
   buttonContainer: {
     width: "100%",
@@ -136,5 +199,18 @@ const styles = StyleSheet.create({
   },
   buttonSpacer: {
     height: theme.spacing.medium,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 24,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
   },
 });
