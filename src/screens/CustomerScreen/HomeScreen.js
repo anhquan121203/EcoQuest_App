@@ -13,18 +13,20 @@ import { useNavigation } from "@react-navigation/native";
 import useHotel from "../../hooks/useHotel";
 import useLocation from "../../hooks/useLocation";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import useDestination from "../../hooks/useDestination";
 
 const HomeScreen = () => {
   const { attractions, loading, error, fetchAttractions } = useAttraction();
   const { addressNow } = useLocation();
-
   const { hotels, fetchHotels } = useHotel();
+  const { destinations, fetchDestinations } = useDestination();
 
   const navigation = useNavigation();
 
   useEffect(() => {
     fetchAttractions();
     fetchHotels();
+    fetchDestinations();
   }, []);
 
   const handleAttractionDetails = (id) => {
@@ -41,7 +43,7 @@ const HomeScreen = () => {
         {/* Vị trí hiện tại */}
         <View style={styles.locationContainer}>
           <Text style={styles.locationText}>
-          <Text style={{ color: "#FF6C00" }}>{addressNow}</Text>
+            <Text style={{ color: "#FF6C00" }}>{addressNow}</Text>
           </Text>
           <TouchableOpacity>
             <Text style={styles.bell}>🔔</Text>
@@ -177,55 +179,36 @@ const HomeScreen = () => {
           )}
         </ScrollView>
 
-        {/* Gợi ý khách sạn */}
+        {/* Gợi ý điểm đến */}
         <View style={styles.tabsContainer}>
           <Text style={styles.sectionTitle}>Khám phá</Text>
           <Text style={styles.seeMore}>Xem thêm</Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.exploreCard}
-          onPress={() => navigation.navigate("AttractionDetails")}
-        >
-          <Image
-            source={require("../../../assets/images/home/mekong.png")}
-            style={styles.exploreImage}
-          />
-          <View style={styles.exploreInfo}>
-            <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
-            <Text style={styles.exploreSubtitle}>
-              Cà Mau · Thiên nhiên · Nắng đẹp
-            </Text>
-            <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
-          </View>
-        </TouchableOpacity>
+        {destinations && destinations?.length > 2 ? (
+          destinations.map((item, index) => {
+            const imageUrl =
+              item.destinationImages?.length > 0
+                ? item.destinationImages[0]
+                : "https://via.placeholder.com/120x100.png?text=No+Image";
 
-        <View style={styles.exploreCard}>
-          <Image
-            source={require("../../../assets/images/home/mekong.png")}
-            style={styles.exploreImage}
-          />
-          <View style={styles.exploreInfo}>
-            <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
-            <Text style={styles.exploreSubtitle}>
-              Cà Mau · Thiên nhiên · Nắng đẹp
-            </Text>
-            <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
-          </View>
-        </View>
-        <View style={styles.exploreCard}>
-          <Image
-            source={require("../../../assets/images/home/mekong.png")}
-            style={styles.exploreImage}
-          />
-          <View style={styles.exploreInfo}>
-            <Text style={styles.exploreTitle}>Chợ nổi Miền Tây</Text>
-            <Text style={styles.exploreSubtitle}>
-              Cà Mau · Thiên nhiên · Nắng đẹp
-            </Text>
-            <Text style={styles.exploreDate}>Từ: 8 tháng 3 - 15 tháng 3</Text>
-          </View>
-        </View>
+            return (
+              <TouchableOpacity style={styles.exploreCard} key={index}>
+                <Image source={{ uri: imageUrl }} style={styles.exploreImage} />
+                <View style={styles.exploreInfo}>
+                  <Text style={styles.exploreTitle}>{item.name}</Text>
+                  <Text style={styles.exploreSubtitle}>
+                    {" "}
+                    {item.description}
+                  </Text>
+                  <Text style={styles.exploreDate}></Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        ) : (
+          <Text>Không có điểm đến nào để hiển thị.</Text>
+        )}
       </ScrollView>
 
       <TouchableOpacity
@@ -233,7 +216,7 @@ const HomeScreen = () => {
         onPress={() => navigation.navigate("ChatbotScreen")}
       >
         <Image
-          source={require("../../../assets/chatbot.png")} // Thay bằng icon của bạn
+          source={require("../../../assets/chatbot.png")}
           style={styles.chatbotIcon}
         />
       </TouchableOpacity>

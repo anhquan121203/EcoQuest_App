@@ -3,11 +3,11 @@ import apiClient from "../../api/apiClient";
 import API from "../../api/apiConfig";
 
 // Async thunks
-export const listDestination = createAsyncThunk(
-  "destination/listDestination",
+export const listTrip = createAsyncThunk(
+  "trip/listTrip",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(API.DESTINATION, {
+      const response = await apiClient.get(API.TRIP, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -20,12 +20,12 @@ export const listDestination = createAsyncThunk(
 );
 
 // get blog by ID
-export const getDestinationById = createAsyncThunk(
-  "destination/getDestinationById",
-  async (destinationId, { rejectWithValue }) => {
+export const getTripById = createAsyncThunk(
+  "trip/getTripById",
+  async (tripId, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(API.DESTINATION_BY_ID, {
-        params: { DestinationId: destinationId },
+      const response = await apiClient.get(API.TRIP_BY_ID, {
+        params: { TripId : tripId },
         headers: {
           "Content-Type": "application/json",
         },
@@ -39,32 +39,32 @@ export const getDestinationById = createAsyncThunk(
 
 
 
-const destinationSlice = createSlice({
-  name: "DESTINATION",
+const tripSlice = createSlice({
+  name: "TRIP",
   initialState: {
-    destinations: [],
-    selectedDestination: [],
+    trips: [],
+    selectedTrip: [],
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(listDestination.pending, (state) => {
+      .addCase(listTrip.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(listDestination.fulfilled, (state, action) => {
+      .addCase(listTrip.fulfilled, (state, action) => {
         state.loading = false;
-        state.destinations = action.payload?.response || [];
+        state.trips = action.payload?.response || [];
       })
-      .addCase(listDestination.rejected, (state, action) => {
+      .addCase(listTrip.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch accounts";
       })
 
-      .addCase(getDestinationById.fulfilled, (state, action) => {
-        state.selectedDestination = action.payload?.response || [];
+      .addCase(getTripById.fulfilled, (state, action) => {
+        state.selectedTrip = action.payload?.response || [];
         state.loading = false;
       })
 
@@ -72,4 +72,4 @@ const destinationSlice = createSlice({
   },
 });
 
-export default destinationSlice;
+export default tripSlice;

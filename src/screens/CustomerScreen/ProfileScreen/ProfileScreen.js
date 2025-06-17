@@ -65,7 +65,7 @@ const ProfileScreen = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.infoItem}>
+        <TouchableOpacity style={styles.infoItem} onPress={() => navigation.navigate("TripHistory")}>
           <Icon name="schedule" size={24} color="#2a9df4" />
           <Text style={styles.infoText}>Lịch trình chuyến đi</Text>
           <Icon

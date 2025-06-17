@@ -19,6 +19,7 @@ import HotelMore from "../screens/CustomerScreen/HotelScreen/HotelMore";
 import ChatbotScreen from "../screens/CustomerScreen/ChatbotScreen/ChatbotScreen";
 import BlogScreen from "../screens/CustomerScreen/BlogScreen/BlogScreen";
 import TripPlannerScreen from "../screens/CustomerScreen/TripPlannerScreen/TripPlannerScreen";
+import TripHistoryScreen from "../screens/CustomerScreen/TripHistoryScreen/TripHistoryScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -82,6 +83,12 @@ function AuthStack() {
         options={{ headerShown: false }}
       />
       
+      <Stack.Screen
+        name="TripHistory"
+        component={TripHistoryScreen}
+        options={{ headerShown: false }}
+      />
+
     </Stack.Navigator>
   );
 }

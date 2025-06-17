@@ -21,14 +21,10 @@ const API = {
   // api destination
   DESTINATION: `${BASE_URL}/api/v1/Ecq200SelectDestinations`,
   DESTINATION_BY_ID: `${BASE_URL}/api/v1/Ecq200SelectDestination`,
-  CREATE_DESTINATION: `${BASE_URL}/api/v1/Ecq200InsertDestination`,
-  UPDATE_DESTINATION: `${BASE_URL}/api/v1/Ecq200UpdateDestination`,
 
   // trip planner
   TRIP: `${BASE_URL}/api/v1/Ecq110SelectTrips`,
   TRIP_BY_ID: `${BASE_URL}/api/v1/Ecq110SelectTrip`,
-  CREATE_TRIP: `${BASE_URL}/api/v1/Ecq110InsertTrip`,
-  UPDATE_TRIP: `${BASE_URL}/api/v1/Ecq110UpdateTrip`,
 };
 
 export default API;
