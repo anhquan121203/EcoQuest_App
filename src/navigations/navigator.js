@@ -19,7 +19,8 @@ import HotelMore from "../screens/CustomerScreen/HotelScreen/HotelMore";
 import ChatbotScreen from "../screens/CustomerScreen/ChatbotScreen/ChatbotScreen";
 import BlogScreen from "../screens/CustomerScreen/BlogScreen/BlogScreen";
 import TripPlannerScreen from "../screens/CustomerScreen/TripPlannerScreen/TripPlannerScreen";
-import TripHistoryScreen from "../screens/CustomerScreen/TripHistoryScreen/TripHistoryScreen";
+import TripHistoryScreen from "../screens/CustomerScreen/TripScreen/TripHistoryScreen";
+import CreateTripScreen from "../screens/CustomerScreen/TripScreen/CreateTripScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,48 +48,6 @@ function AuthStack() {
         component={VerifyModal}
         options={{ presentation: "modal", headerShown: false }}
       />
-      <Stack.Screen
-        name="Home"
-        component={AppTabs}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="AttractionDetails"
-        component={AtractionDetails}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="HotelDetails"
-        component={HotelDetails}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="HotelMore"
-        component={HotelMore}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="ChatbotScreen"
-        component={ChatbotScreen}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="BlogScreen"
-        component={BlogScreen}
-        options={{ headerShown: false }}
-      />
-      
-      <Stack.Screen
-        name="TripHistory"
-        component={TripHistoryScreen}
-        options={{ headerShown: false }}
-      />
-
     </Stack.Navigator>
   );
 }
@@ -115,12 +74,48 @@ function AppTabs() {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
-      <Tab.Screen name="Search" component={HomeScreen} options={{ headerShown: false }}/>
-      <Tab.Screen name="Schedule" component={TripPlannerScreen} options={{ headerShown: false }}/>
-      <Tab.Screen name="Notifications" component={HomeScreen} options={{ headerShown: false }}/>
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Schedule"
+        component={TripPlannerScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Notifications"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
+  );
+}
+
+// Main stack for authenticated users
+function MainAppStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Tabs" component={AppTabs} />
+      <Stack.Screen name="TripHistory" component={TripHistoryScreen} />
+      <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
+      <Stack.Screen name="AttractionDetails" component={AtractionDetails} />
+      <Stack.Screen name="HotelDetails" component={HotelDetails} />
+      <Stack.Screen name="HotelMore" component={HotelMore} />
+      <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
+      <Stack.Screen name="BlogScreen" component={BlogScreen} />
+    </Stack.Navigator>
   );
 }
 
@@ -139,7 +134,7 @@ export default function Navigator() {
   }, []);
   return (
     <NavigationContainer>
-      {isLoggedIn ? <AppTabs /> : <AuthStack />}
+      {isLoggedIn ? <MainAppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }

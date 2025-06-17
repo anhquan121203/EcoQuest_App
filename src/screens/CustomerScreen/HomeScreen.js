@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const { hotels, fetchHotels } = useHotel();
   const { destinations, fetchDestinations } = useDestination();
 
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -145,7 +146,7 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
           style={styles.cardScroll}
         >
-          {hotels && hotels?.length == 3 ? (
+          {hotels && hotels?.length > 0 ? (
             hotels.map((item, index) => {
               const imageUrl =
                 item.hotelImages?.length > 0

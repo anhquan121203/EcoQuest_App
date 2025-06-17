@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
@@ -10,9 +11,19 @@ import {
   ImageBackground,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useDispatch } from "react-redux";
+import { logout } from "../../../feartures/auth/authSlice";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("access_token"); 
+    await AsyncStorage.removeItem("refresh_token");
+    dispatch(logout()); 
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -24,19 +35,19 @@ const ProfileScreen = () => {
         style={styles.header}
         resizeMode="cover"
       > */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.menuIcon}>
-            <Icon name="more-vert" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Image
-            source={{
-              uri: "https://cdn.dribbble.com/userupload/14028171/file/original-3a31127b9b84f9bc5f75737a4720f699.jpg?resize=752x&vertical=center",
-            }} // Replace with your avatar URL
-            style={styles.avatar}
-          />
-          <Text style={styles.name}>Eco Quest</Text>
-          <Text style={styles.phone}>+84 93847263478</Text>
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.menuIcon}>
+          <Icon name="more-vert" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Image
+          source={{
+            uri: "https://cdn.dribbble.com/userupload/14028171/file/original-3a31127b9b84f9bc5f75737a4720f699.jpg?resize=752x&vertical=center",
+          }} // Replace with your avatar URL
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>Eco Quest</Text>
+        <Text style={styles.phone}>+84 93847263478</Text>
+      </View>
       {/* </ImageBackground> */}
 
       {/* Info Section */}
@@ -54,7 +65,10 @@ const ProfileScreen = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.infoItem} onPress={() => navigation.navigate("BlogScreen")}>
+        <TouchableOpacity
+          style={styles.infoItem}
+          onPress={() => navigation.navigate("BlogScreen")}
+        >
           <Icon name="group" size={24} color="#2a9df4" />
           <Text style={styles.infoText}>Cộng đồng du lịch</Text>
           <Icon
@@ -65,7 +79,10 @@ const ProfileScreen = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.infoItem} onPress={() => navigation.navigate("TripHistory")}>
+        <TouchableOpacity
+          style={styles.infoItem}
+          onPress={() => navigation.navigate("TripHistory")}
+        >
           <Icon name="schedule" size={24} color="#2a9df4" />
           <Text style={styles.infoText}>Lịch trình chuyến đi</Text>
           <Icon
@@ -78,7 +95,7 @@ const ProfileScreen = () => {
 
         <TouchableOpacity
           style={styles.infoItem}
-          onPress={() => navigation.navigate("Login")}
+          onPress={() => handleLogout()}
         >
           <Icon name="logout" size={24} color="#2a9df4" />
           <Text style={styles.infoText}>Đăng xuất</Text>
@@ -103,8 +120,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#2a9df4",
     alignItems: "center",
     paddingVertical: 30,
-      // borderBottomLeftRadius: 30,
-      // borderBottomRightRadius: 30,
+    // borderBottomLeftRadius: 30,
+    // borderBottomRightRadius: 30,
     position: "relative",
     height: 350,
     flex: 1,
@@ -151,7 +168,7 @@ const styles = StyleSheet.create({
     color: "#2a9df4",
     marginBottom: 20,
   },
-  
+
   infoItem: {
     backgroundColor: "#fff",
     borderRadius: 12,

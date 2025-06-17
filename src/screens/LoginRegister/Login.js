@@ -19,12 +19,12 @@ export default function LoginScreen({ navigation }) {
     try {
       const response = await loginUser(email, password);
       
-      const accessToken = response.data.access_token;
-      const refreshToken = response.data.refresh_token;
-      if (accessToken && refreshToken) {
-        await AsyncStorage.setItem("access_token", accessToken);
-        await AsyncStorage.setItem("refresh_token", refreshToken);
-        dispatch(login({accessToken, refreshToken}));
+      const access_token = response.data.access_token;
+      const refresh_token = response.data.refresh_token;
+      if (access_token && refresh_token) {
+        await AsyncStorage.setItem("access_token", access_token);
+        await AsyncStorage.setItem("refresh_token", refresh_token);
+        dispatch(login({access_token, refresh_token}));
         Alert.alert(
           "Đăng nhập thành công!",
           `Chào mừng: ${firstName} ${lastName} || "người dùng"}`

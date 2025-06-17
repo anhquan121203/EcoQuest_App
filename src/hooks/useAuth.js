@@ -13,8 +13,8 @@ const useAuth = () => {
    const [isLoading, setIsLoading] = useState(true);
 
   const token =
-    useSelector((state) => state.auth.accessToken) ||
-    AsyncStorage.getItem("accessToken");
+    useSelector((state) => state.auth.access_token) ||
+    AsyncStorage.getItem("access_token");
 
     const fetchUserData = async () => {
       try {

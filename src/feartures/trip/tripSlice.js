@@ -1,14 +1,17 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../../api/apiClient";
 import API from "../../api/apiConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Async thunks
 export const listTrip = createAsyncThunk(
   "trip/listTrip",
   async (_, { rejectWithValue }) => {
     try {
+      const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.get(API.TRIP, {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -24,9 +27,11 @@ export const getTripById = createAsyncThunk(
   "trip/getTripById",
   async (tripId, { rejectWithValue }) => {
     try {
+      const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.get(API.TRIP_BY_ID, {
         params: { TripId : tripId },
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
