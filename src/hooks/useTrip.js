@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTripById, listTrip } from "../feartures/trip/tripSlice";
+import { createTrip, getTripById, listTrip } from "../feartures/trip/tripSlice";
 
 const useTrip = () => {
   const { trips, selectedTrip, loading, error } = useSelector(
@@ -19,7 +19,11 @@ const useTrip = () => {
     dispatch(getTripById(id));
   }
 
-  // console.log(fetchAttractions)
+  // create trip
+  const addNewtrip = async (tripData) => {
+    dispatch(createTrip(tripData));
+    fetchTrips();
+  }
 
   
   return {
@@ -28,7 +32,8 @@ const useTrip = () => {
     loading,
     error,
     fetchTrips,
-    tripById
+    tripById,
+    addNewtrip
   };
 };
 

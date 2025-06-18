@@ -29,7 +29,7 @@ export const getTripById = createAsyncThunk(
     try {
       const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.get(API.TRIP_BY_ID, {
-        params: { TripId : tripId },
+        params: { TripId: tripId },
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -42,7 +42,24 @@ export const getTripById = createAsyncThunk(
   }
 );
 
-
+// create trip
+export const createTrip = createAsyncThunk(
+  "trip/createTrip",
+  async (tripData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(API.CREATE_TRIP, tripData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const tripSlice = createSlice({
   name: "TRIP",
@@ -73,7 +90,10 @@ const tripSlice = createSlice({
         state.loading = false;
       })
 
-    
+      // create trip
+      .addCase(createTrip.fulfilled, (state, action) => {
+        state.trips.push(action.payload)
+      })
   },
 });
 

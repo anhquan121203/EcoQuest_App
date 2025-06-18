@@ -13,11 +13,14 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../feartures/auth/authSlice";
+import useAuth from "../../../hooks/useAuth";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const {firstName, lastName, avatar, email} = useAuth();
 
   const dispatch = useDispatch();
+
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("access_token"); 
@@ -45,8 +48,8 @@ const ProfileScreen = () => {
           }} // Replace with your avatar URL
           style={styles.avatar}
         />
-        <Text style={styles.name}>Eco Quest</Text>
-        <Text style={styles.phone}>+84 93847263478</Text>
+        <Text style={styles.name}>{firstName} {lastName}</Text>
+        <Text style={styles.phone}>{email}</Text>
       </View>
       {/* </ImageBackground> */}
 

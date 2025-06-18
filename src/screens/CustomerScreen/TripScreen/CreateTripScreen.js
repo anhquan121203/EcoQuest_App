@@ -12,6 +12,8 @@ import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
+import useTrip from "../../../hooks/useTrip";
+import { useDispatch } from "react-redux";
 
 export default function CreateTripScreen() {
   const [startDate, setStartDate] = useState("09 March");
@@ -20,6 +22,20 @@ export default function CreateTripScreen() {
   const [interest, setInterest] = useState("");
   const [tripName, setTripName] = useState("");
   const [travelWith, setTravelWith] = useState("Party");
+
+  const {trips, addNewtrip} = useTrip();
+  const dispatch = useDispatch();
+
+  const [selectedTrip, setSelectedTrip] = useState(null);
+
+  const handleCreateTrip = async (tripData) => {
+    try {
+      const result = await dispatch(addNewtrip(tripData));
+      
+    } catch (error) {
+      
+    }
+  }
 
   const navigation = useNavigation();
 

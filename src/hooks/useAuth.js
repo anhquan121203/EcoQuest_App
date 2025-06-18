@@ -27,7 +27,7 @@ const useAuth = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setUser(response.data.data);
+        setUser(response.data.response);
       } catch (error) {
         console.error("Error fetch data user", error);
       }
@@ -39,8 +39,8 @@ const useAuth = () => {
   return {
     userId: user?._id,
     avatar: user?.avartarUrl,
-    firstName: user?.first_name,
-    lastName: user?.last_name,
+    firstName: user?.firstName,
+    lastName: user?.lastName,
     dob: user?.birthDate,
     gender: user?.gender,
     email: user?.email,

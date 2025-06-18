@@ -6,6 +6,9 @@ const API = {
   REGISTER: `${BASE_URL}/api/v1/Ecq010InsertUser`,
   VERIFY: `${BASE_URL}/api/v1/Ecq010InsertUserVerify`,
 
+  // api user
+  USER: `${BASE_URL}/api/v1/Ecq300SelectUser`,
+
   // api home
   ATTRACTION: `${BASE_URL}/api/v1/Ecq100SelectAttractions`,
   ATTRACTION_BY_ID: `${BASE_URL}/api/v1/Ecq100SelectAttraction`,
@@ -25,6 +28,7 @@ const API = {
   // trip planner
   TRIP: `${BASE_URL}/api/v1/Ecq110SelectTrips`,
   TRIP_BY_ID: `${BASE_URL}/api/v1/Ecq110SelectTrip`,
+  CREATE_TRIP: `${BASE_URL}/api/v1/Ecq110InsertTrip`,
 };
 
 export default API;
