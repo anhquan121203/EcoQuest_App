@@ -13,17 +13,19 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import Entypo from "@expo/vector-icons/Entypo";
 import useTrip from "../../../hooks/useTrip";
+import useBlog from "../../../hooks/useBlog";
 import { Picker } from "@react-native-picker/picker";
+import Toast from "react-native-toast-message";
 
 export default function PostBlogScreen() {
   const navigation = useNavigation();
   const { trips, fetchTrips } = useTrip();
+  const { addNewBlog } = useBlog();
 
   const [Title, setTitle] = useState("");
   const [Content, setContent] = useState("");
-  const [BlogImages, setBlogImages] = useState(null);
+  const [BlogImages, setBlogImages] = useState([]); // support multiple images
   const [TripId, setTripId] = useState(null);
 
   useEffect(() => {
@@ -38,46 +40,68 @@ export default function PostBlogScreen() {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
-        Toast.show({
-            type: "infor",
-            text1: "Cho phép truy cập ảnh để tiếp tục.",
-          });
+      Alert.alert("Lỗi", "Bạn cần cho phép truy cập thư viện ảnh.");
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
+      allowsMultipleSelection: true,
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setImage(result.assets[0].uri);
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setBlogImages(result.assets); // store as array
     }
   };
 
-const handlePost = async () => {
+  const handlePost = async () => {
     try {
-        const blogData = {
-            Title,
-            Content,
-            TripId,
-            BlogImages,
-        }
-        const result = await addNewBlog(blogData);
-        if (result.success) {
-            Toast.show({
-                type: "success",
-                text1: "Bài viết đã được đăng.",
-            });
-        }
-        return result;
-    } catch (error) {
-        console.error("handlePost error:", error);
-        return { success: false, error };
-    }
-}
+      const formData = new FormData();
+      formData.append("Title", Title);
+      formData.append("Content", Content);
+      formData.append("TripId", TripId);
 
+      if (BlogImages && BlogImages.length > 0) {
+        BlogImages.forEach((img) => {
+          const filename = img.uri.split("/").pop();
+          const match = /\.(\w+)$/.exec(filename ?? "");
+          const type = match ? `image/${match[1]}` : `image`;
+
+          formData.append("BlogImages", {
+            uri: img.uri,
+            name: filename,
+            type,
+          });
+        });
+      }
+
+      const result = await addNewBlog(formData);
+
+      if (result.success && !result.data?.success) {
+        Toast.show({
+          type: "error",
+          text1: "Lỗi đăng bài viết",
+          text2: result.data?.message || "Vui lòng kiểm tra lại.",
+        });
+        return;
+      }
+
+      if (result.success) {
+        Toast.show({
+          type: "success",
+          text1: "Bài viết đã được đăng.",
+        });
+        navigation.goBack();
+      }
+
+      console.log("🚀 Blog POST result:", result);
+      return result;
+    } catch (error) {
+      console.error("handlePost error:", error);
+      return { success: false, error };
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -111,28 +135,32 @@ const handlePost = async () => {
 
         <Text style={styles.label}>Chọn chuyến đi</Text>
         <Picker
-            selectedValue={TripId}
-            style={styles.inputRow}
-            onValueChange={handleChange}
-          >
-            {trips.map((item) => {
-              return (
-                <Picker.Item
-                  key={item.tripId}
-                  label={item.tripName}
-                  value={item.tripId}
-                />
-              );
-            })}
-          </Picker>
+          selectedValue={TripId}
+          style={styles.inputRow}
+          onValueChange={handleChange}
+        >
+          <Picker.Item label="Chọn chuyến đi" value={null} />
+          {trips.map((item) => (
+            <Picker.Item
+              key={item.tripId}
+              label={item.tripName}
+              value={item.tripId}
+            />
+          ))}
+        </Picker>
 
         <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-          <Text style={styles.imagePickerText}>Chọn ảnh (tùy chọn)</Text>
+          <Text style={styles.imagePickerText}>
+            Chọn ảnh (nhiều ảnh được phép)
+          </Text>
         </TouchableOpacity>
 
-        {BlogImages && <Image source={{ uri: BlogImages }} style={styles.image} />}
+        {BlogImages &&
+          BlogImages.map((img, index) => (
+            <Image key={index} source={{ uri: img.uri }} style={styles.image} />
+          ))}
 
-        <Button title="Đăng bài viết" onPress={handlePost} color="#007BFF" />
+        <Button title="Đăng bài viết" onPress={handlePost} color="#007BFF" style={styles.buttonPost}/>
       </View>
     </ScrollView>
   );
@@ -144,8 +172,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexGrow: 1,
   },
-
-  //   header******************************************
   header: {
     padding: 20,
     justifyContent: "flex-end",
@@ -154,7 +180,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: "center",
   },
-
   backButton: {
     position: "absolute",
     top: 40,
@@ -164,12 +189,9 @@ const styles = StyleSheet.create({
     padding: 5,
     zIndex: 100,
   },
-
-  //   content******************************************
   content: {
     marginTop: 40,
   },
-
   label: {
     fontSize: 16,
     fontWeight: "600",
@@ -202,4 +224,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
+  buttonPost:{
+    marginBottom: 60,
+    padding: 20,
+  }
 });

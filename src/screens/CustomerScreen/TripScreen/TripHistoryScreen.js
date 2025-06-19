@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import Entypo from "@expo/vector-icons/Entypo";import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useTrip from "../../../hooks/useTrip";
-
 
 export default function TripHistoryScreen() {
   const navigation = useNavigation();
@@ -22,7 +22,7 @@ export default function TripHistoryScreen() {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -42,82 +42,89 @@ export default function TripHistoryScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Ongoing Trip */}
-      <Text style={styles.sectionTitle}>Ongoing Trip</Text>
+      <ScrollView style={styles.scrollContent}>
+        {/* Ongoing Trip */}
+        <Text style={styles.sectionTitle}>Ongoing Trip</Text>
 
-      {trips && trips.length > 0 ? (
-        trips.map((item, index) => {
-          return (
-            <View style={styles.tripCard} key={index}>
-              <Image
-                source={{
-                  uri: "https://datviettour.com.vn/uploads/images/chau-a/thai-lan/hinh-danh-thang/850px/phuket-thai-lan.jpg",
-                }}
-                style={styles.tripImage}
-              />
-              <View style={styles.tripInfo}>
-                <Text style={styles.tripTitle}>{item.tripName}</Text>
-                <View style={styles.tripDetails}>
-                  <Ionicons name="location-sharp" size={14} color="#2196F3" />
-                  <Text style={styles.locationText}>Thailand</Text>
-                </View>
-                <Text style={styles.dateText}>{item.startDate} - {item.endDate}</Text>
-                <View style={styles.avatarGroup}>
-                  <Text>{item.totalEstimatedCost}</Text>
+        {trips && trips.length > 0 ? (
+          trips.map((item, index) => {
+            return (
+              <View style={styles.tripCard} key={index}>
+                <Image
+                  source={{
+                    uri: "https://datviettour.com.vn/uploads/images/chau-a/thai-lan/hinh-danh-thang/850px/phuket-thai-lan.jpg",
+                  }}
+                  style={styles.tripImage}
+                />
+                <View style={styles.tripInfo}>
+                  <Text style={styles.tripTitle}>{item.tripName}</Text>
+                  <View style={styles.tripDetails}>
+                    <Ionicons name="location-sharp" size={14} color="#2196F3" />
+                    <Text style={styles.locationText}>Thailand</Text>
+                  </View>
+                  <Text style={styles.dateText}>
+                    {item.startDate} - {item.endDate}
+                  </Text>
+                  <View style={styles.avatarGroup}>
+                    <Text>{item.totalEstimatedCost}</Text>
+                  </View>
                 </View>
               </View>
+            );
+          })
+        ) : (
+          <Text>Không có chuyến đi</Text>
+        )}
+
+        {/* Button */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("CreateTrip")}
+        >
+          <Text style={styles.buttonText}>+ Tạo chuyến đi</Text>
+        </TouchableOpacity>
+
+        {/* Past Trips */}
+        <Text style={styles.sectionPastTrip}>Past Trips</Text>
+        <View style={styles.pastTrips}>
+          {[
+            {
+              title: "Love Tokyo '18",
+              image:
+                "https://cdn.cheapoguides.com/wp-content/uploads/sites/2/2023/09/fuji-cherry-GettyImages-1060517676-1024x600.jpeg",
+              time: "3 months ago",
+            },
+            {
+              title: "London 2018",
+              image:
+                "https://wallpapercat.com/w/full/3/5/f/292593-3840x2160-desktop-4k-london-wallpaper.jpg",
+              time: "6 months ago",
+            },
+            {
+              title: "Santorini 2017",
+              image:
+                "https://plus.unsplash.com/premium_photo-1661964149725-fbf14eabd38c?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2FudG9yaW5pfGVufDB8fDB8fHww",
+              time: "2 years ago",
+            },
+            {
+              title: "Busan",
+              image:
+                "https://wallpapers.com/images/featured/busan-b85vqxi55ve53gk7.jpg",
+              time: "2 years ago",
+            },
+          ].map((trip, index) => (
+            <View style={styles.pastTripCard} key={index}>
+              <Image
+                source={{ uri: trip.image }}
+                style={styles.pastTripImage}
+              />
+              <Text style={styles.pastTripTitle}>{trip.title}</Text>
+              <Text style={styles.pastTripDate}>{trip.time}</Text>
             </View>
-          );
-        })
-      ) : (
-        <Text>Không có chuyến đi</Text>
-      )}
-
-      {/* Button */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("CreateTrip")}
-      >
-        <Text style={styles.buttonText}>+ Tạo chuyến đi</Text>
-      </TouchableOpacity>
-
-      {/* Past Trips */}
-      <Text style={styles.sectionPastTrip}>Past Trips</Text>
-      <View style={styles.pastTrips}>
-        {[
-          {
-            title: "Love Tokyo '18",
-            image:
-              "https://cdn.cheapoguides.com/wp-content/uploads/sites/2/2023/09/fuji-cherry-GettyImages-1060517676-1024x600.jpeg",
-            time: "3 months ago",
-          },
-          {
-            title: "London 2018",
-            image:
-              "https://wallpapercat.com/w/full/3/5/f/292593-3840x2160-desktop-4k-london-wallpaper.jpg",
-            time: "6 months ago",
-          },
-          {
-            title: "Santorini 2017",
-            image:
-              "https://plus.unsplash.com/premium_photo-1661964149725-fbf14eabd38c?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2FudG9yaW5pfGVufDB8fDB8fHww",
-            time: "2 years ago",
-          },
-          {
-            title: "Busan",
-            image:
-              "https://wallpapers.com/images/featured/busan-b85vqxi55ve53gk7.jpg",
-            time: "2 years ago",
-          },
-        ].map((trip, index) => (
-          <View style={styles.pastTripCard} key={index}>
-            <Image source={{ uri: trip.image }} style={styles.pastTripImage} />
-            <Text style={styles.pastTripTitle}>{trip.title}</Text>
-            <Text style={styles.pastTripDate}>{trip.time}</Text>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -173,10 +180,13 @@ const styles = StyleSheet.create({
   },
 
   // content trip******************************************
+  scrollContent: {
+    marginTop: -35,
+    // paddingBottom: 100,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginTop: -10,
     marginHorizontal: 20,
   },
 

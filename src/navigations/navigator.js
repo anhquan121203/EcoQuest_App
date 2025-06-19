@@ -124,6 +124,7 @@ function MainAppStack() {
       <Stack.Screen name="HotelMore" component={HotelMore} />
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <Stack.Screen name="BlogScreen" component={BlogScreen} />
+      <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
   );
 }

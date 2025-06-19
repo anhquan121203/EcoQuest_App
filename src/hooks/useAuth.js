@@ -29,7 +29,9 @@ const useAuth = () => {
         });
         setUser(response.data.response);
       } catch (error) {
-        console.error("Error fetch data user", error);
+        // console.error("Error fetch data user", error);
+      
+
       }
     };
     useEffect(() => {

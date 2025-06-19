@@ -23,8 +23,8 @@ const useBlog = () => {
   const addNewBlog = async (blogData) => {
     try {
       const resultAction = await dispatch(createBlog(blogData));
-  
       const data = await resultAction.payload;
+      fetchBlogs();
       return { success: true, data };
     } catch (error) {
       console.error("addNewtrip error:", error);

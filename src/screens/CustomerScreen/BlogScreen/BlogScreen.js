@@ -25,8 +25,27 @@ export default function BlogScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.titleHeader}>Blogger</Text>
-        <FontAwesome name="pencil-square-o" size={24} color="black" onPress={() => navigation.navigate("PostBlogScreen")}/>
+        <View style={styles.headerTitle}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons
+              name="chevron-back"
+              size={24}
+              color="black"
+              style={styles.iconHeader}
+            />
+          </TouchableOpacity>
+          <Text style={styles.titleHeader}>Blogger</Text>
+        </View>
+
+        <FontAwesome
+          name="pencil-square-o"
+          size={24}
+          color="black"
+          onPress={() => navigation.navigate("PostBlogScreen")}
+        />
       </View>
       {/* Search Box */}
       <View style={styles.searchContainer}>
@@ -63,7 +82,9 @@ export default function BlogScreen() {
 
                 <View style={styles.cardContent}>
                   <Text style={styles.cardTitle}>{item.title}</Text>
-                  <Text style={styles.cardDesc} numberOfLines={4}>{item.content}</Text>
+                  <Text style={styles.cardDesc} numberOfLines={4}>
+                    {item.content}
+                  </Text>
                   <Text style={styles.cardLink}>Xem chi tiết</Text>
                 </View>
               </View>
@@ -93,14 +114,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 10,
+  },
+
+  headerTitle: {
+    flexDirection: "row",
+    alignItems: "center", 
+    justifyContent: "center", 
+    paddingVertical: 10,
+    position: "relative", 
+  },
+  backButton: {
+    position: "absolute", 
+    left: 0,
+    zIndex: 1,
   },
 
   titleHeader: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 16,
+    textAlign: "center",
+    marginLeft: 30,
   },
+
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
