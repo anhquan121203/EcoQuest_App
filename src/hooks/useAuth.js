@@ -39,7 +39,7 @@ const useAuth = () => {
   }, [token]);
   
   return {
-    userId: user?._id,
+    userId: user?.account_id,
     avatar: user?.avartarUrl,
     firstName: user?.firstName,
     lastName: user?.lastName,

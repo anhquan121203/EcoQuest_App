@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import useTrip from "../../../hooks/useTrip";
 import useBlog from "../../../hooks/useBlog";
+import useAuth from "../../../hooks/useAuth";
 import { Picker } from "@react-native-picker/picker";
 import Toast from "react-native-toast-message";
 
@@ -22,6 +23,7 @@ export default function PostBlogScreen() {
   const navigation = useNavigation();
   const { trips, fetchTrips } = useTrip();
   const { addNewBlog } = useBlog();
+  const { userId } = useAuth();
 
   const [Title, setTitle] = useState("");
   const [Content, setContent] = useState("");
@@ -140,13 +142,15 @@ export default function PostBlogScreen() {
           onValueChange={handleChange}
         >
           <Picker.Item label="Chọn chuyến đi" value={null} />
-          {trips.map((item) => (
-            <Picker.Item
-              key={item.tripId}
-              label={item.tripName}
-              value={item.tripId}
-            />
-          ))}
+          {trips
+            .filter((item) => item.status === 3 && item.user_id === userId)
+            .map((item) => (
+              <Picker.Item
+                key={item.tripId}
+                label={item.tripName}
+                value={item.tripId}
+              />
+            ))}
         </Picker>
 
         <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
@@ -160,7 +164,12 @@ export default function PostBlogScreen() {
             <Image key={index} source={{ uri: img.uri }} style={styles.image} />
           ))}
 
-        <Button title="Đăng bài viết" onPress={handlePost} color="#007BFF" style={styles.buttonPost}/>
+        <Button
+          title="Đăng bài viết"
+          onPress={handlePost}
+          color="#007BFF"
+          style={styles.buttonPost}
+        />
       </View>
     </ScrollView>
   );
@@ -224,8 +233,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
-  buttonPost:{
+  buttonPost: {
     marginBottom: 60,
     padding: 20,
-  }
+  },
 });
