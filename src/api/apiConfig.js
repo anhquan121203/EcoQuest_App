@@ -20,6 +20,7 @@ const API = {
   // api blog
   BLOG: `${BASE_URL}/api/v1/Ecq100SelectBlogs`,
   BLOG_BY_ID: `${BASE_URL}/api/v1/Ecq100SelectBlog`,
+  CREATE_BLOG: `${BASE_URL}/api/v1/Ecq100InsertBlog`,
 
   // api destination
   DESTINATION: `${BASE_URL}/api/v1/Ecq200SelectDestinations`,
@@ -29,6 +30,7 @@ const API = {
   TRIP: `${BASE_URL}/api/v1/Ecq110SelectTrips`,
   TRIP_BY_ID: `${BASE_URL}/api/v1/Ecq110SelectTrip`,
   CREATE_TRIP: `${BASE_URL}/api/v1/Ecq110InsertTrip`,
+  CREATE_TRIP_SCHEDULE: `${BASE_URL}/api/v1/Ecq110InsertTripSchedule`,
 };
 
 export default API;

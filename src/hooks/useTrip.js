@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createTrip, getTripById, listTrip } from "../feartures/trip/tripSlice";
+import { createTrip, createTripSchedule, getTripById, listTrip } from "../feartures/trip/tripSlice";
 
 const useTrip = () => {
-  const { trips, selectedTrip, loading, error } = useSelector(
+  const { trips, tripSchedules, selectedTrip, selectedTripSchedule, loading, error } = useSelector(
     (state) => state.trip
   );
   const dispatch = useDispatch();
@@ -20,20 +20,52 @@ const useTrip = () => {
   }
 
   // create trip
+  // const addNewtrip = async (tripData) => {
+  //   dispatch(createTrip(tripData));
+  //   fetchTrips();
+  // }
+
   const addNewtrip = async (tripData) => {
-    dispatch(createTrip(tripData));
-    fetchTrips();
-  }
+    try {
+      const resultAction = await dispatch(createTrip(tripData));
+      fetchTrips();
+  
+      // unwrap kết quả để lấy data từ payload (RTK way)
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("addNewtrip error:", error);
+      return { success: false, error };
+    }
+  };
+
+  // create trip schedule
+  const addNewtripSchedule = async (tripScheduleData) => {
+    try {
+      const resultAction = await dispatch(createTripSchedule(tripScheduleData));
+  
+      // unwrap kết quả để lấy data từ payload (RTK way)
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("addNewtripSchedule error:", error);
+      return { success: false, error };
+    }
+  };
+  
 
   
   return {
     trips,
+    tripSchedules,
+    selectedTripSchedule,
     selectedTrip,
     loading,
     error,
     fetchTrips,
     tripById,
-    addNewtrip
+    addNewtrip,
+    addNewtripSchedule
   };
 };
 

@@ -11,6 +11,7 @@ import {
 import { Ionicons, Feather } from "@expo/vector-icons";
 import useBlog from "../../../hooks/useBlog";
 import { useNavigation } from "@react-navigation/native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function BlogScreen() {
   const { blogs, loading, error, fetchBlogs } = useBlog();
@@ -23,8 +24,10 @@ export default function BlogScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <Text style={styles.header}>Blogger</Text>
-
+      <View style={styles.header}>
+        <Text style={styles.titleHeader}>Blogger</Text>
+        <FontAwesome name="pencil-square-o" size={24} color="black" onPress={() => navigation.navigate("PostBlogScreen")}/>
+      </View>
       {/* Search Box */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#555" />
@@ -59,12 +62,8 @@ export default function BlogScreen() {
                 </View>
 
                 <View style={styles.cardContent}>
-                  <Text style={styles.cardTitle}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.cardDesc}>
-                    {item.content}
-                  </Text>
+                  <Text style={styles.cardTitle}>{item.title}</Text>
+                  <Text style={styles.cardDesc} numberOfLines={4}>{item.content}</Text>
                   <Text style={styles.cardLink}>Xem chi tiết</Text>
                 </View>
               </View>
@@ -89,7 +88,15 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 16,
   },
+
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  titleHeader: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 16,
@@ -168,6 +175,7 @@ const styles = StyleSheet.create({
   cardDesc: {
     fontSize: 14,
     color: "#555",
+    lineHeight: 20,
   },
   cardLink: {
     color: "#FF6600",

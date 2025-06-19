@@ -14,12 +14,17 @@ import useHotel from "../../../hooks/useHotel";
 
 import MapView, { Marker } from "react-native-maps";
 import Swiper from "react-native-swiper";
+import useStreetMap from "../../../hooks/useStreetMap";
 
 const HotelDetails = () => {
   const route = useRoute();
   const { id } = route.params;
   const navigation = useNavigation();
   const { selectedHotel, hotelById, loading, error } = useHotel();
+  const address = selectedHotel?.address;
+  const { coordinates } = useStreetMap(address);
+
+
 
   useEffect(() => {
     if (id) {
@@ -96,24 +101,27 @@ const HotelDetails = () => {
             <Text style={styles.mapName}>{selectedHotel.address}</Text>
 
             <Text style={styles.mapTitle}>Bản đồ</Text>
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: selectedHotel.latitude || 21.0278,
-                longitude: selectedHotel.longitude || 105.8342,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{
-                  latitude: selectedHotel.latitude || 21.0278,
-                  longitude: selectedHotel.longitude || 105.8342,
+
+            {coordinates ? (
+              <MapView
+                style={styles.map}
+                initialRegion={{
+                  ...coordinates,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
-                title={selectedHotel.hotelName}
-                description={selectedHotel.address}
-              />
-            </MapView>
+              >
+                <Marker
+                  coordinate={coordinates}
+                  title={selectedHotel.hotelName}
+                  description={selectedHotel.address}
+                />
+              </MapView>
+            ) : (
+              <Text style={{ color: "#999", fontStyle: "italic" }}>
+                Không thể hiển thị bản đồ.
+              </Text>
+            )}
 
             <Text style={styles.distance}>Điểm đến gần nhất</Text>
             <Text style={styles.distanceItem}>⛳ Lăng Bác - 2.7 km</Text>
@@ -129,14 +137,14 @@ const HotelDetails = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", marginBottom: 10 },
-  
+
   // header
   backButton: {
     position: "absolute",
     top: 40,
     left: 20,
     zIndex: 100,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 50,
     padding: 10,
     shadowColor: "#000",
@@ -151,7 +159,7 @@ const styles = StyleSheet.create({
   content: { padding: 10 },
 
   title: { fontSize: 24, fontWeight: "bold" },
-  
+
   subtitle: { fontSize: 16, color: "#555", marginVertical: 5 },
 
   description: { fontSize: 14, color: "#666", marginBottom: 10 },
@@ -161,7 +169,7 @@ const styles = StyleSheet.create({
   mapTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5
+    marginBottom: 5,
   },
 
   mapImage: {

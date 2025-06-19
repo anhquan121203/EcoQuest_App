@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -14,30 +15,112 @@ import { useNavigation } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
 import useTrip from "../../../hooks/useTrip";
 import { useDispatch } from "react-redux";
+import useDestination from "../../../hooks/useDestination";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import EvilIcons from "@expo/vector-icons/EvilIcons";
+import { Picker } from "@react-native-picker/picker";
+import Toast from "react-native-toast-message";
 
 export default function CreateTripScreen() {
-  const [startDate, setStartDate] = useState("09 March");
-  const [endDate, setEndDate] = useState("11 March");
-  const [budget, setBudget] = useState("");
-  const [interest, setInterest] = useState("");
   const [tripName, setTripName] = useState("");
-  const [travelWith, setTravelWith] = useState("Party");
+  const [numberOfPeople, setNumberOfPeople] = useState(0);
+  const [totalEstimatedCost, setTotalEstimatedCost] = useState(0);
+  const [description, setDescription] = useState("");
+  const [startingPointAddress, setStartingPointAddress] = useState("");
+  const [destinationId, setDestinationId] = useState("");
+  const [note, setNote] = useState("");
 
-  const {trips, addNewtrip} = useTrip();
+  const [startDate, setStartDate] = useState("2025-06-18");
+  const [endDate, setEndDate] = useState("2025-06-20");
+  const [rawStartDate, setRawStartDate] = useState(new Date());
+  const [rawEndDate, setRawEndDate] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  const handleChange = (value) => {
+    setDestinationId(value);
+  };
+
+  const { addNewtrip } = useTrip();
+  const { destinations, fetchDestinations } = useDestination();
   const dispatch = useDispatch();
-
-  const [selectedTrip, setSelectedTrip] = useState(null);
-
-  const handleCreateTrip = async (tripData) => {
-    try {
-      const result = await dispatch(addNewtrip(tripData));
-      
-    } catch (error) {
-      
-    }
-  }
-
   const navigation = useNavigation();
+
+  useEffect(() => {
+    fetchDestinations();
+  }, []);
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const onStartDateChange = (event, selectedDate) => {
+    setShowStartPicker(false);
+    if (selectedDate) {
+      setRawStartDate(selectedDate);
+      setStartDate(formatDate(selectedDate));
+    }
+  };
+
+  const onEndDateChange = (event, selectedDate) => {
+    setShowEndPicker(false);
+    if (selectedDate) {
+      setRawEndDate(selectedDate);
+      setEndDate(formatDate(selectedDate));
+    }
+  };
+
+  const handleCreateTrip = async () => {
+    const tripData = {
+      tripName,
+      startDate,
+      endDate,
+      numberOfPeople: Number(numberOfPeople),
+      totalEstimatedCost: Number(totalEstimatedCost),
+      description,
+      startingPointAddress,
+      destinations: [
+        {
+          destinationId,
+          note,
+        },
+      ],
+    };
+
+    try {
+      const result = await addNewtrip(tripData);
+      if (result.success) {
+        Toast.show({
+          type: "success",
+          text1: "🎉 Tạo chuyến đi thành công!",
+          text2: "Chuyến đi của bạn đã được lưu.",
+        });
+
+        navigation.goBack();
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "❌ Tạo chuyến đi thất bại!",
+          text2: "Vui lòng kiểm tra lại thông tin.",
+        });
+
+        console.error("Failed to create trip:", result);
+      }
+
+      return result;
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "😢 Có lỗi xảy ra!",
+        text2: "Vui lòng thử lại sau.",
+      });
+
+      console.error("Error creating trip:", error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -63,10 +146,10 @@ export default function CreateTripScreen() {
         </ImageBackground>
       </View>
 
-      {/* Content ****************************************************/}
+      {/* Thông tin chuyến đi */}
       <View style={styles.form}>
-        {/* Date */}
         <Text style={styles.contentTitle}>Thông tin chuyến đi 🗓️</Text>
+
         <View style={styles.inputRow}>
           <Ionicons
             name="calendar"
@@ -74,12 +157,43 @@ export default function CreateTripScreen() {
             color="#888"
             style={styles.icon}
           />
-          <Text style={styles.dateText}>
-            {startDate} - {endDate}
-          </Text>
+          <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+            <Text style={styles.dateText}>Bắt đầu: {startDate} - </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowEndPicker(true)}
+            style={{ marginLeft: 10 }}
+          >
+            <Text style={styles.dateText}>{endDate}</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Budget */}
+        <View style={styles.inputRow}>
+          <MaterialIcons
+            name="travel-explore"
+            size={20}
+            color="#888"
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Tên chuyến đi"
+            value={tripName}
+            onChangeText={setTripName}
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.inputRow}>
+          <Ionicons name="people" size={20} color="#888" style={styles.icon} />
+          <TextInput
+            placeholder="Số lượng người"
+            value={numberOfPeople}
+            onChangeText={setNumberOfPeople}
+            style={styles.input}
+            keyboardType="numeric"
+          />
+        </View>
+
         <View style={styles.inputRow}>
           <FontAwesome
             name="money"
@@ -88,89 +202,114 @@ export default function CreateTripScreen() {
             style={styles.icon}
           />
           <TextInput
-            placeholder="Budget per day per person"
-            value={budget}
-            onChangeText={setBudget}
+            placeholder="Số tiền dự kiến"
+            value={totalEstimatedCost}
+            onChangeText={setTotalEstimatedCost}
             style={styles.input}
             keyboardType="numeric"
           />
         </View>
 
-        {/* Interest */}
         <View style={styles.inputRow}>
-          <Feather name="heart" size={20} color="#888" style={styles.icon} />
+          <MaterialIcons
+            name="description"
+            size={20}
+            color="#888"
+            style={styles.icon}
+          />
           <TextInput
-            placeholder="Choose your interest"
-            value={interest}
-            onChangeText={setInterest}
+            placeholder="Mô tả chuyến đi"
+            value={description}
+            onChangeText={setDescription}
             style={styles.input}
           />
         </View>
 
-        {/* Trip Name */}
-        <TextInput
-          placeholder="Trip Name"
-          value={tripName}
-          onChangeText={setTripName}
-          style={[styles.input, { marginLeft: 40 }]}
-        />
-
-        {/* Travel With */}
-        <Text style={styles.label}>Travel with?</Text>
-        <View style={styles.toggleGroup}>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              travelWith === "Solo" && styles.activeToggle,
-            ]}
-            onPress={() => setTravelWith("Solo")}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                travelWith === "Solo" && styles.activeToggleText,
-              ]}
-            >
-              Solo
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              travelWith === "Party" && styles.activeToggle,
-            ]}
-            onPress={() => setTravelWith("Party")}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                travelWith === "Party" && styles.activeToggleText,
-              ]}
-            >
-              Party
-            </Text>
-          </TouchableOpacity>
+        <View style={styles.inputRow}>
+          <EvilIcons
+            name="location"
+            size={20}
+            color="#888"
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Điểm khởi hành"
+            value={startingPointAddress}
+            onChangeText={setStartingPointAddress}
+            style={styles.input}
+          />
         </View>
 
-        {/* Start Button */}
-        <TouchableOpacity style={styles.startButton}>
+        <View>
+          <Text style={styles.label}>Chọn điểm đến:</Text>
+          <Picker
+            selectedValue={destinationId}
+            style={styles.inputRow}
+            onValueChange={handleChange}
+          >
+            {destinations.map((item) => {
+              return (
+                <Picker.Item
+                  key={item.destinationId}
+                  label={item.name}
+                  value={item.destinationId}
+                />
+              );
+            })}
+          </Picker>
+        </View>
+
+        <View style={styles.inputRow}>
+          <MaterialIcons
+            name="description"
+            size={20}
+            color="#888"
+            style={styles.icon}
+          />
+          <TextInput
+            placeholder="Lưu ý"
+            value={note}
+            onChangeText={setNote}
+            style={styles.input}
+          />
+        </View>
+
+        <Text style={styles.label}>Travel with?</Text>
+
+        <TouchableOpacity style={styles.startButton} onPress={handleCreateTrip}>
           <Text style={styles.startButtonText}>START MY TRIP</Text>
         </TouchableOpacity>
       </View>
+
+      {showStartPicker && (
+        <DateTimePicker
+          value={rawStartDate}
+          mode="date"
+          display="default"
+          onChange={onStartDateChange}
+        />
+      )}
+
+      {showEndPicker && (
+        <DateTimePicker
+          value={rawEndDate}
+          mode="date"
+          display="default"
+          onChange={onEndDateChange}
+        />
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
-
   headerImage: {
     height: 250,
     padding: 20,
     justifyContent: "flex-end",
     position: "relative",
   },
-
   backButton: {
     position: "absolute",
     top: 40,
@@ -180,7 +319,6 @@ const styles = StyleSheet.create({
     padding: 5,
     zIndex: 100,
   },
-
   settingButton: {
     position: "absolute",
     top: 40,
@@ -190,38 +328,15 @@ const styles = StyleSheet.create({
     padding: 5,
     zIndex: 100,
   },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    position: "absolute",
-    top: 50,
-    alignSelf: "center",
-  },
-  subText: {
-    color: "#fff",
-    fontSize: 14,
-    opacity: 0.8,
-  },
-  destination: {
-    color: "#fff",
-    fontSize: 26,
-    fontWeight: "bold",
-  },
-
-  // content******************************************
   contentTitle: {
     fontSize: 18,
     fontWeight: "600",
     marginTop: 10,
-    // marginHorizontal: 20,
   },
-
   form: {
     padding: 20,
     gap: 15,
   },
-
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -273,14 +388,26 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   startButton: {
-    backgroundColor: "#E0E0E0",
+    backgroundColor: "#1976D2",
     paddingVertical: 16,
     borderRadius: 12,
     marginTop: 20,
+    marginBottom: 20,
     alignItems: "center",
   },
   startButtonText: {
-    color: "#999",
+    color: "#fff",
     fontWeight: "bold",
+  },
+
+  label: {
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  picker: {
+    height: 50,
+    width: 200,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 });

@@ -37,6 +37,25 @@ export const getBlogById = createAsyncThunk(
   }
 );
 
+// create blog
+export const createBlog = createAsyncThunk(
+  "blog/createBlog",
+  async (blogData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(API.CREATE_BLOG, blogData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const blogSlice = createSlice({
   name: "BLOG",
   initialState: {
@@ -64,6 +83,10 @@ const blogSlice = createSlice({
       .addCase(getBlogById.fulfilled, (state, action) => {
         state.selectedBlog = action.payload?.response || [];
         state.loading = false;
+      })
+
+      .addCase(createBlog.fulfilled, (state, action) => {
+        state.blogs.push(action.payload);
       });
   },
 });

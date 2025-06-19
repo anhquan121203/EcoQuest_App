@@ -10,7 +10,6 @@ import WelcomeScreen from "../screens/LoginRegister/Welcome";
 import LoginScreen from "../screens/LoginRegister/Login";
 import HomeScreen from "../screens/CustomerScreen/HomeScreen";
 import RegisterScreen from "../screens/LoginRegister/Register";
-import VerifyByLinkScreen from "../screens/LoginRegister/VerifyScreen";
 import VerifyModal from "../screens/LoginRegister/VerifyScreen";
 import AtractionDetails from "../screens/CustomerScreen/AttractionScreen/AtractionDetails";
 import ProfileScreen from "../screens/CustomerScreen/ProfileScreen/ProfileScreen";
@@ -18,9 +17,10 @@ import HotelDetails from "../screens/CustomerScreen/HotelScreen/HotelDetails";
 import HotelMore from "../screens/CustomerScreen/HotelScreen/HotelMore";
 import ChatbotScreen from "../screens/CustomerScreen/ChatbotScreen/ChatbotScreen";
 import BlogScreen from "../screens/CustomerScreen/BlogScreen/BlogScreen";
-import TripPlannerScreen from "../screens/CustomerScreen/TripPlannerScreen/TripPlannerScreen";
 import TripHistoryScreen from "../screens/CustomerScreen/TripScreen/TripHistoryScreen";
 import CreateTripScreen from "../screens/CustomerScreen/TripScreen/CreateTripScreen";
+import TripScheduleScreen from "../screens/CustomerScreen/TripScheduleScreen/TripScheduleScreen";
+import PostBlogScreen from "../screens/CustomerScreen/BlogScreen/PostBlogScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,6 +48,15 @@ function AuthStack() {
         component={VerifyModal}
         options={{ presentation: "modal", headerShown: false }}
       />
+      <Stack.Screen name="Home" component={AppTabs} options={{ headerShown: false }}/>
+      <Stack.Screen name="TripHistory" component={TripHistoryScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="CreateTrip" component={CreateTripScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="AttractionDetails" component={AtractionDetails} options={{ headerShown: false }}/>
+      <Stack.Screen name="HotelDetails" component={HotelDetails} options={{ headerShown: false }}/>
+      <Stack.Screen name="HotelMore" component={HotelMore} options={{ headerShown: false }}/>
+      <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="BlogScreen" component={BlogScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
   );
 }
@@ -85,8 +94,8 @@ function AppTabs() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="Schedule"
-        component={TripPlannerScreen}
+        name="TripScheduleScreen"
+        component={TripScheduleScreen}
         options={{ headerShown: false }}
       />
       <Tab.Screen

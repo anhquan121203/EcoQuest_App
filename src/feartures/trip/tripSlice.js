@@ -61,11 +61,32 @@ export const createTrip = createAsyncThunk(
   }
 );
 
+// create trip schedule
+export const createTripSchedule = createAsyncThunk(
+  "trip/createTripSchedule",
+  async (tripScheduleData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(API.CREATE_TRIP_SCHEDULE, tripScheduleData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const tripSlice = createSlice({
   name: "TRIP",
   initialState: {
     trips: [],
+    tripSchedules: [],
     selectedTrip: [],
+    selectedTripSchedule: [],
     loading: false,
     error: null,
   },
@@ -92,8 +113,13 @@ const tripSlice = createSlice({
 
       // create trip
       .addCase(createTrip.fulfilled, (state, action) => {
-        state.trips.push(action.payload)
+        state.trips.push(action.payload);
       })
+
+      // create trip schedule
+      .addCase(createTripSchedule.fulfilled, (state, action) => {
+        state.tripSchedules.push(action.payload);
+      });
   },
 });
 

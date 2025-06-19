@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getBlogById, listBlog } from "../feartures/blog/blogSlice";
+import { createBlog, getBlogById, listBlog } from "../feartures/blog/blogSlice";
 
 const useBlog = () => {
   const { blogs, selectedBlog, loading, error } = useSelector(
@@ -19,7 +19,18 @@ const useBlog = () => {
     dispatch(getBlogById(id));
   }
 
-  // console.log(fetchAttractions)
+  // create blog
+  const addNewBlog = async (blogData) => {
+    try {
+      const resultAction = await dispatch(createBlog(blogData));
+  
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("addNewtrip error:", error);
+      return { success: false, error };
+    }
+  };
 
   
   return {
@@ -28,7 +39,8 @@ const useBlog = () => {
     loading,
     error,
     fetchBlogs ,
-    blogById
+    blogById,
+    addNewBlog
   };
 };
 

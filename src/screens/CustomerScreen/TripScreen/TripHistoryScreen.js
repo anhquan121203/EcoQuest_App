@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import Entypo from "@expo/vector-icons/Entypo";import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useTrip from "../../../hooks/useTrip";
-import Entypo from "@expo/vector-icons/Entypo";
+
 
 export default function TripHistoryScreen() {
   const navigation = useNavigation();
