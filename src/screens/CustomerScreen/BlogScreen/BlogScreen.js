@@ -21,6 +21,10 @@ export default function BlogScreen() {
     fetchBlogs();
   }, []);
 
+  const handleBlogDetail = (id) => {
+    navigation.navigate("BlogDetail", {id})
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -73,7 +77,7 @@ export default function BlogScreen() {
                 : "https://www.elegantthemes.com/blog/wp-content/uploads/2020/02/000-404.png";
 
             return (
-              <View style={styles.card} key={index}>
+              <View style={styles.card} key={index} >
                 <Image source={{ uri: imageUrl }} style={styles.cardImage} />
 
                 <View style={styles.durationTag}>
@@ -85,7 +89,7 @@ export default function BlogScreen() {
                   <Text style={styles.cardDesc} numberOfLines={4}>
                     {item.content}
                   </Text>
-                  <Text style={styles.cardLink}>Xem chi tiết</Text>
+                  <Text style={styles.cardLink} onPress={() => handleBlogDetail(item.blogId)}>Xem chi tiết</Text>
                 </View>
               </View>
             );

@@ -1,5 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, TextInput, StyleSheet, Alert, Button, Touchable } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  Button,
+  Touchable,
+} from "react-native";
 import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "../../themes/theme";
@@ -7,6 +15,7 @@ import { CustomButton } from "../../components/Button";
 import { login } from "../../feartures/auth/authSlice";
 import { loginUser } from "../../api/apiAuth";
 import useAuth from "../../hooks/useAuth";
+import Toast from "react-native-toast-message";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -18,17 +27,17 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     try {
       const response = await loginUser(email, password);
-      
+
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
       if (access_token && refresh_token) {
         await AsyncStorage.setItem("access_token", access_token);
         await AsyncStorage.setItem("refresh_token", refresh_token);
-        dispatch(login({access_token, refresh_token}));
-        Alert.alert(
-          "Đăng nhập thành công!",
-          `Chào mừng: ${firstName} ${lastName} || "người dùng"}`
-        );
+        dispatch(login({ access_token, refresh_token }));
+        Toast.show({
+          type: "success",
+          text1: "🎉 Đăng nhập thành công!",
+        });
         navigation.navigate("Home");
       } else {
         Alert.alert("Đăng nhập thất bại", "Vui lòng kiểm tra lại thông tin");
@@ -85,7 +94,10 @@ export default function LoginScreen({ navigation }) {
       </View>
 
       <View style={styles.registerContainer}>
-        <Button title="Trang chủ" onPress={() => navigation.navigate("Home")}></Button>
+        <Button
+          title="Trang chủ"
+          onPress={() => navigation.navigate("Home")}
+        ></Button>
       </View>
     </View>
   );

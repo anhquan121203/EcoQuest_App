@@ -80,6 +80,26 @@ export const createTripSchedule = createAsyncThunk(
   }
 );
 
+// get trip schedule by trip id
+export const getTripScheduleByTripId = createAsyncThunk(
+  "trip/getTripScheduleByTripId",
+  async (tripId , { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.get(API.GET_TRIP_SCHEDULE_BY_TRIPID, {
+        params: { TripId: tripId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const tripSlice = createSlice({
   name: "TRIP",
   initialState: {
@@ -119,7 +139,12 @@ const tripSlice = createSlice({
       // create trip schedule
       .addCase(createTripSchedule.fulfilled, (state, action) => {
         state.tripSchedules.push(action.payload);
-      });
+      })
+
+      .addCase(getTripScheduleByTripId.fulfilled, (state, action) => {
+        state.selectedTripSchedule = action.payload?.response || [];
+        state.loading = false;
+      })
   },
 });
 

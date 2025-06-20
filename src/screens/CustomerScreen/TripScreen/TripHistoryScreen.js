@@ -21,6 +21,10 @@ export default function TripHistoryScreen() {
     fetchTrips();
   }, []);
 
+  const handleTripDetail = (id) => {
+    navigation.navigate("TripDetail", {id})
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -49,27 +53,35 @@ export default function TripHistoryScreen() {
         {trips && trips.length > 0 ? (
           trips.map((item, index) => {
             return (
-              <View style={styles.tripCard} key={index}>
-                <Image
-                  source={{
-                    uri: "https://datviettour.com.vn/uploads/images/chau-a/thai-lan/hinh-danh-thang/850px/phuket-thai-lan.jpg",
-                  }}
-                  style={styles.tripImage}
-                />
-                <View style={styles.tripInfo}>
-                  <Text style={styles.tripTitle}>{item.tripName}</Text>
-                  <View style={styles.tripDetails}>
-                    <Ionicons name="location-sharp" size={14} color="#2196F3" />
-                    <Text style={styles.locationText}>Thailand</Text>
-                  </View>
-                  <Text style={styles.dateText}>
-                    {item.startDate} - {item.endDate}
-                  </Text>
-                  <View style={styles.avatarGroup}>
-                    <Text>{item.totalEstimatedCost}</Text>
+              <TouchableOpacity
+                onPress={() => handleTripDetail(item.tripId)}
+              >
+                <View style={styles.tripCard} key={index}>
+                  <Image
+                    source={{
+                      uri: "https://datviettour.com.vn/uploads/images/chau-a/thai-lan/hinh-danh-thang/850px/phuket-thai-lan.jpg",
+                    }}
+                    style={styles.tripImage}
+                  />
+                  <View style={styles.tripInfo}>
+                    <Text style={styles.tripTitle}>{item.tripName}</Text>
+                    <View style={styles.tripDetails}>
+                      <Ionicons
+                        name="location-sharp"
+                        size={14}
+                        color="#2196F3"
+                      />
+                      <Text style={styles.locationText}>Thailand</Text>
+                    </View>
+                    <Text style={styles.dateText}>
+                      {item.startDate} - {item.endDate}
+                    </Text>
+                    <View style={styles.avatarGroup}>
+                      <Text>{item.totalEstimatedCost}</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })
         ) : (
@@ -142,7 +154,7 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: "absolute",
-    top: 40,
+    top: 50,
     left: 20,
     backgroundColor: "rgba(0, 0, 0 , 0.3)",
     borderRadius: 50,
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
   },
   settingButton: {
     position: "absolute",
-    top: 40,
+    top: 50,
     right: 20,
   },
 

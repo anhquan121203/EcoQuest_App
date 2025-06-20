@@ -1,23 +1,31 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createTrip, createTripSchedule, getTripById, listTrip } from "../feartures/trip/tripSlice";
+import {
+  createTrip,
+  createTripSchedule,
+  getTripById,
+  getTripScheduleByTripId,
+  listTrip,
+} from "../feartures/trip/tripSlice";
 
 const useTrip = () => {
-  const { trips, tripSchedules, selectedTrip, selectedTripSchedule, loading, error } = useSelector(
-    (state) => state.trip
-  );
+  const {
+    trips,
+    tripSchedules,
+    selectedTrip,
+    selectedTripSchedule,
+    loading,
+    error,
+  } = useSelector((state) => state.trip);
   const dispatch = useDispatch();
 
-  const fetchTrips = useCallback(
-    () => {
-      dispatch(listTrip());
-    },
-    [dispatch]
-  );
+  const fetchTrips = useCallback(() => {
+    dispatch(listTrip());
+  }, [dispatch]);
 
   const tripById = async (id) => {
     dispatch(getTripById(id));
-  }
+  };
 
   // create trip
   // const addNewtrip = async (tripData) => {
@@ -29,7 +37,7 @@ const useTrip = () => {
     try {
       const resultAction = await dispatch(createTrip(tripData));
       fetchTrips();
-  
+
       // unwrap kết quả để lấy data từ payload (RTK way)
       const data = await resultAction.payload;
       return { success: true, data };
@@ -43,7 +51,7 @@ const useTrip = () => {
   const addNewtripSchedule = async (tripScheduleData) => {
     try {
       const resultAction = await dispatch(createTripSchedule(tripScheduleData));
-  
+
       // unwrap kết quả để lấy data từ payload (RTK way)
       const data = await resultAction.payload;
       return { success: true, data };
@@ -52,9 +60,11 @@ const useTrip = () => {
       return { success: false, error };
     }
   };
-  
 
-  
+  const tripScheduleByTripId = async (id) => {
+    dispatch(getTripScheduleByTripId(id));
+  };
+
   return {
     trips,
     tripSchedules,
@@ -65,7 +75,8 @@ const useTrip = () => {
     fetchTrips,
     tripById,
     addNewtrip,
-    addNewtripSchedule
+    addNewtripSchedule,
+    tripScheduleByTripId,
   };
 };
 

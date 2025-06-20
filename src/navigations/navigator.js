@@ -21,6 +21,8 @@ import TripHistoryScreen from "../screens/CustomerScreen/TripScreen/TripHistoryS
 import CreateTripScreen from "../screens/CustomerScreen/TripScreen/CreateTripScreen";
 import TripScheduleScreen from "../screens/CustomerScreen/TripScheduleScreen/TripScheduleScreen";
 import PostBlogScreen from "../screens/CustomerScreen/BlogScreen/PostBlogScreen";
+import BlogDetailScreen from "../screens/CustomerScreen/BlogScreen/BlogDetailScreen";
+import TripDetailScreen from "../screens/CustomerScreen/TripScreen/TripDetailScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,15 +50,61 @@ function AuthStack() {
         component={VerifyModal}
         options={{ presentation: "modal", headerShown: false }}
       />
-      <Stack.Screen name="Home" component={AppTabs} options={{ headerShown: false }}/>
-      <Stack.Screen name="TripHistory" component={TripHistoryScreen} options={{ headerShown: false }}/>
-      <Stack.Screen name="CreateTrip" component={CreateTripScreen} options={{ headerShown: false }}/>
-      <Stack.Screen name="AttractionDetails" component={AtractionDetails} options={{ headerShown: false }}/>
-      <Stack.Screen name="HotelDetails" component={HotelDetails} options={{ headerShown: false }}/>
-      <Stack.Screen name="HotelMore" component={HotelMore} options={{ headerShown: false }}/>
-      <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} options={{ headerShown: false }}/>
-      <Stack.Screen name="BlogScreen" component={BlogScreen} options={{ headerShown: false }}/>
-      <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} options={{ headerShown: false }}/>
+      <Stack.Screen
+        name="Home"
+        component={AppTabs}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TripHistory"
+        component={TripHistoryScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreateTrip"
+        component={CreateTripScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AttractionDetails"
+        component={AtractionDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="HotelDetails"
+        component={HotelDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="HotelMore"
+        component={HotelMore}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ChatbotScreen"
+        component={ChatbotScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BlogScreen"
+        component={BlogScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PostBlogScreen"
+        component={PostBlogScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BlogDetail"
+        component={BlogDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TripDetail"
+        component={TripDetailScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -124,7 +172,9 @@ function MainAppStack() {
       <Stack.Screen name="HotelMore" component={HotelMore} />
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <Stack.Screen name="BlogScreen" component={BlogScreen} />
-      <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} />
+      <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
+      <Stack.Screen name="TripDetail" component={TripDetailScreen} />
     </Stack.Navigator>
   );
 }
