@@ -8,9 +8,9 @@ import {
   Button,
 } from "react-native";
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import TripScheduleModal from "./TripScheduleModal";
 import useTrip from "../../../hooks/useTrip";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import TripScheduleDetailModal from "./TripScheduleDetailModal";
 
 const trip = {
   tripName: "Tour miền Tây sông nước",
@@ -28,6 +28,7 @@ export default function TripDetailScreen() {
   const route = useRoute();
   const { id } = route.params;
   const { selectedTrip, tripById } = useTrip();
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (id) {
@@ -94,18 +95,24 @@ export default function TripDetailScreen() {
             <MaterialIcons name="attach-money" size={24} color="#00b894" />
             <Text style={styles.cardLabel}>Chi phí</Text>
             <Text style={styles.cardValue}>
-              {selectedTrip.totalEstimatedCost.toLocaleString()}đ
+              {selectedTrip.totalEstimatedCost}đ
             </Text>
           </View>
         </View>
       </View>
 
       {/* Trip schedule */}
-      <TripScheduleModal
+      <TripScheduleDetailModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+        id={selectedTrip.tripId}
       />
       <Button title="Xem lịch trình" onPress={() => setModalVisible(true)} />
+
+      <Button
+        title="Tạo lịch trình"
+        onPress={() => navigation.navigate("TripSchedule", { id: selectedTrip.tripId })}
+      />
     </ScrollView>
   );
 }
@@ -118,7 +125,7 @@ const styles = StyleSheet.create({
     height: 270,
     justifyContent: "flex-end",
     padding: 20,
-  },
+  },  
   overlay: {
     backgroundColor: "rgba(0,0,0,0.3)",
     borderRadius: 10,

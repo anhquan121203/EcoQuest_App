@@ -14,7 +14,7 @@ import { Button } from "react-native-paper";
 
 const dateFormat = "YYYY/MM/DD";
 
-export default function TripScheduleScreen() {
+export default function TripScheduleAiScreen() {
   const [location, setLocation] = useState("");
   const [dates, setDates] = useState("");
   const [groupSize, setGroupSize] = useState("");

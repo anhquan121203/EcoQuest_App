@@ -19,10 +19,12 @@ import ChatbotScreen from "../screens/CustomerScreen/ChatbotScreen/ChatbotScreen
 import BlogScreen from "../screens/CustomerScreen/BlogScreen/BlogScreen";
 import TripHistoryScreen from "../screens/CustomerScreen/TripScreen/TripHistoryScreen";
 import CreateTripScreen from "../screens/CustomerScreen/TripScreen/CreateTripScreen";
-import TripScheduleScreen from "../screens/CustomerScreen/TripScheduleScreen/TripScheduleScreen";
 import PostBlogScreen from "../screens/CustomerScreen/BlogScreen/PostBlogScreen";
 import BlogDetailScreen from "../screens/CustomerScreen/BlogScreen/BlogDetailScreen";
 import TripDetailScreen from "../screens/CustomerScreen/TripScreen/TripDetailScreen";
+import CreateTripScheduleScreen from "../screens/CustomerScreen/TripScreen/CreateTripScheduleScreen";
+import TripScheduleAiScreen from "../screens/CustomerScreen/TripScheduleScreen/TripScheduleAiScreen";
+import TripScheduleScreen from "../screens/CustomerScreen/TripScreen/TripScheduleScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -105,6 +107,16 @@ function AuthStack() {
         component={TripDetailScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="CreateTripSchedule"
+        component={CreateTripScheduleScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TripSchedule"
+        component={TripScheduleScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -142,8 +154,8 @@ function AppTabs() {
         options={{ headerShown: false }}
       />
       <Tab.Screen
-        name="TripScheduleScreen"
-        component={TripScheduleScreen}
+        name="TripScheduleAi"
+        component={TripScheduleAiScreen}
         options={{ headerShown: false }}
       />
       <Tab.Screen
@@ -175,6 +187,8 @@ function MainAppStack() {
       <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} />
       <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
       <Stack.Screen name="TripDetail" component={TripDetailScreen} />
+      <Stack.Screen name="CreateTripSchedule" component={CreateTripScheduleScreen}/>
+      <Stack.Screen name="TripSchedule" component={TripScheduleScreen}/>
     </Stack.Navigator>
   );
 }

@@ -22,8 +22,35 @@ export default function TripHistoryScreen() {
   }, []);
 
   const handleTripDetail = (id) => {
-    navigation.navigate("TripDetail", {id})
+    navigation.navigate("TripDetail", { id });
+  };
+  let label = "";
+  let backgroundColor = "";
+
+  switch (trips.status) {
+    case 1:
+      label = "Bắt đầu";
+      backgroundColor = "#1890ff";
+      break;
+    case 2:
+      label = "Đang đi";
+      backgroundColor = "#fadb14";
+      break;
+    case 3:
+      label = "Hoàn thành";
+      backgroundColor = "#52c41a";
+      break;
+    case 4:
+      label = "Đã huỷ";
+      backgroundColor = "#ff4d4f";
+      break;
+    default:
+      label = "Không xác định";
+      backgroundColor = "#d9d9d9";
+      break;
   }
+
+  <Text style={[styles.status, { backgroundColor }]}>{label}</Text>;
 
   return (
     <View style={styles.container}>
@@ -52,14 +79,41 @@ export default function TripHistoryScreen() {
 
         {trips && trips.length > 0 ? (
           trips.map((item, index) => {
+            let label = "";
+            let backgroundColor = "";
+
+            switch (item.status) {
+              case 1:
+                label = "Bắt đầu";
+                backgroundColor = "#1890ff";
+                break;
+              case 2:
+                label = "Đang đi";
+                backgroundColor = "#fadb14";
+                break;
+              case 3:
+                label = "Hoàn thành";
+                backgroundColor = "#52c41a";
+                break;
+              case 4:
+                label = "Đã huỷ";
+                backgroundColor = "#ff4d4f";
+                break;
+              default:
+                label = "Không xác định";
+                backgroundColor = "#d9d9d9";
+                break;
+            }
+
             return (
               <TouchableOpacity
+                key={item.tripId}
                 onPress={() => handleTripDetail(item.tripId)}
               >
                 <View style={styles.tripCard} key={index}>
                   <Image
                     source={{
-                      uri: "https://datviettour.com.vn/uploads/images/chau-a/thai-lan/hinh-danh-thang/850px/phuket-thai-lan.jpg",
+                      uri: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/4f/7d/fc/caption.jpg?w=1200&h=-1&s=1",
                     }}
                     style={styles.tripImage}
                   />
@@ -76,8 +130,11 @@ export default function TripHistoryScreen() {
                     <Text style={styles.dateText}>
                       {item.startDate} - {item.endDate}
                     </Text>
-                    <View style={styles.avatarGroup}>
+                    <View style={styles.footerCard}>
                       <Text>{item.totalEstimatedCost}</Text>
+                      <Text style={[styles.status, { backgroundColor }]}>
+                        {label}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -238,16 +295,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#888",
   },
-  avatarGroup: {
+  footerCard: {
     flexDirection: "row",
     marginTop: 8,
+    justifyContent: "space-between",
   },
-  groupAvatar: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    marginRight: 4,
+  status: {
+    color: "#fff",
+    fontWeight: "bold",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    overflow: "hidden",
   },
+
   button: {
     marginHorizontal: 20,
     backgroundColor: "#1976D2",

@@ -22,7 +22,7 @@ export const listTrip = createAsyncThunk(
   }
 );
 
-// get blog by ID
+// get trip by ID
 export const getTripById = createAsyncThunk(
   "trip/getTripById",
   async (tripId, { rejectWithValue }) => {
@@ -99,6 +99,8 @@ export const getTripScheduleByTripId = createAsyncThunk(
     }
   }
 );
+
+
 
 const tripSlice = createSlice({
   name: "TRIP",
