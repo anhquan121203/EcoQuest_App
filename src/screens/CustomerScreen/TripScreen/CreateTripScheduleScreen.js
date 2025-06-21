@@ -8,13 +8,32 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Platform,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import useTrip from "../../../hooks/useTrip";
+import useService from "../../../hooks/useService";
+import { Picker } from "@react-native-picker/picker";
 
 export default function CreateTripScheduleScreen() {
   const route = useRoute();
-  const { selectedDate } = route.params || {};
+  const { id, selectedDate } = route.params || {};
   const { addNewtripSchedule } = useTrip();
+  const { serviceByType } = useService();
+
+  const service = (serviceByType) => {
+    switch (serviceByType){
+      case serviceByType == 1:
+        return "Khách sạn";
+      case serviceByType == 2:
+        return "Nhà hàng";
+      case serviceByType == 3:
+        return "Địa điểm";
+      default:
+        return "Không có "
+    }
+      
+  }
 
   const allowedStartTime = "08:00";
   const allowedEndTime = "17:00";
@@ -24,15 +43,59 @@ export default function CreateTripScheduleScreen() {
   const [description, setDescription] = useState("");
   const [estimatedCost, setEstimatedCost] = useState("");
   const [address, setAddress] = useState("");
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [serviceId, setServiceId] = useState("");
 
-  const handleSubmit = () => {
-    Alert.alert(
-      "Tạo lịch trình",
-      `Lịch trình đã được tạo cho ngày ${scheduleDate}!`
-    );
-    // Gắn logic gửi dữ liệu API tại đây
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  const formatTime = (date) => {
+    if (!date) return "";
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
+  const handleAddNewTripSchedule = async () => {
+    if (
+      !title ||
+      !description ||
+      !estimatedCost ||
+      !address ||
+      !startTime ||
+      !endTime
+    ) {
+      Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin.");
+      return;
+    }
+
+    try {
+      const payload = {
+        tripId: id,
+        tripScheduleDetails: [
+          {
+            scheduleDate,
+            title,
+            description,
+            estimatedCost: parseFloat(estimatedCost),
+            startTime: formatTime(startTime),
+            endTime: formatTime(endTime),
+            address,
+            serviceId,
+          },
+        ],
+      };
+
+      await addNewtripSchedule(payload);
+      Alert.alert(
+        "Thành công",
+        `Lịch trình đã được tạo cho ngày ${scheduleDate}!`
+      );
+    } catch (error) {
+      console.error("❌ Error creating schedule:", error);
+      Alert.alert("Lỗi", "Không thể tạo lịch trình. Vui lòng thử lại.");
+    }
   };
 
   return (
@@ -87,7 +150,68 @@ export default function CreateTripScheduleScreen() {
         onChangeText={setAddress}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <Text style={styles.label}>Thời gian bắt đầu</Text>
+      <TouchableOpacity
+        style={styles.input}
+        onPress={() => setShowStartPicker(true)}
+      >
+        <Text>{startTime ? formatTime(startTime) : "Chọn giờ bắt đầu"}</Text>
+      </TouchableOpacity>
+      {showStartPicker && (
+        <DateTimePicker
+          mode="time"
+          value={startTime || new Date()}
+          is24Hour={true}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(_, selectedTime) => {
+            setShowStartPicker(false);
+            if (selectedTime) setStartTime(selectedTime);
+          }}
+        />
+      )}
+
+      <Text style={styles.label}>Thời gian kết thúc</Text>
+      <TouchableOpacity
+        style={styles.input}
+        onPress={() => setShowEndPicker(true)}
+      >
+        <Text>{endTime ? formatTime(endTime) : "Chọn giờ kết thúc"}</Text>
+      </TouchableOpacity>
+      {showEndPicker && (
+        <DateTimePicker
+          mode="time"
+          value={endTime || new Date()}
+          is24Hour={true}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(_, selectedTime) => {
+            setShowEndPicker(false);
+            if (selectedTime) setEndTime(selectedTime);
+          }}
+        />
+      )}
+
+      <Text style={styles.label}>Chọn dịch vụ</Text>
+        <Picker
+          selectedValue={serviceId}
+          style={styles.inputRow}
+          onValueChange={handleChange}
+        >
+          <Picker.Item label="Chọn chuyến đi" value={null} />
+          {trips
+            .filter((item) => item.status === 3 && item.user_id === userId)
+            .map((item) => (
+              <Picker.Item
+                key={item.tripId}
+                label={item.tripName}
+                value={item.tripId}
+              />
+            ))}
+        </Picker>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleAddNewTripSchedule}
+      >
         <Text style={styles.buttonText}>Tạo lịch trình</Text>
       </TouchableOpacity>
     </ScrollView>

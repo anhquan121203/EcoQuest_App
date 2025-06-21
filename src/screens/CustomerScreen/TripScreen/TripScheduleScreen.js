@@ -118,7 +118,7 @@ export default function TripScheduleScreen({ navigation }) {
       <TouchableOpacity
         style={styles.createButton}
         onPress={() => {
-          navigation.navigate("CreateTripSchedule", { selectedDate });
+          navigation.navigate("CreateTripSchedule", { id, selectedDate });
         }}
       >
         <Text style={styles.createText}>Tạo lịch trình mới</Text>

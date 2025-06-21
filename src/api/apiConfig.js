@@ -1,5 +1,7 @@
 const BASE_URL = 'http://160.250.246.33:5269';
 
+const BASE_LOCAL = "https://27ae-183-80-111-9.ngrok-free.app"
+
 const API = {
   BASE_URL,
   LOGIN: `${BASE_URL}/connect/token`,
@@ -31,7 +33,13 @@ const API = {
   TRIP_BY_ID: `${BASE_URL}/api/v1/Ecq110SelectTrip`,
   CREATE_TRIP: `${BASE_URL}/api/v1/Ecq110InsertTrip`,
   CREATE_TRIP_SCHEDULE: `${BASE_URL}/api/v1/Ecq110InsertTripSchedule`,
-  GET_TRIP_SCHEDULE_BY_TRIPID: `${BASE_URL}/api/v1/Ecq110SelectTripSchedule`
+  GET_TRIP_SCHEDULE_BY_TRIPID: `${BASE_URL}/api/v1/Ecq110SelectTripSchedule`,
+
+  // api payment
+  PAYMENT: `${BASE_LOCAL}/api/v1/Ecq110InsertPayment`,
+
+  // api service
+  SERVICE: `${BASE_URL}/api/v1/Ecq110SelectService`
 };
 
 export default API;

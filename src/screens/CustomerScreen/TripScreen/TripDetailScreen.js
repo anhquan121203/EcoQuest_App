@@ -11,6 +11,7 @@ import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import useTrip from "../../../hooks/useTrip";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import TripScheduleDetailModal from "./TripScheduleDetailModal";
+import usePayment from "../../../hooks/usePayment";
 
 const trip = {
   tripName: "Tour miền Tây sông nước",
@@ -30,6 +31,8 @@ export default function TripDetailScreen() {
   const { selectedTrip, tripById } = useTrip();
   const navigation = useNavigation();
 
+  const { payments, addNewPayment } = usePayment();
+
   useEffect(() => {
     if (id) {
       tripById(id);
@@ -43,6 +46,42 @@ export default function TripDetailScreen() {
       </View>
     );
   }
+
+  const handlePayment = async () => {
+    const paymentData = {
+     tripId: selectedTrip.tripId,
+    };
+
+    try {
+      const result = await addNewPayment(paymentData);
+      if (result.success) {
+        Toast.show({
+          type: "success",
+          text1: "🎉 Tạo chuyến đi thành công!",
+          text2: "Chuyến đi của bạn đã được lưu.",
+        });
+
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "❌ Tạo chuyến đi thất bại!",
+          text2: "Vui lòng kiểm tra lại thông tin.",
+        });
+
+        console.error("Failed to create trip:", result);
+      }
+
+      return result;
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "😢 Có lỗi xảy ra!",
+        text2: "Vui lòng thử lại sau.",
+      });
+
+      console.error("Error creating trip:", error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -111,7 +150,16 @@ export default function TripDetailScreen() {
 
       <Button
         title="Tạo lịch trình"
-        onPress={() => navigation.navigate("TripSchedule", { id: selectedTrip.tripId })}
+        onPress={() =>
+          navigation.navigate("TripSchedule", { id: selectedTrip.tripId })
+        }
+      />
+
+      <Button
+        title="Thanh toán"
+        onPress={() =>
+          handlePayment(selectedTrip.tripId)
+        }
       />
     </ScrollView>
   );
@@ -125,7 +173,7 @@ const styles = StyleSheet.create({
     height: 270,
     justifyContent: "flex-end",
     padding: 20,
-  },  
+  },
   overlay: {
     backgroundColor: "rgba(0,0,0,0.3)",
     borderRadius: 10,
