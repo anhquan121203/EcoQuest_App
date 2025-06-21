@@ -48,7 +48,7 @@ export default function TripScheduleScreen({ navigation }) {
 
     while (current.isSameOrBefore(end)) {
       list.push({
-        label: current.format("DD-MM"),
+        label: current.format("DD/MM"),
         value: current.format("YYYY-MM-DD"),
       });
       current.add(1, "days");

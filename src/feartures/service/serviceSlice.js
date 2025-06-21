@@ -6,11 +6,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // get trip by ID
 export const getServiceByType = createAsyncThunk(
   "service/getServiceByType",
-  async (serviceId, { rejectWithValue }) => {
+  async (serviceData, { rejectWithValue }) => {
     try {
       const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.get(API.SERVICE, {
-        params: { ServiceType: serviceId },
+        params: { ServiceType: serviceData },
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -33,10 +33,19 @@ const serviceSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getServiceByType.fulfilled, (state, action) => {
-      state.selectedService = action.payload?.response || [];
-      state.loading = false;
-    });
+    builder
+      .addCase(getServiceByType.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getServiceByType.fulfilled, (state, action) => {
+        state.selectedService = action.payload?.response || [];
+        state.loading = false;
+      })
+      .addCase(getServiceByType.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

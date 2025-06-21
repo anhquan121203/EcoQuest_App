@@ -1,5 +1,5 @@
 import { useRoute } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,34 +9,23 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 import useTrip from "../../../hooks/useTrip";
 import useService from "../../../hooks/useService";
-import { Picker } from "@react-native-picker/picker";
 
 export default function CreateTripScheduleScreen() {
   const route = useRoute();
   const { id, selectedDate } = route.params || {};
   const { addNewtripSchedule } = useTrip();
-  const { serviceByType } = useService();
-
-  const service = (serviceByType) => {
-    switch (serviceByType){
-      case serviceByType == 1:
-        return "Khách sạn";
-      case serviceByType == 2:
-        return "Nhà hàng";
-      case serviceByType == 3:
-        return "Địa điểm";
-      default:
-        return "Không có "
-    }
-      
-  }
-
-  const allowedStartTime = "08:00";
-  const allowedEndTime = "17:00";
+  const {
+    serviceByType,
+    selectedService,
+    loading: serviceLoading,
+    error: serviceError,
+  } = useService();
 
   const [scheduleDate, setScheduleDate] = useState(selectedDate || "");
   const [title, setTitle] = useState("");
@@ -49,6 +38,14 @@ export default function CreateTripScheduleScreen() {
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [selectedServiceType, setSelectedServiceType] = useState(1); // Default: Hotel
+
+  const allowedStartTime = "08:00";
+  const allowedEndTime = "17:00";
+
+  useEffect(() => {
+    serviceByType(selectedServiceType);
+  }, [selectedServiceType]);
 
   const formatTime = (date) => {
     if (!date) return "";
@@ -190,23 +187,43 @@ export default function CreateTripScheduleScreen() {
         />
       )}
 
+      <Text style={styles.label}>Loại dịch vụ</Text>
+      <Picker
+        selectedValue={selectedServiceType}
+        style={styles.inputRow}
+        onValueChange={(value) => setSelectedServiceType(value)}
+      >
+        <Picker.Item label="Khách sạn" value={1} />
+        <Picker.Item label="Nhà hàng" value={2} />
+        <Picker.Item label="Địa điểm" value={3} />
+      </Picker>
+
       <Text style={styles.label}>Chọn dịch vụ</Text>
+      {serviceLoading ? (
+        <ActivityIndicator size="small" color="#2196f3" />
+      ) : (
         <Picker
           selectedValue={serviceId}
           style={styles.inputRow}
-          onValueChange={handleChange}
+          onValueChange={(value) => setServiceId(value)}
         >
-          <Picker.Item label="Chọn chuyến đi" value={null} />
-          {trips
-            .filter((item) => item.status === 3 && item.user_id === userId)
-            .map((item) => (
-              <Picker.Item
-                key={item.tripId}
-                label={item.tripName}
-                value={item.tripId}
-              />
-            ))}
+          <Picker.Item label="Chọn dịch vụ" value={null} />
+          {selectedService.map((item) => (
+            <Picker.Item
+              key={item.serviceId}
+              label={item.serviceName}
+              value={item.serviceId}
+            />
+            
+          ))}
         </Picker>
+      )}
+
+      {serviceError && (
+        <Text style={{ color: "red", marginTop: 5 }}>
+          ❌ Lỗi khi tải dịch vụ: {serviceError}
+        </Text>
+      )}
 
       <TouchableOpacity
         style={styles.button}
@@ -228,6 +245,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    marginTop: 45,
   },
   timeInfo: {
     marginBottom: 20,
@@ -252,6 +270,13 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     backgroundColor: "#f9f9f9",
+  },
+  inputRow: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+    marginBottom: 10,
   },
   button: {
     marginTop: 30,

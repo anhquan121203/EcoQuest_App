@@ -5,24 +5,14 @@ import {
   StyleSheet,
   ImageBackground,
   ScrollView,
-  Button,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import useTrip from "../../../hooks/useTrip";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import TripScheduleDetailModal from "./TripScheduleDetailModal";
 import usePayment from "../../../hooks/usePayment";
-
-const trip = {
-  tripName: "Tour miền Tây sông nước",
-  description: "Tour khám phá các tỉnh miền Tây với nhiều hoạt động thú vị.",
-  startDate: "05/08/2025",
-  endDate: "10/08/2025",
-  numberOfPeople: 6,
-  totalEstimatedCost: 10000000,
-  firstName: "Gia Khôi",
-  lastName: "Phạm",
-};
+import Toast from "react-native-toast-message";
 
 export default function TripDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,7 +20,6 @@ export default function TripDetailScreen() {
   const { id } = route.params;
   const { selectedTrip, tripById } = useTrip();
   const navigation = useNavigation();
-
   const { payments, addNewPayment } = usePayment();
 
   useEffect(() => {
@@ -49,119 +38,153 @@ export default function TripDetailScreen() {
 
   const handlePayment = async () => {
     const paymentData = {
-     tripId: selectedTrip.tripId,
+      tripId: id,
     };
 
     try {
       const result = await addNewPayment(paymentData);
-      if (result.success) {
-        Toast.show({
-          type: "success",
-          text1: "🎉 Tạo chuyến đi thành công!",
-          text2: "Chuyến đi của bạn đã được lưu.",
-        });
 
+      if (result.success) {
+        const checkoutUrl = result.data?.response?.checkoutUrl;
+
+        if (checkoutUrl) {
+          Toast.show({
+            type: "success",
+            text1: "🎉 Đang chuyển đến cổng thanh toán...",
+          });
+
+          navigation.navigate("PaymentWebview", { checkoutUrl });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "❌ Không tìm thấy đường dẫn thanh toán",
+            text2: "Vui lòng thử lại sau.",
+          });
+        }
       } else {
         Toast.show({
           type: "error",
-          text1: "❌ Tạo chuyến đi thất bại!",
+          text1: "❌ Tạo thanh toán thất bại!",
           text2: "Vui lòng kiểm tra lại thông tin.",
         });
-
-        console.error("Failed to create trip:", result);
+        console.error("Failed to create payment:", result);
       }
-
-      return result;
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "😢 Có lỗi xảy ra!",
         text2: "Vui lòng thử lại sau.",
       });
-
-      console.error("Error creating trip:", error);
+      console.error("Error creating payment:", error);
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <ImageBackground
-        source={{
-          uri: "https://static.vecteezy.com/system/resources/previews/007/264/314/non_2x/the-concept-travel-the-world-on-the-airplanes-vector.jpg",
-        }}
-        style={styles.headerImage}
-        imageStyle={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <View style={styles.overlay}>
-          <Text style={styles.tripName}>{selectedTrip.tripName}</Text>
-          <Text style={styles.userName}>
-            Người tạo: {selectedTrip.firstName} {selectedTrip.lastName}
-          </Text>
-        </View>
-      </ImageBackground>
-      <View style={styles.detailContainer}>
-        <View style={styles.card}>
-          <Ionicons
-            name="information-circle-outline"
-            size={24}
-            color="#4e73df"
-          />
-          <Text style={styles.cardText}>{selectedTrip.description}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <View style={styles.cardSmall}>
-            <FontAwesome5 name="calendar-alt" size={20} color="#20c997" />
-            <Text style={styles.cardLabel}>Bắt đầu</Text>
-            <Text style={styles.cardValue}>{selectedTrip.startDate}</Text>
-          </View>
-
-          <View style={styles.cardSmall}>
-            <FontAwesome5 name="calendar-check" size={20} color="#20c997" />
-            <Text style={styles.cardLabel}>Kết thúc</Text>
-            <Text style={styles.cardValue}>{selectedTrip.endDate}</Text>
-          </View>
-        </View>
-
-        <View style={styles.row}>
-          <View style={styles.cardSmall}>
-            <Ionicons name="people-outline" size={22} color="#ff9f43" />
-            <Text style={styles.cardLabel}>Số người</Text>
-            <Text style={styles.cardValue}>{selectedTrip.numberOfPeople}</Text>
-          </View>
-
-          <View style={styles.cardSmall}>
-            <MaterialIcons name="attach-money" size={24} color="#00b894" />
-            <Text style={styles.cardLabel}>Chi phí</Text>
-            <Text style={styles.cardValue}>
-              {selectedTrip.totalEstimatedCost}đ
+        <ImageBackground
+          source={{
+            uri: "https://static.vecteezy.com/system/resources/previews/007/264/314/non_2x/the-concept-travel-the-world-on-the-airplanes-vector.jpg",
+          }}
+          style={styles.headerImage}
+          imageStyle={{
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+          }}
+        >
+          <View style={styles.overlay}>
+            <Text style={styles.tripName}>{selectedTrip.tripName}</Text>
+            <Text style={styles.userName}>
+              Người tạo: {selectedTrip.firstName} {selectedTrip.lastName}
             </Text>
           </View>
+        </ImageBackground>
+
+        <View style={styles.detailContainer}>
+          <View style={styles.card}>
+            <Ionicons
+              name="information-circle-outline"
+              size={24}
+              color="#4e73df"
+            />
+            <Text style={styles.cardText}>{selectedTrip.description}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.cardSmall}>
+              <FontAwesome5 name="calendar-alt" size={20} color="#20c997" />
+              <Text style={styles.cardLabel}>Bắt đầu</Text>
+              <Text style={styles.cardValue}>{selectedTrip.startDate}</Text>
+            </View>
+
+            <View style={styles.cardSmall}>
+              <FontAwesome5 name="calendar-check" size={20} color="#20c997" />
+              <Text style={styles.cardLabel}>Kết thúc</Text>
+              <Text style={styles.cardValue}>{selectedTrip.endDate}</Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.cardSmall}>
+              <Ionicons name="people-outline" size={22} color="#ff9f43" />
+              <Text style={styles.cardLabel}>Số người</Text>
+              <Text style={styles.cardValue}>
+                {selectedTrip.numberOfPeople}
+              </Text>
+            </View>
+
+            <View style={styles.cardSmall}>
+              <MaterialIcons name="attach-money" size={24} color="#00b894" />
+              <Text style={styles.cardLabel}>Chi phí</Text>
+              <Text style={styles.cardValue}>
+                {selectedTrip.totalEstimatedCost?.toLocaleString()}đ
+              </Text>
+            </View>
+          </View>
         </View>
+
+        <TripScheduleDetailModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          id={selectedTrip.tripId}
+        />
+
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={{
+            alignSelf: "center",
+            marginTop: 10,
+            padding: 10,
+            backgroundColor: "#4e73df",
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ color: "#fff", fontWeight: "600" }}>
+            Xem lịch trình
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Nút cố định dưới cùng */}
+      <View style={styles.fixedBottomButtons}>
+        <TouchableOpacity
+          style={styles.leftButton}
+          onPress={() =>
+            navigation.navigate("TripSchedule", { id: selectedTrip.tripId })
+          }
+        >
+          <Ionicons name="calendar" size={18} color="#fff" />
+          <Text style={styles.buttonText}>Tạo lịch trình</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.rightButton} onPress={handlePayment}>
+          <Text style={styles.paymentText}>Thanh toán</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Trip schedule */}
-      <TripScheduleDetailModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        id={selectedTrip.tripId}
-      />
-      <Button title="Xem lịch trình" onPress={() => setModalVisible(true)} />
-
-      <Button
-        title="Tạo lịch trình"
-        onPress={() =>
-          navigation.navigate("TripSchedule", { id: selectedTrip.tripId })
-        }
-      />
-
-      <Button
-        title="Thanh toán"
-        onPress={() =>
-          handlePayment(selectedTrip.tripId)
-        }
-      />
-    </ScrollView>
+    </View>
   );
 }
 
@@ -238,5 +261,55 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#333",
+  },
+  fixedBottomButtons: {
+    flexDirection: "row",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: "100%",
+    height: "10%",
+  },
+  leftButton: {
+    flex: 1,
+    backgroundColor: "#00b894",
+    padding: 12,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
+    marginBottom: 10,
+  },
+  rightButton: {
+    flex: 1.2,
+    backgroundColor: "#e74c3c",
+    padding: 12,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  paymentText: {
+    color: "#fff",
+    fontSize: 13,
+  },
+  paymentAmount: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

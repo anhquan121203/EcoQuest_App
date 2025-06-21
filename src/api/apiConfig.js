@@ -36,7 +36,7 @@ const API = {
   GET_TRIP_SCHEDULE_BY_TRIPID: `${BASE_URL}/api/v1/Ecq110SelectTripSchedule`,
 
   // api payment
-  PAYMENT: `${BASE_LOCAL}/api/v1/Ecq110InsertPayment`,
+  PAYMENT: `${BASE_URL}/api/v1/Ecq110InsertPayment`,
 
   // api service
   SERVICE: `${BASE_URL}/api/v1/Ecq110SelectService`
