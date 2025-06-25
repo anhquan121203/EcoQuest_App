@@ -30,6 +30,7 @@ export default function LoginScreen({ navigation }) {
 
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
+      console.log(access_token)
       if (access_token && refresh_token) {
         await AsyncStorage.setItem("access_token", access_token);
         await AsyncStorage.setItem("refresh_token", refresh_token);
@@ -40,7 +41,10 @@ export default function LoginScreen({ navigation }) {
         });
         navigation.navigate("Home");
       } else {
-        Alert.alert("Đăng nhập thất bại", "Vui lòng kiểm tra lại thông tin");
+        Toast.show({
+          type: "error",
+          text1: "Đăng nhập không thành công!",
+        });
       }
     } catch (err) {
       console.error(err);

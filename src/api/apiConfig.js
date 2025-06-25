@@ -39,7 +39,11 @@ const API = {
   PAYMENT: `${BASE_URL}/api/v1/Ecq110InsertPayment`,
 
   // api service
-  SERVICE: `${BASE_URL}/api/v1/Ecq110SelectService`
+  SERVICE: `${BASE_URL}/api/v1/Ecq110SelectService`,
+
+  // api comment
+  COMMENT: `${BASE_URL}/api/v1/Ecq100SelectComments`,
+  CREATE_COMMENT: `${BASE_URL}/api/v1/Ecq100InsertComment`
 };
 
 export default API;

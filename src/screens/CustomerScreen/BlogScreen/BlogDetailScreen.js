@@ -11,16 +11,19 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import useBlog from "../../../hooks/useBlog";
+import useComment from "../../../hooks/useComment";
 
 export default function BlogDetailScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { id } = route.params;
   const { selectedBlog, blogById, loading, error } = useBlog();
+  const { selectedComment, commentByBlog, addNewComment } = useComment();
 
   useEffect(() => {
     if (id) {
       blogById(id);
+      commentByBlog(id);
     }
   }, [id]);
 
@@ -38,6 +41,14 @@ export default function BlogDetailScreen() {
   const hasImages = blogImages.length > 0;
   const fallbackImage =
     "https://www.elegantthemes.com/blog/wp-content/uploads/2020/02/000-404.png";
+
+  const handleAddComment = async () => {
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -104,41 +115,38 @@ export default function BlogDetailScreen() {
         <Text style={styles.commentTitle}>Bình luận</Text>
 
         {/* Danh sách bình luận (mock tĩnh) */}
-        <View style={styles.commentItem}>
-          <Image
-            source={{
-              uri: "https://img.freepik.com/free-icon/user_318-159711.jpg",
-            }}
-            style={styles.commentAvatar}
-          />
-          <View style={styles.commentContent}>
-            <Text style={styles.commentAuthor}>Nguyễn Văn A</Text>
-            <Text style={styles.commentText}>
-              Bài viết rất hay và chi tiết. Cảm ơn bạn!
-            </Text>
-          </View>
-        </View>
+        {selectedComment.length > 0 ? (
+          selectedComment.map((item, index) => {
+            return (
+              <View style={styles.commentItem} key={index}>
+                <Image
+                  source={{
+                    uri: "https://img.freepik.com/free-icon/user_318-159711.jpg",
+                  }}
+                  style={styles.commentAvatar}
+                />
+                <View style={styles.commentContent}>
+                  <Text style={styles.commentAuthor}>{item.commenterName}</Text>
+                  <Text style={styles.commentText}>
+                   {item.content}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <Text>Không có bình luận nào!</Text>
+        )}
 
-        <View style={styles.commentItem}>
-          <Image
-            source={{
-              uri: "https://img.freepik.com/free-icon/user_318-159711.jpg",
-            }}
-            style={styles.commentAvatar}
-          />
-          <View style={styles.commentContent}>
-            <Text style={styles.commentAuthor}>Trần Thị B</Text>
-            <Text style={styles.commentText}>Hóng phần tiếp theo ❤️</Text>
-          </View>
-        </View>
+        
 
         {/* Form tạo bình luận */}
         <View style={styles.commentForm}>
           <Text style={styles.commentFormTitle}>Viết bình luận</Text>
-          <Text style={styles.commentFormLabel}>Tên của bạn</Text>
-          <View style={styles.commentInput} />
+          
           <Text style={styles.commentFormLabel}>Nội dung</Text>
           <View style={[styles.commentInput, { height: 80 }]} />
+          
           <TouchableOpacity style={styles.commentButton}>
             <Text style={{ color: "#fff", textAlign: "center" }}>
               Gửi bình luận
