@@ -7,6 +7,7 @@ import destinationSlice from "../feartures/destination/destinationSlice";
 import tripSlice from "../feartures/trip/tripSlice";
 import paymentSlice from "../feartures/payment/paymentSlice";
 import serviceSlice from "../feartures/service/serviceSlice";
+import commentSlice from "../feartures/comment/commentSlice";
 
 export const store = configureStore({
     reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
         trip: tripSlice.reducer,
         payment: paymentSlice.reducer,
         service: serviceSlice.reducer,
+        comment: commentSlice.reducer,
     },
     
 })
