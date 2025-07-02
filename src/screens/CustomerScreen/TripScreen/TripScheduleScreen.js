@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import useTrip from "../../../hooks/useTrip";
 import moment from "moment";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TripScheduleScreen({ navigation }) {
   const [scheduleDates, setScheduleDates] = useState([]);
@@ -66,7 +68,20 @@ export default function TripScheduleScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lịch trình {selectedTrip.title}</Text>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <Text style={styles.title}>Lịch trình {selectedTrip.title}</Text>
+
+        <TouchableOpacity style={styles.settingButton}>
+          <Entypo name="dots-three-vertical" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
 
       {/* Danh sách ngày */}
       <View style={styles.dateList}>
@@ -102,9 +117,7 @@ export default function TripScheduleScreen({ navigation }) {
               <Text style={styles.titleText}>{item.title}</Text>
               <Text style={styles.desc}>{item.description}</Text>
               <Text style={styles.address}>📍 {item.address}</Text>
-              <Text style={styles.cost}>
-                Chi phí: {item.estimatedCost} VNĐ
-              </Text>
+              <Text style={styles.cost}>Chi phí: {item.estimatedCost} VNĐ</Text>
             </View>
           ))
         ) : (
@@ -133,6 +146,29 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#f7eafd",
   },
+
+  // header**********************************
+  header: {
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  backButton: {
+    position: "absolute",
+    top: 15,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0 , 0.3)",
+    borderRadius: 50,
+    padding: 5,
+    zIndex: 100,
+  },
+
+  settingButton: {
+    position: "absolute",
+    top: 15,
+    right: 0,
+  },
+
   title: {
     fontSize: 18,
     fontWeight: "bold",
@@ -140,6 +176,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginTop: 20,
   },
+
+  // conetent******************************************
   dateList: {
     flexDirection: "row",
     justifyContent: "center",
@@ -147,19 +185,20 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   dateItem: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#00b894",
     borderRadius: 10,
     padding: 10,
     margin: 5,
     alignItems: "center",
-    width: 60,
+    width: 80,
+    height: 40,
   },
   dateItemActive: {
-    backgroundColor: "#6200ee",
+    backgroundColor: "#2a9df4",
   },
   dateText: {
     textAlign: "center",
-    color: "#333",
+    color: "#fff",
   },
   dateTextActive: {
     color: "#fff",
@@ -209,7 +248,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   createButton: {
-    backgroundColor: "#6200ee",
+    backgroundColor: "#2a9df4",
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: "center",

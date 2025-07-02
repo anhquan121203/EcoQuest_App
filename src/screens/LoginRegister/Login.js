@@ -43,13 +43,11 @@ export default function LoginScreen({ navigation }) {
         Alert.alert("Đăng nhập thất bại", "Vui lòng kiểm tra lại thông tin");
       }
     } catch (err) {
-      console.error(err);
-      const errorMessage =
-        err.response?.data?.message || // lỗi trả về từ server
-        err.message || // lỗi chung
-        "Đã xảy ra lỗi không xác định";
-
-      Alert.alert("Đăng nhập thất bại", errorMessage);
+      Toast.show({
+        type: "error",
+        text1: "Đăng nhập không thành công!",
+        text2: err.response?.data?.message || err.message,
+      });
     }
   };
 

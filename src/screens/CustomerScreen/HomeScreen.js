@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 60,
+    marginTop: 20,
     alignItems: "center",
   },
 

@@ -9,7 +9,7 @@ import {
   ImageBackground,
 } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useTrip from "../../../hooks/useTrip";
 
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: "absolute",
-    top: 50,
+    top: 20,
     left: 20,
     backgroundColor: "rgba(0, 0, 0 , 0.3)",
     borderRadius: 50,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   settingButton: {
     position: "absolute",
-    top: 50,
+    top: 20,
     right: 20,
   },
 

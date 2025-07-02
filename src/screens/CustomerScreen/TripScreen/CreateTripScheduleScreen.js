@@ -1,4 +1,4 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -15,11 +15,15 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import useTrip from "../../../hooks/useTrip";
 import useService from "../../../hooks/useService";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 
 export default function CreateTripScheduleScreen() {
+  const navigation  = useNavigation();
   const route = useRoute();
   const { id, selectedDate } = route.params || {};
-  const { addNewtripSchedule } = useTrip();
+  const { addNewtripSchedule, tripScheduleByTripId } = useTrip();
   const {
     serviceByType,
     selectedService,
@@ -38,14 +42,22 @@ export default function CreateTripScheduleScreen() {
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [selectedServiceType, setSelectedServiceType] = useState(1); // Default: Hotel
+  const [selectedServiceType, setSelectedServiceType] = useState("");
 
-  const allowedStartTime = "08:00";
-  const allowedEndTime = "17:00";
+  const allowedStartTime = "00:00";
+  const allowedEndTime = "23:00";
 
   useEffect(() => {
     serviceByType(selectedServiceType);
+    setServiceId("");
   }, [selectedServiceType]);
+
+  useEffect(() => {
+    if (id) {
+      tripScheduleByTripId(id);
+    }
+  }, [id]);
+  
 
   const formatTime = (date) => {
     if (!date) return "";
@@ -85,19 +97,41 @@ export default function CreateTripScheduleScreen() {
       };
 
       await addNewtripSchedule(payload);
-      Alert.alert(
-        "Thành công",
-        `Lịch trình đã được tạo cho ngày ${scheduleDate}!`
-      );
+      await tripScheduleByTripId(id);
+      console.log("data trip", payload)
+
+      Toast.show({
+        type: "success",
+        text1: "Thành công!",
+        text2: `Lịch trình đã được tạo cho ngày ${scheduleDate}!`,
+      });
+      navigation.goBack();
     } catch (error) {
       console.error("❌ Error creating schedule:", error);
       Alert.alert("Lỗi", "Không thể tạo lịch trình. Vui lòng thử lại.");
+      Toast.show({
+        type: "error",
+        text1: `Không thể tạo lịch trình. Vui lòng thử lại.`,
+      });
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Tạo lịch trình cho chuyến đi</Text>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <Text style={styles.title}>Tạo lịch trình cho chuyến đi</Text>
+
+        <TouchableOpacity style={styles.settingButton}>
+          <Entypo name="dots-three-vertical" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.timeInfo}>
         <Text style={styles.label}>Khung giờ cho phép:</Text>
@@ -123,7 +157,7 @@ export default function CreateTripScheduleScreen() {
 
       <Text style={styles.label}>Mô tả</Text>
       <TextInput
-        style={[styles.input, { height: 100 }]}
+        style={[styles.input, { height: 80 }]}
         placeholder="Nhập mô tả"
         multiline
         value={description}
@@ -187,11 +221,13 @@ export default function CreateTripScheduleScreen() {
         />
       )}
 
+      {/* Loai dịch vụ**************************************** */}
       <Text style={styles.label}>Loại dịch vụ</Text>
       <Picker
         selectedValue={selectedServiceType}
         style={styles.inputRow}
         onValueChange={(value) => setSelectedServiceType(value)}
+        placeholder="Loại dịch vụ"
       >
         <Picker.Item label="Khách sạn" value={1} />
         <Picker.Item label="Nhà hàng" value={2} />
@@ -202,21 +238,49 @@ export default function CreateTripScheduleScreen() {
       {serviceLoading ? (
         <ActivityIndicator size="small" color="#2196f3" />
       ) : (
-        <Picker
-          selectedValue={serviceId}
-          style={styles.inputRow}
-          onValueChange={(value) => setServiceId(value)}
-        >
-          <Picker.Item label="Chọn dịch vụ" value={null} />
-          {selectedService.map((item) => (
-            <Picker.Item
-              key={item.serviceId}
-              label={item.serviceName}
-              value={item.serviceId}
-            />
-            
-          ))}
-        </Picker>
+        <>
+          <Picker
+            selectedValue={serviceId}
+            style={styles.inputRow}
+            onValueChange={(value) => setServiceId(value)}
+          >
+            <Picker.Item label="Chọn dịch vụ" value={""} />
+            {selectedService.map((item) => (
+              <Picker.Item
+                key={item.serviceId}
+                label={item.serviceName}
+                value={item.serviceId}
+              />
+            ))}
+          </Picker>
+
+          {/* Hiển thị thông tin chi tiết dịch vụ đã chọn */}
+          {serviceId && (
+            <View
+              style={{
+                marginTop: 10,
+                padding: 10,
+                backgroundColor: "#f1f1f1",
+                borderRadius: 8,
+              }}
+            >
+              {selectedService
+                .filter((item) => item.serviceId === serviceId)
+                .map((item) => (
+                  <View key={item.serviceId}>
+                    <Text style={styles.label}>Tên dịch vụ:</Text>
+                    <Text>{item.serviceName}</Text>
+
+                    <Text style={styles.label}>Địa chỉ:</Text>
+                    <Text>{item.address}</Text>
+
+                    <Text style={styles.label}>Chi phí:</Text>
+                    <Text>{item.cost} VNĐ</Text>
+                  </View>
+                ))}
+            </View>
+          )}
+        </>
       )}
 
       {serviceError && (
@@ -240,18 +304,43 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
+
   header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    marginTop: 45,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
+
+  backButton: {
+    position: "absolute",
+    top: 15,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0 , 0.3)",
+    borderRadius: 50,
+    padding: 5,
+    zIndex: 100,
+  },
+
+  settingButton: {
+    position: "absolute",
+    top: 15,
+    right: 0,
+  },
+
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 10,
+    marginTop: 20,
+  },
+
+  // content************************
   timeInfo: {
     marginBottom: 20,
     padding: 10,
     backgroundColor: "#e0f7fa",
     borderRadius: 8,
+    marginTop: 20,
   },
   label: {
     fontWeight: "600",

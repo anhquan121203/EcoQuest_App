@@ -158,7 +158,7 @@ export default function TripDetailScreen() {
             alignSelf: "center",
             marginTop: 10,
             padding: 10,
-            backgroundColor: "#4e73df",
+            backgroundColor: "#2a9df4",
             borderRadius: 8,
           }}
         >
