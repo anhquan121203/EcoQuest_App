@@ -27,7 +27,7 @@ export const registerUser = async (userData) => {
   return response;
 };
 
-export const verifyUser = async (email, key) => {
+export const verifyUser = async ({ email, key }) => {
   const response = await apiClient.post(API.VERIFY, { email, key }, {
     headers: {
       "Content-Type": "application/json",

@@ -187,7 +187,7 @@ const HomeScreen = () => {
         </View>
 
         {destinations && destinations?.length > 2 ? (
-          destinations.map((item, index) => {
+          destinations.slice(0, 5).map((item, index) => {
             const imageUrl =
               item.destinationImages?.length > 0
                 ? item.destinationImages[0]
@@ -232,13 +232,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 16,
+    paddingVertical: 20,
     top: 0,
   },
 
   locationContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 40,
     alignItems: "center",
   },
 

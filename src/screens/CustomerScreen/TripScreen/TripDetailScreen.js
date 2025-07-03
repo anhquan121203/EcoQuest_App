@@ -177,7 +177,15 @@ export default function TripDetailScreen() {
           }
         >
           <Ionicons name="calendar" size={18} color="#fff" />
-          <Text style={styles.buttonText}>Tạo lịch trình</Text>
+          <Text style={styles.buttonText}>Tạo lịch</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.middleButton}
+          
+        >
+          <Ionicons name="sparkles-outline" size={18} color="#fff" style={{marginRight: 8}}/>
+          <Text style={styles.buttonText}>Tạo AI</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.rightButton} onPress={handlePayment}>
@@ -262,6 +270,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#333",
   },
+
+  // Fotter button **************************************
   fixedBottomButtons: {
     flexDirection: "row",
     position: "absolute",
@@ -272,7 +282,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: "#ddd",
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     width: "100%",
     height: "10%",
   },
@@ -288,6 +298,17 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 10,
   },
+
+  middleButton: {
+    flex: 1,
+    backgroundColor: "#0984e3",
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  
   rightButton: {
     flex: 1.2,
     backgroundColor: "#e74c3c",

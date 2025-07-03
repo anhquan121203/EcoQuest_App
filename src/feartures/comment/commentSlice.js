@@ -8,11 +8,11 @@ export const listCommentByBlog = createAsyncThunk(
   "comment/listCommentByBlog",
   async (blogId, { rejectWithValue }) => {
     try {
-      const token = await AsyncStorage.setItem("access_token");
+      // const token = await AsyncStorage.setItem("access_token");
       const response = await apiClient.get(API.COMMENT, {
         params: { BlogId: blogId },
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -45,7 +45,7 @@ export const createComment = createAsyncThunk(
 const commentSlice = createSlice({
   name: "COMMENT",
   initialState: {
-    commnets: [],
+    comments: [],
     selectedComment: [],
     loading: false,
     error: null,
@@ -67,7 +67,7 @@ const commentSlice = createSlice({
       })
 
       .addCase(createComment.fulfilled, (state, action) => {
-        state.commnets.push(action.payload);
+        state.comments.push(action.payload);
       });
   },
 });

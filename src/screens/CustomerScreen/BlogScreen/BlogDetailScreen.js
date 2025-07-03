@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,17 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import useBlog from "../../../hooks/useBlog";
 import useComment from "../../../hooks/useComment";
+import Toast from "react-native-toast-message";
 
 export default function BlogDetailScreen() {
   const navigation = useNavigation();
@@ -19,6 +25,7 @@ export default function BlogDetailScreen() {
   const { id } = route.params;
   const { selectedBlog, blogById, loading, error } = useBlog();
   const { selectedComment, commentByBlog, addNewComment } = useComment();
+  const [commentContent, setCommentContent] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -43,118 +50,150 @@ export default function BlogDetailScreen() {
     "https://www.elegantthemes.com/blog/wp-content/uploads/2020/02/000-404.png";
 
   const handleAddComment = async () => {
-    try {
-      
-    } catch (error) {
-      
+    if (!commentContent.trim()) return;
+
+    const commentData = {
+      blogId: id,
+      content: commentContent,
+      parentCommentId: null,
+    };
+
+    const result = await addNewComment(commentData);
+    if (result.success) {
+      setCommentContent("");
+      commentByBlog(id);
+      Toast.show({
+        type: "success",
+        text1: "Viết bình luận thành công!",
+      });
+    } else {
+      console.log("Comment creation failed");
     }
-  }
+  };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header Image */}
-
-      <ImageBackground
-        source={{
-          uri: hasImages ? blogImages[0] : fallbackImage,
-        }}
-        style={styles.imageBackground}
-        imageStyle={{
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
-        }}
-      >
-        <View style={styles.overlay} />
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          keyboardShouldPersistTaps="handled"
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.category}>{selectedBlog.destinationName}</Text>
-          <Text style={styles.title}>{selectedBlog.title}</Text>
-          <View style={styles.authorRow}>
-            <Image
-              source={{
-                uri: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
-              }}
-              style={styles.avatar}
-            />
-            <Text style={styles.authorText}>
-              {selectedBlog.authorLastName} {selectedBlog.authorFirstName}
-            </Text>
-          </View>
-        </View>
-      </ImageBackground>
-
-      {/* Blog Content */}
-      <View style={styles.contentContainer}>
-        <Text style={styles.heading}>{selectedBlog.title}</Text>
-        <Text style={styles.paragraph}>{selectedBlog.content}</Text>
-        <Text style={styles.subheading}>1. {selectedBlog.destinationName}</Text>
-
-        {blogImages.slice(1).map((img, index) => (
-          <Image
-            key={index}
-            source={{ uri: img }}
-            style={{
-              width: "100%",
-              height: 200,
-              borderRadius: 12,
-              marginTop: 10,
-              // marginBottom: 100,
+          {/* --- phần header Image --- */}
+          <ImageBackground
+            source={{ uri: hasImages ? blogImages[0] : fallbackImage }}
+            style={styles.imageBackground}
+            imageStyle={{
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
             }}
-            resizeMode="cover"
-          />
-        ))}
-      </View>
-
-      {/* Comment Section */}
-      <View style={styles.commentSection}>
-        <Text style={styles.commentTitle}>Bình luận</Text>
-
-        {/* Danh sách bình luận (mock tĩnh) */}
-        {selectedComment.length > 0 ? (
-          selectedComment.map((item, index) => {
-            return (
-              <View style={styles.commentItem} key={index}>
+          >
+            <View style={styles.overlay} />
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.headerContent}>
+              <Text style={styles.category}>
+                {selectedBlog.destinationName}
+              </Text>
+              <Text style={styles.title}>{selectedBlog.title}</Text>
+              <View style={styles.authorRow}>
                 <Image
                   source={{
-                    uri: "https://img.freepik.com/free-icon/user_318-159711.jpg",
+                    uri: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
                   }}
-                  style={styles.commentAvatar}
+                  style={styles.avatar}
                 />
-                <View style={styles.commentContent}>
-                  <Text style={styles.commentAuthor}>{item.commenterName}</Text>
-                  <Text style={styles.commentText}>
-                   {item.content}
-                  </Text>
-                </View>
+                <Text style={styles.authorText}>
+                  {selectedBlog.authorLastName} {selectedBlog.authorFirstName}
+                </Text>
               </View>
-            );
-          })
-        ) : (
-          <Text>Không có bình luận nào!</Text>
-        )}
+            </View>
+          </ImageBackground>
 
-        
-
-        {/* Form tạo bình luận */}
-        <View style={styles.commentForm}>
-          <Text style={styles.commentFormTitle}>Viết bình luận</Text>
-          
-          <Text style={styles.commentFormLabel}>Nội dung</Text>
-          <View style={[styles.commentInput, { height: 80 }]} />
-          
-          <TouchableOpacity style={styles.commentButton}>
-            <Text style={{ color: "#fff", textAlign: "center" }}>
-              Gửi bình luận
+          {/* --- nội dung bài viết --- */}
+          <View style={styles.contentContainer}>
+            <Text style={styles.heading}>{selectedBlog.title}</Text>
+            <Text style={styles.paragraph}>{selectedBlog.content}</Text>
+            <Text style={styles.subheading}>
+              1. {selectedBlog.destinationName}
             </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+
+            {blogImages.slice(1).map((img, index) => (
+              <Image
+                key={index}
+                source={{ uri: img }}
+                style={{
+                  width: "100%",
+                  height: 200,
+                  borderRadius: 12,
+                  marginTop: 10,
+                }}
+                resizeMode="cover"
+              />
+            ))}
+          </View>
+
+          {/* --- phần bình luận --- */}
+          <View style={styles.commentSection}>
+            <Text style={styles.commentTitle}>Bình luận</Text>
+
+            {selectedComment.length > 0 ? (
+              selectedComment.map((item, index) => (
+                <View style={styles.commentItem} key={index}>
+                  <Image
+                    source={{
+                      uri: "https://img.freepik.com/free-icon/user_318-159711.jpg",
+                    }}
+                    style={styles.commentAvatar}
+                  />
+                  <View style={styles.commentContent}>
+                    <Text style={styles.commentAuthor}>
+                      {item.commenterName}
+                    </Text>
+                    <Text style={styles.commentText}>{item.content}</Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <Text>Không có bình luận nào!</Text>
+            )}
+
+            {/* --- form bình luận --- */}
+            <View style={styles.commentForm}>
+              <Text style={styles.commentFormTitle}>Viết bình luận</Text>
+
+              <Text style={styles.commentFormLabel}>Nội dung</Text>
+              <TextInput
+                style={[
+                  styles.commentInput,
+                  { height: 80, textAlignVertical: "top", padding: 8 },
+                ]}
+                multiline
+                value={commentContent}
+                onChangeText={setCommentContent}
+                placeholder="Nhập bình luận của bạn..."
+              />
+
+              <TouchableOpacity
+                style={styles.commentButton}
+                onPress={handleAddComment}
+              >
+                <Text style={{ color: "#fff", textAlign: "center" }}>
+                  Gửi bình luận
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -248,6 +287,9 @@ const styles = StyleSheet.create({
   commentItem: {
     flexDirection: "row",
     marginBottom: 16,
+    borderBottomWidth: 1,
+    padding: 10,
+    borderColor: "#eee",
   },
   commentAvatar: {
     width: 40,
@@ -268,9 +310,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   commentForm: {
-    marginTop: 24,
+    marginTop: 10,
     paddingTop: 16,
-    borderTopWidth: 1,
+    // borderTopWidth: 1,
     borderColor: "#eee",
   },
   commentFormTitle: {
@@ -295,6 +337,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#007BFF",
     paddingVertical: 12,
     borderRadius: 6,
-    marginBottom: 50,
+    // marginBottom: 50,
   },
 });

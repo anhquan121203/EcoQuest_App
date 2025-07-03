@@ -1,216 +1,306 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Alert, StyleSheet, Modal } from "react-native";
-import { theme } from "../../themes/theme";
-import { CustomButton } from "../../components/Button";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+import WaveBackground from "../../components/WaveBackground";
 import { registerUser, verifyUser } from "../../api/apiAuth";
 
 export default function RegisterScreen({ navigation }) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [verifyModalVisible, setVerifyModalVisible] = useState(false);
   const [verifyCode, setVerifyCode] = useState("");
+  const [verifyModalVisible, setVerifyModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert("Lỗi", "Vui lòng nhập đầy đủ thông tin");
+      Toast.show({ type: "error", text1: "Vui lòng nhập đầy đủ thông tin" });
       return;
     }
+
     if (password !== confirmPassword) {
-      Alert.alert("Lỗi", "Mật khẩu không khớp");
+      Toast.show({ type: "error", text1: "Mật khẩu không khớp" });
       return;
     }
 
     setLoading(true);
-
-    const userData = {
-      email,
-      password,
-      firstName,
-      lastName,
-    };
-
     try {
-      const response = await registerUser(userData);
-      console.log("Register API response:", response);
-    
-      if ((response.status === 200 || response.status === 201) && response.data?.success) {
-        Alert.alert("Đăng ký thành công", "Vui lòng nhập mã xác minh email");
+      const res = await registerUser({ email, password, firstName, lastName });
+      if ((res.status === 200 || res.status === 201) && res.data?.success) {
+        Toast.show({
+          type: "success",
+          text1: "Đăng ký thành công!",
+          text2: "Vui lòng nhập mã xác minh được gửi đến email.",
+        });
         setVerifyModalVisible(true);
       } else {
-        Alert.alert("Lỗi", response.data?.message || "Đăng ký thất bại");
+        Toast.show({ type: "error", text1: res.data?.message || "Đăng ký thất bại" });
       }
-    } catch (error) {
-      console.error("Register error:", error?.message);
-      Alert.alert(
-        "Lỗi",
-        error.response?.data?.message || error.message || "Có lỗi xảy ra. Vui lòng thử lại."
-      );
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi",
+        text2: err.response?.data?.message || err.message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleVerify = async () => {
     if (!verifyCode) {
-      Alert.alert("Lỗi", "Vui lòng nhập mã xác minh");
+      Toast.show({ type: "error", text1: "Vui lòng nhập mã xác minh" });
       return;
     }
 
     setVerifying(true);
     try {
-      const response = await verifyUser({ email, key: verifyCode });
-
-      if (response.status === 200) {
-        Alert.alert("✅ Thành công", "Tài khoản đã được xác minh", [
-          { text: "Đăng nhập", onPress: () => navigation.navigate("Login") },
-        ]);
+      const res = await verifyUser({ email, key: verifyCode });
+      if (res.status === 200) {
+        Toast.show({ type: "success", text1: "Xác minh thành công!" });
         setVerifyModalVisible(false);
+        navigation.navigate("Login");
       } else {
-        Alert.alert("Lỗi", "Mã xác minh không đúng hoặc đã hết hạn.");
+        Toast.show({ type: "error", text1: "Mã xác minh không đúng hoặc hết hạn" });
       }
-    } catch (error) {
-      console.error("Verify error:", error);
-      Alert.alert(
-        "Lỗi",
-        error.response?.data?.message || "Có lỗi xảy ra khi xác minh."
-      );
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi xác minh",
+        text2: err.response?.data?.message || err.message,
+      });
     } finally {
       setVerifying(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>ĐĂNG KÝ</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        value={firstName}
-        onChangeText={setFirstName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        value={lastName}
-        onChangeText={setLastName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập mật khẩu"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập lại mật khẩu"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.container}>
+            <WaveBackground style={styles.svgBackground} />
 
-      <View style={styles.buttonContainer}>
-        <CustomButton
-          title={loading ? "Đang đăng ký..." : "ĐĂNG KÝ"}
-          onPress={handleRegister}
-          type="primary"
-          disabled={loading}
-        />
-        <View style={styles.buttonSpacer} />
-        <CustomButton
-          title="TRỞ VỀ ĐĂNG NHẬP"
-          onPress={() => navigation.navigate("Login")}
-          type="secondary"
-          disabled={loading}
-        />
-      </View>
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Đăng ký</Text>
 
-      {/* Verify Code Modal */}
-      <Modal visible={verifyModalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.title}>Nhập mã xác minh (6 chữ số)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Mã xác minh"
-              value={verifyCode}
-              onChangeText={setVerifyCode}
-              keyboardType="number-pad"
-              maxLength={6}
-            />
-            <CustomButton
-              title={verifying ? "Đang xác minh..." : "XÁC MINH"}
-              onPress={handleVerify}
-              type="primary"
-              disabled={verifying}
-            />
-            <View style={styles.buttonSpacer} />
-            <CustomButton
-              title="Đóng"
-              onPress={() => setVerifyModalVisible(false)}
-              type="secondary"
-            />
+              <Text style={styles.label}>Họ và Tên</Text>
+              <View style={styles.rowContainer}>
+                <View style={styles.inputHalf}>
+                  <Ionicons name="person-outline" size={18} color="#aaa" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Họ"
+                    value={lastName}
+                    onChangeText={setLastName}
+                  />
+                </View>
+                <View style={[styles.inputHalf, { marginLeft: 10 }]}>
+                  <Ionicons name="person-outline" size={18} color="#aaa" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Tên"
+                    value={firstName}
+                    onChangeText={setFirstName}
+                  />
+                </View>
+              </View>
+
+              <Text style={styles.label}>Email</Text>
+              <View style={styles.inputRow}>
+                <Ionicons name="mail-outline" size={18} color="#aaa" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="eco@email.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+
+              <Text style={styles.label}>Mật khẩu</Text>
+              <View style={styles.inputRow}>
+                <Ionicons name="lock-closed-outline" size={18} color="#aaa" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nhập mật khẩu..."
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+
+              <Text style={styles.label}>Xác nhận mật khẩu</Text>
+              <View style={styles.inputRow}>
+                <Ionicons name="lock-closed-outline" size={18} color="#aaa" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nhập lại mật khẩu..."
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+              </View>
+
+              <TouchableOpacity style={styles.loginButton} onPress={handleRegister} disabled={loading}>
+                <Text style={styles.loginButtonText}>
+                  {loading ? "Đang đăng ký..." : "Đăng ký"}
+                </Text>
+              </TouchableOpacity>
+
+              <Text style={styles.footerText}>
+                Đã có tài khoản?{" "}
+                <Text style={styles.signUpText} onPress={() => navigation.navigate("Login")}>
+                  Đăng nhập
+                </Text>
+              </Text>
+            </View>
+
+            {/* Modal xác minh */}
+            <Modal visible={verifyModalVisible} transparent animationType="fade">
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.title}>Xác minh Email</Text>
+                  <TextInput
+                    style={[styles.input, { borderBottomWidth: 1, borderColor: "#ccc", marginBottom: 20 }]}
+                    placeholder="Mã xác minh (6 số)"
+                    value={verifyCode}
+                    onChangeText={setVerifyCode}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                  />
+                  <TouchableOpacity style={styles.loginButton} onPress={handleVerify}>
+                    <Text style={styles.loginButtonText}>
+                      {verifying ? "Đang xác minh..." : "Xác minh"}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setVerifyModalVisible(false)}>
+                    <Text style={[styles.footerText, { marginTop: 20 }]}>Đóng</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: "#fff"},
+  svgBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    width: 300,
+    height: 300,
+    zIndex: 2,
+  },
+  formContainer: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing.large,
+    padding: 20,
+    marginTop: 200,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    color: theme.colors.text,
-    marginBottom: theme.spacing.large,
+    marginBottom: 30,
+    color: "#333",
     textAlign: "center",
   },
-  input: {
-    width: "100%",
-    padding: theme.spacing.medium,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 5,
-    marginBottom: theme.spacing.medium,
-    backgroundColor: "white",
+  label: {
+    fontSize: 14,
+    color: "#333",
+    marginTop: 15,
+    marginBottom: 5,
   },
-  buttonContainer: {
-    width: "100%",
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 10,
   },
-  buttonSpacer: {
-    height: theme.spacing.medium,
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    paddingVertical: 8,
+    gap: 10,
+  },
+  inputHalf: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    paddingVertical: 8,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#000",
+    width: "100%",
+  },
+  loginButton: {
+    backgroundColor: "#2483e0",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 30,
+  },
+  loginButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footerText: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#333",
+    marginTop: 20,
+  },
+  signUpText: {
+    color: "#2483e0",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "center",
     alignItems: "center",
   },
   modalContent: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     padding: 24,
-    borderRadius: 10,
+    borderRadius: 12,
     width: "80%",
-    alignItems: "center",
+    elevation: 5,
   },
 });

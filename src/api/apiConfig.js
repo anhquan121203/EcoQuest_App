@@ -34,6 +34,7 @@ const API = {
   CREATE_TRIP: `${BASE_URL}/api/v1/Ecq110InsertTrip`,
   CREATE_TRIP_SCHEDULE: `${BASE_URL}/api/v1/Ecq110InsertTripSchedule`,
   GET_TRIP_SCHEDULE_BY_TRIPID: `${BASE_URL}/api/v1/Ecq110SelectTripSchedule`,
+  CREATE_TRIP_SCHEDULE_AI: `${BASE_URL}/api/v1/Ecq110InsertTripScheduleWithAi`,
 
   // api payment
   PAYMENT: `${BASE_URL}/api/v1/Ecq110InsertPayment`,

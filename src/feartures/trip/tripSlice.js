@@ -67,12 +67,16 @@ export const createTripSchedule = createAsyncThunk(
   async (tripScheduleData, { rejectWithValue }) => {
     try {
       const token = await AsyncStorage.getItem("access_token");
-      const response = await apiClient.post(API.CREATE_TRIP_SCHEDULE, tripScheduleData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiClient.post(
+        API.CREATE_TRIP_SCHEDULE,
+        tripScheduleData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -83,7 +87,7 @@ export const createTripSchedule = createAsyncThunk(
 // get trip schedule by trip id
 export const getTripScheduleByTripId = createAsyncThunk(
   "trip/getTripScheduleByTripId",
-  async (tripId , { rejectWithValue }) => {
+  async (tripId, { rejectWithValue }) => {
     try {
       const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.get(API.GET_TRIP_SCHEDULE_BY_TRIPID, {
@@ -100,7 +104,28 @@ export const getTripScheduleByTripId = createAsyncThunk(
   }
 );
 
-
+// create trip schedule with  AI
+export const createTripScheduleAI = createAsyncThunk(
+  "trip/createTripScheduleAI",
+  async (tripScheduleData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(
+        API.CREATE_TRIP_SCHEDULE_AI,
+        tripScheduleData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const tripSlice = createSlice({
   name: "TRIP",
@@ -147,6 +172,11 @@ const tripSlice = createSlice({
         state.selectedTripSchedule = action.payload?.response || [];
         state.loading = false;
       })
+
+      // create trip schedule AI
+      .addCase(createTripScheduleAI.fulfilled, (state, action) => {
+        state.tripSchedules.push(action.payload);
+      });
   },
 });
 

@@ -16,13 +16,14 @@ const useComment = () => {
     try {
       const resultAction = await dispatch(createComment(commentData));
       const data = await resultAction.payload;
-      commentByBlog();
+      await commentByBlog(commentData.BlogId); 
       return { success: true, data };
     } catch (error) {
-      console.error("addNewtrip error:", error);
+      console.error("addNewComment error:", error);
       return { success: false, error };
     }
   };
+  
 
   return {
     comments,

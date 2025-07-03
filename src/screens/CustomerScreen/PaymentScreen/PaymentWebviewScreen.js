@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ActivityIndicator,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Text,
   Alert,
+  Modal,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -15,6 +16,8 @@ export default function PaymentWebviewScreen() {
   const navigation = useNavigation();
   const { checkoutUrl } = useRoute().params;
 
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const handleNavigationChange = (navState) => {
     if (
       navState.url.includes("success") ||
@@ -23,7 +26,11 @@ export default function PaymentWebviewScreen() {
       navState.url.includes("returnUrl") ||
       navState.url.includes("MOBILE_RETURN_URL")
     ) {
-      navigation.goBack();
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        navigation.navigate("Home");
+      }, 5000);
     }
   };
 
@@ -67,6 +74,23 @@ export default function PaymentWebviewScreen() {
       <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
         <Text style={styles.cancelText}>Hủy thanh toán</Text>
       </TouchableOpacity>
+
+      {/* Modal Thanh toán thành công */}
+      <Modal visible={showSuccessModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>🎉 Thanh toán thành công!</Text>
+            <Text style={styles.modalMessage}>
+              Bạn sẽ được chuyển về trang chủ sau vài giây...
+            </Text>
+            <ActivityIndicator
+              size="large"
+              color="#28a745"
+              style={{ marginTop: 20 }}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -89,5 +113,30 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    elevation: 5,
+    width: 300,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#28a745",
+    marginBottom: 12,
+  },
+  modalMessage: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#555",
   },
 });
