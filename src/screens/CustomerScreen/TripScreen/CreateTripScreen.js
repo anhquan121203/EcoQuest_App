@@ -60,6 +60,18 @@ export default function CreateTripScreen() {
   const onStartDateChange = (event, selectedDate) => {
     setShowStartPicker(false);
     if (selectedDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // bỏ giờ phút để so sánh chuẩn
+
+      if (selectedDate < today) {
+        Toast.show({
+          type: "error",
+          text1: "⛔ Ngày bắt đầu không hợp lệ",
+          text2: "Vui lòng chọn ngày hôm nay hoặc sau.",
+        });
+        return; // không set state nếu ngày quá khứ
+      }
+
       setRawStartDate(selectedDate);
       setStartDate(formatDate(selectedDate));
     }
@@ -68,6 +80,26 @@ export default function CreateTripScreen() {
   const onEndDateChange = (event, selectedDate) => {
     setShowEndPicker(false);
     if (selectedDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        Toast.show({
+          type: "error",
+          text1: "⛔ Ngày kết thúc không hợp lệ",
+          text2: "Vui lòng chọn ngày hôm nay hoặc sau.",
+        });
+        return;
+      }
+
+      if (selectedDate < rawStartDate) {
+        Toast.show({
+          type: "error",
+          text1: "📅 Ngày kết thúc phải sau ngày bắt đầu",
+        });
+        return;
+      }
+
       setRawEndDate(selectedDate);
       setEndDate(formatDate(selectedDate));
     }
@@ -149,7 +181,6 @@ export default function CreateTripScreen() {
       {/* Thông tin chuyến đi */}
       <View style={styles.form}>
         <Text style={styles.contentTitle}>Thông tin chuyến đi 🗓️</Text>
-
         <View style={styles.inputRow}>
           <Ionicons
             name="calendar"
@@ -168,6 +199,25 @@ export default function CreateTripScreen() {
           </TouchableOpacity>
         </View>
 
+        {showStartPicker && (
+          <DateTimePicker
+            value={rawStartDate}
+            mode="date"
+            display="default"
+            onChange={onStartDateChange}
+            minimumDate={new Date()} 
+          />
+        )}
+
+        {showEndPicker && (
+          <DateTimePicker
+            value={rawEndDate}
+            mode="date"
+            display="default"
+            onChange={onEndDateChange}
+            minimumDate={rawStartDate} 
+          />
+        )}
         <View style={styles.inputRow}>
           <MaterialIcons
             name="travel-explore"
@@ -182,7 +232,6 @@ export default function CreateTripScreen() {
             style={styles.input}
           />
         </View>
-
         <View style={styles.inputRow}>
           <Ionicons name="people" size={20} color="#888" style={styles.icon} />
           <TextInput
@@ -193,7 +242,6 @@ export default function CreateTripScreen() {
             keyboardType="numeric"
           />
         </View>
-
         <View style={styles.inputRow}>
           <FontAwesome
             name="money"
@@ -209,7 +257,6 @@ export default function CreateTripScreen() {
             keyboardType="numeric"
           />
         </View>
-
         <View style={styles.inputRow}>
           <MaterialIcons
             name="description"
@@ -224,7 +271,6 @@ export default function CreateTripScreen() {
             style={styles.input}
           />
         </View>
-
         <View style={styles.inputRow}>
           <EvilIcons
             name="location"
@@ -239,7 +285,6 @@ export default function CreateTripScreen() {
             style={styles.input}
           />
         </View>
-
         <View>
           <Text style={styles.label}>Chọn điểm đến:</Text>
           <Picker
@@ -258,7 +303,6 @@ export default function CreateTripScreen() {
             })}
           </Picker>
         </View>
-
         <View style={styles.inputRow}>
           <MaterialIcons
             name="description"
@@ -273,31 +317,11 @@ export default function CreateTripScreen() {
             style={styles.input}
           />
         </View>
-
         <Text style={styles.label}>Travel with?</Text>
-
         <TouchableOpacity style={styles.startButton} onPress={handleCreateTrip}>
-          <Text style={styles.startButtonText}>START MY TRIP</Text>
+          <Text style={styles.startButtonText}>Bắt đầu chuyến đi</Text>
         </TouchableOpacity>
       </View>
-
-      {showStartPicker && (
-        <DateTimePicker
-          value={rawStartDate}
-          mode="date"
-          display="default"
-          onChange={onStartDateChange}
-        />
-      )}
-
-      {showEndPicker && (
-        <DateTimePicker
-          value={rawEndDate}
-          mode="date"
-          display="default"
-          onChange={onEndDateChange}
-        />
-      )}
     </ScrollView>
   );
 }

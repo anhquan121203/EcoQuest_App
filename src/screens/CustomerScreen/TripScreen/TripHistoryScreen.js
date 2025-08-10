@@ -78,69 +78,72 @@ export default function TripHistoryScreen() {
         <Text style={styles.sectionTitle}>Ongoing Trip</Text>
 
         {trips && trips.length > 0 ? (
-          trips.map((item, index) => {
-            let label = "";
-            let backgroundColor = "";
+          trips
+            .slice()
+            .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+            .map((item, index) => {
+              let label = "";
+              let backgroundColor = "";
 
-            switch (item.status) {
-              case 1:
-                label = "Bắt đầu";
-                backgroundColor = "#1890ff";
-                break;
-              case 2:
-                label = "Đang đi";
-                backgroundColor = "#fadb14";
-                break;
-              case 3:
-                label = "Hoàn thành";
-                backgroundColor = "#52c41a";
-                break;
-              case 4:
-                label = "Đã huỷ";
-                backgroundColor = "#ff4d4f";
-                break;
-              default:
-                label = "Không xác định";
-                backgroundColor = "#d9d9d9";
-                break;
-            }
+              switch (item.status) {
+                case 1:
+                  label = "Bắt đầu";
+                  backgroundColor = "#1890ff";
+                  break;
+                case 2:
+                  label = "Đang đi";
+                  backgroundColor = "#fadb14";
+                  break;
+                case 3:
+                  label = "Hoàn thành";
+                  backgroundColor = "#52c41a";
+                  break;
+                case 4:
+                  label = "Đã huỷ";
+                  backgroundColor = "#ff4d4f";
+                  break;
+                default:
+                  label = "Không xác định";
+                  backgroundColor = "#d9d9d9";
+                  break;
+              }
 
-            return (
-              <TouchableOpacity
-                key={item.tripId}
-                onPress={() => handleTripDetail(item.tripId)}
-              >
-                <View style={styles.tripCard} key={index}>
-                  <Image
-                    source={{
-                      uri: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/4f/7d/fc/caption.jpg?w=1200&h=-1&s=1",
-                    }}
-                    style={styles.tripImage}
-                  />
-                  <View style={styles.tripInfo}>
-                    <Text style={styles.tripTitle}>{item.tripName}</Text>
-                    <View style={styles.tripDetails}>
-                      <Ionicons
-                        name="location-sharp"
-                        size={14}
-                        color="#2196F3"
-                      />
-                      <Text style={styles.locationText}>Thailand</Text>
-                    </View>
-                    <Text style={styles.dateText}>
-                      {item.startDate} - {item.endDate}
-                    </Text>
-                    <View style={styles.footerCard}>
-                      <Text>{item.totalEstimatedCost}</Text>
-                      <Text style={[styles.status, { backgroundColor }]}>
-                        {label}
+              return (
+                <TouchableOpacity
+                  key={item.tripId}
+                  onPress={() => handleTripDetail(item.tripId)}
+                >
+                  <View style={styles.tripCard} key={index}>
+                    <Image
+                      source={{
+                        uri: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/4f/7d/fc/caption.jpg?w=1200&h=-1&s=1",
+                      }}
+                      style={styles.tripImage}
+                    />
+                    <View style={styles.tripInfo}>
+                      <Text style={styles.tripTitle}>{item.tripName}</Text>
+                      <View style={styles.tripDetails}>
+                        <Ionicons
+                          name="location-sharp"
+                          size={14}
+                          color="#2196F3"
+                        />
+                        <Text style={styles.locationText}>Thailand</Text>
+                      </View>
+                      <Text style={styles.dateText}>
+                        {item.startDate} - {item.endDate}
                       </Text>
+                      <View style={styles.footerCard}>
+                        <Text>{item.totalEstimatedCost}</Text>
+                        <Text style={[styles.status, { backgroundColor }]}>
+                          {label}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          })
+                </TouchableOpacity>
+              );
+            })
         ) : (
           <Text>Không có chuyến đi</Text>
         )}
@@ -153,7 +156,7 @@ export default function TripHistoryScreen() {
           <Text style={styles.buttonText}>+ Tạo chuyến đi</Text>
         </TouchableOpacity>
 
-        {/* Past Trips */}
+        {/* Past Trips
         <Text style={styles.sectionPastTrip}>Past Trips</Text>
         <View style={styles.pastTrips}>
           {[
@@ -191,7 +194,7 @@ export default function TripHistoryScreen() {
               <Text style={styles.pastTripDate}>{trip.time}</Text>
             </View>
           ))}
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -322,6 +325,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 10,
+    marginBottom: 50,
   },
 
   buttonText: {

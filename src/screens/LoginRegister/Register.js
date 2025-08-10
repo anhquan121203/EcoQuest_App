@@ -27,6 +27,16 @@ export default function RegisterScreen({ navigation }) {
   const [verifyModalVisible, setVerifyModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  const checkPasswordCriteria = (pwd) => ({
+    hasUpperCase: /[A-Z]/.test(pwd),
+    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+    hasNumber: /\d/.test(pwd),
+    minLength: pwd.length >= 8,
+  });
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -37,6 +47,20 @@ export default function RegisterScreen({ navigation }) {
     if (password !== confirmPassword) {
       Toast.show({ type: "error", text1: "Mật khẩu không khớp" });
       return;
+    }
+
+    if (
+      !/[A-Z]/.test(password) ||
+      !/[!@#$%^&*(),.?":{}|<>]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      password.length < 8
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Mật khẩu không hợp lệ",
+        text2: "Phải có chữ in hoa, ký tự đặc biệt, số và tối thiểu 8 ký tự.",
+      });
+      return; // Dừng lại, không gọi API
     }
 
     setLoading(true);
@@ -50,7 +74,10 @@ export default function RegisterScreen({ navigation }) {
         });
         setVerifyModalVisible(true);
       } else {
-        Toast.show({ type: "error", text1: res.data?.message || "Đăng ký thất bại" });
+        Toast.show({
+          type: "error",
+          text1: res.data?.message || "Đăng ký thất bại",
+        });
       }
     } catch (err) {
       Toast.show({
@@ -77,7 +104,10 @@ export default function RegisterScreen({ navigation }) {
         setVerifyModalVisible(false);
         navigation.navigate("Login");
       } else {
-        Toast.show({ type: "error", text1: "Mã xác minh không đúng hoặc hết hạn" });
+        Toast.show({
+          type: "error",
+          text1: "Mã xác minh không đúng hoặc hết hạn",
+        });
       }
     } catch (err) {
       Toast.show({
@@ -147,11 +177,41 @@ export default function RegisterScreen({ navigation }) {
                 <TextInput
                   style={styles.input}
                   placeholder="Nhập mật khẩu..."
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
+                  placeholderTextColor="#aaa"
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                 />
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={18}
+                    color="#aaa"
+                  />
+                </TouchableOpacity>
               </View>
+              {/* Khung tiêu chí */}
+              {isPasswordFocused && (
+                <View style={styles.criteriaBox}>
+                  {Object.entries(checkPasswordCriteria(password)).map(
+                    ([key, passed]) => (
+                      <Text
+                        key={key}
+                        style={{ color: passed ? "green" : "red" }}
+                      >
+                        {key === "hasUpperCase" && "• Chứa chữ in hoa"}
+                        {key === "hasSpecialChar" && "• Chứa ký tự đặc biệt"}
+                        {key === "hasNumber" && "• Chứa số"}
+                        {key === "minLength" && "• Tối thiểu 8 ký tự"}
+                      </Text>
+                    )
+                  )}
+                </View>
+              )}
 
               <Text style={styles.label}>Xác nhận mật khẩu</Text>
               <View style={styles.inputRow}>
@@ -159,13 +219,28 @@ export default function RegisterScreen({ navigation }) {
                 <TextInput
                   style={styles.input}
                   placeholder="Nhập lại mật khẩu..."
-                  secureTextEntry
+                  secureTextEntry={!showConfirmPassword}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                 />
+                <TouchableOpacity
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <Ionicons
+                    name={
+                      showConfirmPassword ? "eye-off-outline" : "eye-outline"
+                    }
+                    size={18}
+                    color="#aaa"
+                  />
+                </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.loginButton} onPress={handleRegister} disabled={loading}>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={handleRegister}
+                disabled={loading}
+              >
                 <Text style={styles.loginButtonText}>
                   {loading ? "Đang đăng ký..." : "Đăng ký"}
                 </Text>
@@ -173,36 +248,53 @@ export default function RegisterScreen({ navigation }) {
 
               <Text style={styles.footerText}>
                 Đã có tài khoản?{" "}
-                <Text style={styles.signUpText} onPress={() => navigation.navigate("Login")}>
+                <Text
+                  style={styles.signUpText}
+                  onPress={() => navigation.navigate("Login")}
+                >
                   Đăng nhập
                 </Text>
               </Text>
             </View>
 
             {/* Modal xác minh */}
-            <Modal visible={verifyModalVisible} transparent animationType="fade">
-              <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.title}>Xác minh Email</Text>
-                  <TextInput
-                    style={[styles.input, { borderBottomWidth: 1, borderColor: "#ccc", marginBottom: 20 }]}
-                    placeholder="Mã xác minh (6 số)"
-                    value={verifyCode}
-                    onChangeText={setVerifyCode}
-                    keyboardType="number-pad"
-                    maxLength={6}
-                  />
-                  <TouchableOpacity style={styles.loginButton} onPress={handleVerify}>
-                    <Text style={styles.loginButtonText}>
-                      {verifying ? "Đang xác minh..." : "Xác minh"}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setVerifyModalVisible(false)}>
-                    <Text style={[styles.footerText, { marginTop: 20 }]}>Đóng</Text>
-                  </TouchableOpacity>
+            <Modal
+              visible={verifyModalVisible}
+              transparent
+              animationType="fade"
+            >
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={styles.modalOverlay}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.title}>Xác minh Email</Text>
+                    <TextInput
+                      style={styles.verifyInput}
+                      placeholder="Mã xác minh (6 số)"
+                      value={verifyCode}
+                      onChangeText={setVerifyCode}
+                      keyboardType="number-pad"
+                      maxLength={6}
+                    />
+                    <TouchableOpacity
+                      style={styles.loginButton}
+                      onPress={handleVerify}
+                    >
+                      <Text style={styles.loginButtonText}>
+                        {verifying ? "Đang xác minh..." : "Xác minh"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => setVerifyModalVisible(false)}
+                    >
+                      <Text style={[styles.footerText, { marginTop: 20 }]}>
+                        Đóng
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
+              </TouchableWithoutFeedback>
             </Modal>
+            {/* ========================================================================== */}
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -211,7 +303,7 @@ export default function RegisterScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff"},
+  container: { flex: 1, backgroundColor: "#fff" },
   svgBackground: {
     position: "absolute",
     top: 0,
@@ -252,6 +344,12 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     paddingVertical: 8,
     gap: 10,
+  },
+  criteriaBox: {
+    marginTop: 8,
+    padding: 10,
+    backgroundColor: "#f8f8f8",
+    borderRadius: 8,
   },
   inputHalf: {
     flex: 1,
@@ -302,5 +400,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: "80%",
     elevation: 5,
+  },
+
+  verifyInput: {
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    fontSize: 16,
+    color: "#000",
+    paddingVertical: 8,
+    marginBottom: 20,
   },
 });

@@ -23,6 +23,7 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👈 thêm state
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
@@ -91,11 +92,20 @@ export default function LoginScreen({ navigation }) {
                 <TextInput
                   style={styles.input}
                   placeholder="Nhập mật khẩu..."
-                  secureTextEntry
+                  secureTextEntry={!showPassword} // 👈 đổi theo state
                   value={password}
                   onChangeText={setPassword}
                   placeholderTextColor="#aaa"
                 />
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                    size={18}
+                    color="#aaa"
+                  />
+                </TouchableOpacity>
               </View>
 
               <View style={styles.optionRow}>
@@ -103,7 +113,9 @@ export default function LoginScreen({ navigation }) {
                   style={styles.rememberMe}
                   onPress={() => setRememberMe(!rememberMe)}
                 >
-                  <View style={[styles.checkbox, rememberMe && styles.checkedBox]}>
+                  <View
+                    style={[styles.checkbox, rememberMe && styles.checkedBox]}
+                  >
                     {rememberMe && (
                       <Ionicons name="checkmark" size={12} color="#fff" />
                     )}
@@ -111,12 +123,17 @@ export default function LoginScreen({ navigation }) {
                   <Text style={styles.optionText}>Nhớ mật khẩu</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("ForgotPassword")}
+                >
                   <Text style={styles.forgotText}>Quên mật khẩu?</Text>
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={handleLogin}
+              >
                 <Text style={styles.loginButtonText}>Đăng nhập</Text>
               </TouchableOpacity>
 

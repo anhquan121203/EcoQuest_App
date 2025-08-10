@@ -20,7 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 
 export default function CreateTripScheduleScreen() {
-  const navigation  = useNavigation();
+  const navigation = useNavigation();
   const route = useRoute();
   const { id, selectedDate } = route.params || {};
   const { addNewtripSchedule, tripScheduleByTripId } = useTrip();
@@ -39,6 +39,7 @@ export default function CreateTripScheduleScreen() {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [serviceId, setServiceId] = useState("");
+  const [tripSchedules, setTripSchedules] = useState([]);
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -57,7 +58,6 @@ export default function CreateTripScheduleScreen() {
       tripScheduleByTripId(id);
     }
   }, [id]);
-  
 
   const formatTime = (date) => {
     if (!date) return "";
@@ -66,7 +66,8 @@ export default function CreateTripScheduleScreen() {
     return `${hours}:${minutes}`;
   };
 
-  const handleAddNewTripSchedule = async () => {
+  // ✅ Thêm lịch trình vào danh sách tạm
+  const handleAddScheduleToList = () => {
     if (
       !title ||
       !description ||
@@ -79,45 +80,69 @@ export default function CreateTripScheduleScreen() {
       return;
     }
 
+    const newSchedule = {
+      scheduleDate,
+      title,
+      description,
+      estimatedCost: parseFloat(estimatedCost),
+      startTime: formatTime(startTime),
+      endTime: formatTime(endTime),
+      address,
+      serviceId,
+    };
+
+    setTripSchedules((prev) => [...prev, newSchedule]);
+
+    // Reset form sau khi thêm
+    setTitle("");
+    setDescription("");
+    setEstimatedCost("");
+    setAddress("");
+    setStartTime(null);
+    setEndTime(null);
+    setServiceId("");
+
+    Toast.show({
+      type: "success",
+      text1: "Đã thêm lịch trình vào danh sách",
+    });
+  };
+
+  // ✅ Gửi toàn bộ lịch trình về BE
+  const handleSubmitAllSchedules = async () => {
+    if (tripSchedules.length === 0) {
+      Alert.alert("Lỗi", "Bạn chưa thêm lịch trình nào.");
+      return;
+    }
+
     try {
       const payload = {
         tripId: id,
-        tripScheduleDetails: [
-          {
-            scheduleDate,
-            title,
-            description,
-            estimatedCost: parseFloat(estimatedCost),
-            startTime: formatTime(startTime),
-            endTime: formatTime(endTime),
-            address,
-            serviceId,
-          },
-        ],
+        tripScheduleDetails: tripSchedules,
       };
 
       await addNewtripSchedule(payload);
       await tripScheduleByTripId(id);
-      console.log("data trip", payload)
 
       Toast.show({
         type: "success",
         text1: "Thành công!",
-        text2: `Lịch trình đã được tạo cho ngày ${scheduleDate}!`,
+        text2: `${tripSchedules.length} lịch trình đã được tạo!`,
       });
+
       navigation.goBack();
     } catch (error) {
       console.error("❌ Error creating schedule:", error);
-      Alert.alert("Lỗi", "Không thể tạo lịch trình. Vui lòng thử lại.");
       Toast.show({
         type: "error",
-        text1: `Không thể tạo lịch trình. Vui lòng thử lại.`,
+        text1: "Không thể tạo lịch trình",
       });
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -181,6 +206,7 @@ export default function CreateTripScheduleScreen() {
         onChangeText={setAddress}
       />
 
+      {/* Thời gian bắt đầu */}
       <Text style={styles.label}>Thời gian bắt đầu</Text>
       <TouchableOpacity
         style={styles.input}
@@ -201,6 +227,7 @@ export default function CreateTripScheduleScreen() {
         />
       )}
 
+      {/* Thời gian kết thúc */}
       <Text style={styles.label}>Thời gian kết thúc</Text>
       <TouchableOpacity
         style={styles.input}
@@ -221,13 +248,12 @@ export default function CreateTripScheduleScreen() {
         />
       )}
 
-      {/* Loai dịch vụ**************************************** */}
+      {/* Loại dịch vụ */}
       <Text style={styles.label}>Loại dịch vụ</Text>
       <Picker
         selectedValue={selectedServiceType}
         style={styles.inputRow}
         onValueChange={(value) => setSelectedServiceType(value)}
-        placeholder="Loại dịch vụ"
       >
         <Picker.Item label="Khách sạn" value={1} />
         <Picker.Item label="Nhà hàng" value={2} />
@@ -254,7 +280,6 @@ export default function CreateTripScheduleScreen() {
             ))}
           </Picker>
 
-          {/* Hiển thị thông tin chi tiết dịch vụ đã chọn */}
           {serviceId && (
             <View
               style={{
@@ -289,11 +314,47 @@ export default function CreateTripScheduleScreen() {
         </Text>
       )}
 
+      {/* Nút thêm vào danh sách */}
       <TouchableOpacity
-        style={styles.button}
-        onPress={handleAddNewTripSchedule}
+        style={[styles.button, { backgroundColor: "#4CAF50" }]}
+        onPress={handleAddScheduleToList}
       >
-        <Text style={styles.buttonText}>Tạo lịch trình</Text>
+        <Text style={styles.buttonText}>Thêm vào danh sách</Text>
+      </TouchableOpacity>
+
+      {/* Danh sách tạm */}
+      {tripSchedules.length > 0 && (
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ fontWeight: "bold", marginBottom: 10 }}>
+            📋 Danh sách lịch trình tạm:
+          </Text>
+          {tripSchedules.map((item, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: "#f1f1f1",
+                padding: 10,
+                marginBottom: 5,
+                borderRadius: 8,
+              }}
+            >
+              <Text>
+                {index + 1}. {item.title} - {item.scheduleDate}
+              </Text>
+              <Text>
+                {item.startTime} - {item.endTime}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Nút gửi về BE */}
+      <TouchableOpacity
+        style={[styles.button, { marginTop: 20 }]}
+        onPress={handleSubmitAllSchedules}
+      >
+        <Text style={styles.buttonText}>📤 Tạo lịch trình</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -304,12 +365,10 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
-
   header: {
     justifyContent: "space-between",
     alignItems: "center",
   },
-
   backButton: {
     position: "absolute",
     top: 15,
@@ -319,13 +378,11 @@ const styles = StyleSheet.create({
     padding: 5,
     zIndex: 100,
   },
-
   settingButton: {
     position: "absolute",
     top: 15,
     right: 0,
   },
-
   title: {
     fontSize: 18,
     fontWeight: "bold",
@@ -333,8 +390,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginTop: 20,
   },
-
-  // content************************
   timeInfo: {
     marginBottom: 20,
     padding: 10,
