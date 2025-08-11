@@ -115,9 +115,7 @@ export default function TripHistoryScreen() {
                 >
                   <View style={styles.tripCard} key={index}>
                     <Image
-                      source={{
-                        uri: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/4f/7d/fc/caption.jpg?w=1200&h=-1&s=1",
-                      }}
+                      source={require("../../../../assets/image_trip_history.jpg")}
                       style={styles.tripImage}
                     />
                     <View style={styles.tripInfo}>

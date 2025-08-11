@@ -86,9 +86,7 @@ export default function TripDetailScreen() {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         <ImageBackground
-          source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/007/264/314/non_2x/the-concept-travel-the-world-on-the-airplanes-vector.jpg",
-          }}
+          source={require("../../../../assets/images/trips/image_trip_detail.jpg")}
           style={styles.headerImage}
           imageStyle={{
             borderBottomLeftRadius: 20,

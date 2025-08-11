@@ -27,7 +27,7 @@ const HotelMore = () => {
         onPress={() => navigation.navigate("AttractionDetails")}
       >
         <Image
-          source={require("../../../../assets/images/home/mekong.png")}
+          source={require("../../../../assets/images/home/me_kong.jpg")}
           style={styles.exploreImage}
         />
         <View style={styles.exploreInfo}>
@@ -41,7 +41,7 @@ const HotelMore = () => {
 
       <View style={styles.exploreCard}>
         <Image
-          source={require("../../../../assets/images/home/mekong.png")}
+          source={require("../../../../assets/images/home/me_kong.jpg")}
           style={styles.exploreImage}
         />
         <View style={styles.exploreInfo}>
@@ -54,7 +54,7 @@ const HotelMore = () => {
       </View>
       <View style={styles.exploreCard}>
         <Image
-          source={require("../../../../assets/images/home/mekong.png")}
+          source={require("../../../../assets/images/home/me_kong.jpg")}
           style={styles.exploreImage}
         />
         <View style={styles.exploreInfo}>

@@ -22,7 +22,7 @@ export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../../assets/images/login/1.png")}
+        source={require("../../../assets/images/login/login_welcome.jpg")}
         style={styles.image}
         resizeMode="cover"
       />

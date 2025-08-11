@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const { hotels, fetchHotels } = useHotel();
   const { destinations, fetchDestinations } = useDestination();
 
+  const localImage = require("../../../assets/image_default.jpg");
 
   const navigation = useNavigation();
 
@@ -100,7 +101,7 @@ const HomeScreen = () => {
               const imageUrl =
                 item.attractionImages?.length > 0
                   ? item.attractionImages[0]
-                  : "https://static.vinwonders.com/production/ho-hoan-kiem-2.jpg";
+                  : localImage;
 
               return (
                 <TouchableOpacity
@@ -151,7 +152,7 @@ const HomeScreen = () => {
               const imageUrl =
                 item.hotelImages?.length > 0
                   ? item.hotelImages[0]
-                  : "https://via.placeholder.com/160x100.png?text=No+Image";
+                  : localImage;
 
               return (
                 <TouchableOpacity
@@ -191,7 +192,7 @@ const HomeScreen = () => {
             const imageUrl =
               item.destinationImages?.length > 0
                 ? item.destinationImages[0]
-                : "https://via.placeholder.com/120x100.png?text=No+Image";
+                : localImage;
 
             return (
               <TouchableOpacity style={styles.exploreCard} key={index}>

@@ -42,14 +42,16 @@ const AtractionDetails = () => {
     );
   }
 
+  const localImage = require("../../../../assets/image_default.jpg");
+
   const imageUrl =
     selectedAttraction.attractionImages?.[0] ??
-    "https://via.placeholder.com/300x200.png?text=No+Image";
+    localImage;
 
   return (
     <ScrollView style={styles.container}>
       <View>
-        <Image source={{ uri: "https://cdn.xanhsm.com/2024/11/aa4af80d-ho-hoan-kiem-2.jpg" }} style={styles.image} />
+        <Image source={require("../../../../assets/images/home/ho-guom.jpg")} style={styles.image} />
 
         <View style={styles.content}>
           <Text style={styles.title}>{selectedAttraction?.attractionName}</Text>
@@ -63,7 +65,7 @@ const AtractionDetails = () => {
             <Text style={styles.mapTitle}>Địa điểm</Text>
             <Text style={styles.mapName}>{selectedAttraction.address}</Text>
             <Image
-              source={{ uri: "https://example.com/map-image.jpg" }}
+              source={require("../../../../assets/image_default.jpg")}
               style={styles.mapImage}
             />
             <Text style={styles.address}>

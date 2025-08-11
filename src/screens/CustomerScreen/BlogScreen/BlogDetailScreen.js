@@ -46,8 +46,7 @@ export default function BlogDetailScreen() {
     ? selectedBlog.blogImages
     : []; // đảm bảo là mảng
   const hasImages = blogImages.length > 0;
-  const fallbackImage =
-    "https://www.elegantthemes.com/blog/wp-content/uploads/2020/02/000-404.png";
+  const fallbackImage = require("../../../../assets/image_default.jpg");
 
   const handleAddComment = async () => {
     if (!commentContent.trim()) return;
@@ -105,9 +104,7 @@ export default function BlogDetailScreen() {
               <Text style={styles.title}>{selectedBlog.title}</Text>
               <View style={styles.authorRow}>
                 <Image
-                  source={{
-                    uri: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740",
-                  }}
+                  source={require("../../../../assets/image_default.jpg")}
                   style={styles.avatar}
                 />
                 <Text style={styles.authorText}>
@@ -148,9 +145,7 @@ export default function BlogDetailScreen() {
               selectedComment.map((item, index) => (
                 <View style={styles.commentItem} key={index}>
                   <Image
-                    source={{
-                      uri: "https://img.freepik.com/free-icon/user_318-159711.jpg",
-                    }}
+                    source={require("../../../../assets/image_default.jpg")}
                     style={styles.commentAvatar}
                   />
                   <View style={styles.commentContent}>

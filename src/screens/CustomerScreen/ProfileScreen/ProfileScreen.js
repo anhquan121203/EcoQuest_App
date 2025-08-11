@@ -43,9 +43,7 @@ const ProfileScreen = () => {
           <Icon name="more-vert" size={24} color="#fff" />
         </TouchableOpacity>
         <Image
-          source={{
-            uri: "https://cdn.dribbble.com/userupload/14028171/file/original-3a31127b9b84f9bc5f75737a4720f699.jpg?resize=752x&vertical=center",
-          }} // Replace with your avatar URL
+          source={require("../../../../assets/chatbot.png")}
           style={styles.avatar}
         />
         <Text style={styles.name}>{firstName} {lastName}</Text>

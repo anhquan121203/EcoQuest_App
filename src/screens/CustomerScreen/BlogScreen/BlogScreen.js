@@ -22,8 +22,10 @@ export default function BlogScreen() {
   }, []);
 
   const handleBlogDetail = (id) => {
-    navigation.navigate("BlogDetail", {id})
-  }
+    navigation.navigate("BlogDetail", { id });
+  };
+
+  const imageDefault = require("../../../../assets/image_default.jpg");
 
   return (
     <View style={styles.container}>
@@ -72,12 +74,10 @@ export default function BlogScreen() {
         {blogs && blogs?.length > 0 ? (
           blogs.map((item, index) => {
             const imageUrl =
-              item.blogImages?.length > 0
-                ? item.blogImages[0]
-                : "https://www.elegantthemes.com/blog/wp-content/uploads/2020/02/000-404.png";
+              item.blogImages?.length > 0 ? item.blogImages[0] : imageDefault;
 
             return (
-              <View style={styles.card} key={index} >
+              <View style={styles.card} key={index}>
                 <Image source={{ uri: imageUrl }} style={styles.cardImage} />
 
                 <View style={styles.durationTag}>
@@ -89,7 +89,12 @@ export default function BlogScreen() {
                   <Text style={styles.cardDesc} numberOfLines={4}>
                     {item.content}
                   </Text>
-                  <Text style={styles.cardLink} onPress={() => handleBlogDetail(item.blogId)}>Xem chi tiết</Text>
+                  <Text
+                    style={styles.cardLink}
+                    onPress={() => handleBlogDetail(item.blogId)}
+                  >
+                    Xem chi tiết
+                  </Text>
                 </View>
               </View>
             );
@@ -123,13 +128,13 @@ const styles = StyleSheet.create({
 
   headerTitle: {
     flexDirection: "row",
-    alignItems: "center", 
-    justifyContent: "center", 
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 10,
-    position: "relative", 
+    position: "relative",
   },
   backButton: {
-    position: "absolute", 
+    position: "absolute",
     left: 0,
     zIndex: 1,
   },

@@ -56,7 +56,8 @@ const HotelDetails = () => {
     );
   }
 
-  const fallbackImage = "https://via.placeholder.com/300x200.png?text=No+Image";
+  const fallbackImage = require("../../../../assets/image_default.jpg");
+
   const hotelImages = selectedHotel.hotelImages?.length
     ? selectedHotel.hotelImages
     : [fallbackImage];
