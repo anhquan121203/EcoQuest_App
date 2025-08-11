@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createTrip,
   createTripSchedule,
+  createTripScheduleAI,
   getTripById,
   getTripScheduleByTripId,
   listTrip,
@@ -52,7 +53,6 @@ const useTrip = () => {
     try {
       const resultAction = await dispatch(createTripSchedule(tripScheduleData));
 
-      // unwrap kết quả để lấy data từ payload (RTK way)
       const data = await resultAction.payload;
       return { success: true, data };
     } catch (error) {
@@ -64,6 +64,18 @@ const useTrip = () => {
   const tripScheduleByTripId = async (id) => {
     dispatch(getTripScheduleByTripId(id));
   };
+
+  const  addNewtripScheduleWithAI = async (tripScheduleAiData) => {
+    try {
+      const resultAction = await dispatch(createTripScheduleAI(tripScheduleAiData));
+
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("add New trip Schedule AI error:", error);
+      return { success: false, error };
+    }
+  }
 
   return {
     trips,
@@ -77,6 +89,7 @@ const useTrip = () => {
     addNewtrip,
     addNewtripSchedule,
     tripScheduleByTripId,
+    addNewtripScheduleWithAI,
   };
 };
 

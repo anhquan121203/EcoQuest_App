@@ -61,7 +61,7 @@ export default function CreateTripScreen() {
     setShowStartPicker(false);
     if (selectedDate) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // bỏ giờ phút để so sánh chuẩn
+      today.setHours(0, 0, 0, 0);
 
       if (selectedDate < today) {
         Toast.show({

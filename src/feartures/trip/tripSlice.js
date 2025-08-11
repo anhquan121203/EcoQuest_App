@@ -107,12 +107,12 @@ export const getTripScheduleByTripId = createAsyncThunk(
 // create trip schedule with  AI
 export const createTripScheduleAI = createAsyncThunk(
   "trip/createTripScheduleAI",
-  async (tripScheduleData, { rejectWithValue }) => {
+  async (tripScheduleAiData, { rejectWithValue }) => {
     try {
       const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.post(
         API.CREATE_TRIP_SCHEDULE_AI,
-        tripScheduleData,
+        tripScheduleAiData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -132,6 +132,7 @@ const tripSlice = createSlice({
   initialState: {
     trips: [],
     tripSchedules: [],
+    tripSchedulesWithAI: [],
     selectedTrip: [],
     selectedTripSchedule: [],
     loading: false,
@@ -175,7 +176,7 @@ const tripSlice = createSlice({
 
       // create trip schedule AI
       .addCase(createTripScheduleAI.fulfilled, (state, action) => {
-        state.tripSchedules.push(action.payload);
+        state.tripSchedulesWithAI.push(action.payload);
       });
   },
 });

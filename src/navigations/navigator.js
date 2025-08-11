@@ -123,6 +123,11 @@ function AuthStack() {
         component={PaymentWebviewScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="TripScheduleAi"
+        component={TripScheduleAiScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -159,11 +164,11 @@ function AppTabs() {
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="TripScheduleAi"
         component={TripScheduleAiScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Tab.Screen
         name="Notifications"
         component={HomeScreen}
@@ -193,9 +198,13 @@ function MainAppStack() {
       <Stack.Screen name="PostBlogScreen" component={PostBlogScreen} />
       <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
       <Stack.Screen name="TripDetail" component={TripDetailScreen} />
-      <Stack.Screen name="CreateTripSchedule" component={CreateTripScheduleScreen}/>
-      <Stack.Screen name="TripSchedule" component={TripScheduleScreen}/>
+      <Stack.Screen
+        name="CreateTripSchedule"
+        component={CreateTripScheduleScreen}
+      />
+      <Stack.Screen name="TripSchedule" component={TripScheduleScreen} />
       <Stack.Screen name="PaymentWebview" component={PaymentWebviewScreen} />
+      <Stack.Screen name="TripScheduleAi" component={TripScheduleAiScreen} />
     </Stack.Navigator>
   );
 }

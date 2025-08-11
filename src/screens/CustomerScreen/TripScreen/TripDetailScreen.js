@@ -21,6 +21,7 @@ export default function TripDetailScreen() {
   const { selectedTrip, tripById } = useTrip();
   const navigation = useNavigation();
   const { payments, addNewPayment } = usePayment();
+  const { addNewtripScheduleWithAI } = useTrip();
 
   useEffect(() => {
     if (id) {
@@ -79,6 +80,26 @@ export default function TripDetailScreen() {
     }
   };
 
+  // create trip withh AI
+
+  const handleCreateTripWithAI = async () => {
+    try {
+      const payload = {
+        tripId: selectedTrip.tripId,
+      };
+
+      const res = await addNewtripScheduleWithAI(payload);
+      Toast.show({
+        type: "success",
+        text1: "Thành công!",
+        text2: `Lịch trình đã được tạo!`,
+      });
+      // console.log("Thông tin lích trình:", payload);
+
+      navigation.navigate("TripScheduleAi", { aiData: res, tripId: selectedTrip.tripId });
+    } catch (error) {}
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
@@ -86,9 +107,7 @@ export default function TripDetailScreen() {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         <ImageBackground
-          source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/007/264/314/non_2x/the-concept-travel-the-world-on-the-airplanes-vector.jpg",
-          }}
+          source={require("../../../../assets/images/trips/image_trip_detail.jpg")}
           style={styles.headerImage}
           imageStyle={{
             borderBottomLeftRadius: 20,
@@ -170,6 +189,7 @@ export default function TripDetailScreen() {
 
       {/* Nút cố định dưới cùng */}
       <View style={styles.fixedBottomButtons}>
+        {/* navigate towis trang TripScheduleScreen */}
         <TouchableOpacity
           style={styles.leftButton}
           onPress={() =>
@@ -182,9 +202,14 @@ export default function TripDetailScreen() {
 
         <TouchableOpacity
           style={styles.middleButton}
-          
+          onPress={handleCreateTripWithAI}
         >
-          <Ionicons name="sparkles-outline" size={18} color="#fff" style={{marginRight: 8}}/>
+          <Ionicons
+            name="sparkles-outline"
+            size={18}
+            color="#fff"
+            style={{ marginRight: 8 }}
+          />
           <Text style={styles.buttonText}>Tạo AI</Text>
         </TouchableOpacity>
 
@@ -308,7 +333,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 10,
   },
-  
+
   rightButton: {
     flex: 1.2,
     backgroundColor: "#e74c3c",

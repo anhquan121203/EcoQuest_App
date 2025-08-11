@@ -18,11 +18,12 @@ import useService from "../../../hooks/useService";
 import Entypo from "@expo/vector-icons/Entypo";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
+import moment from "moment";
 
 export default function CreateTripScheduleScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { id, selectedDate } = route.params || {};
+  const { id, selectedDate, startDate, endDate } = route.params || {};
   const { addNewtripSchedule, tripScheduleByTripId } = useTrip();
   const {
     serviceByType,
@@ -32,6 +33,7 @@ export default function CreateTripScheduleScreen() {
   } = useService();
 
   const [scheduleDate, setScheduleDate] = useState(selectedDate || "");
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [estimatedCost, setEstimatedCost] = useState("");
@@ -80,6 +82,14 @@ export default function CreateTripScheduleScreen() {
       return;
     }
 
+    if (
+      moment(scheduleDate).isBefore(moment(startDate, "DD/MM/YYYY")) ||
+      moment(scheduleDate).isAfter(moment(endDate, "DD/MM/YYYY"))
+    ) {
+      Alert.alert("Lỗi", "Ngày lịch trình phải nằm trong thời gian chuyến đi.");
+      return;
+    }
+
     const newSchedule = {
       scheduleDate,
       title,
@@ -111,17 +121,33 @@ export default function CreateTripScheduleScreen() {
   // ✅ Gửi toàn bộ lịch trình về BE
   const handleSubmitAllSchedules = async () => {
     if (tripSchedules.length === 0) {
-      Alert.alert("Lỗi", "Bạn chưa thêm lịch trình nào.");
+      // Alert.alert("Lỗi", "Bạn chưa thêm lịch trình nào.");
+      Toast.show({
+        type: "error",
+        text1: "Lỗi!",
+        text2: `Bạn chưa thêm lịch trình nào!`,
+      });
       return;
     }
 
     try {
       const payload = {
         tripId: id,
-        tripScheduleDetails: tripSchedules,
+        tripScheduleDetails: tripSchedules.map((sch) => ({
+          scheduleDate: sch.scheduleDate,
+          title: sch.title,
+          description: sch.description,
+          startTime: sch.startTime, // HH:mm
+          endTime: sch.endTime, // HH:mm
+          address: sch.address,
+          estimatedCost: parseFloat(sch.estimatedCost),
+          // Chỉ gửi serviceId nếu có
+          ...(sch.serviceId ? { serviceId: sch.serviceId } : {}),
+        })),
       };
 
-      await addNewtripSchedule(payload);
+      const res = await addNewtripSchedule(payload);
+      
       await tripScheduleByTripId(id);
 
       Toast.show({
@@ -129,6 +155,7 @@ export default function CreateTripScheduleScreen() {
         text1: "Thành công!",
         text2: `${tripSchedules.length} lịch trình đã được tạo!`,
       });
+      // console.log("Thông tin lích trình:", payload);
 
       navigation.goBack();
     } catch (error) {
@@ -166,11 +193,32 @@ export default function CreateTripScheduleScreen() {
       </View>
 
       <Text style={styles.label}>Ngày lịch trình</Text>
-      <TextInput
-        style={[styles.input, { backgroundColor: "#eee" }]}
-        value={scheduleDate}
-        editable={false}
-      />
+      <TouchableOpacity
+        style={[styles.input, { justifyContent: "center" }]}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text>
+          {scheduleDate
+            ? moment(scheduleDate).format("DD/MM/YYYY")
+            : "Chọn ngày"}
+        </Text>
+      </TouchableOpacity>
+
+      {showDatePicker && (
+        <DateTimePicker
+          mode="date"
+          value={scheduleDate ? new Date(scheduleDate) : new Date(startDate)}
+          minimumDate={moment(startDate, "DD/MM/YYYY").toDate()}
+          maximumDate={moment(endDate, "DD/MM/YYYY").toDate()}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(_, date) => {
+            setShowDatePicker(false);
+            if (date) {
+              setScheduleDate(moment(date).format("YYYY-MM-DD"));
+            }
+          }}
+        />
+      )}
 
       <Text style={styles.label}>Tiêu đề</Text>
       <TextInput
