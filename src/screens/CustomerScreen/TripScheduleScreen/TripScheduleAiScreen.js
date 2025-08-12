@@ -143,4 +143,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6c5ce7",
   },
+  confirmBtn: {
+    backgroundColor: "#00b894",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
 });

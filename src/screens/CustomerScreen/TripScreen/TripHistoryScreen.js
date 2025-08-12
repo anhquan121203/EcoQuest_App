@@ -113,7 +113,7 @@ export default function TripHistoryScreen() {
                   key={item.tripId}
                   onPress={() => handleTripDetail(item.tripId)}
                 >
-                  <View style={styles.tripCard} key={index}>
+                  <View style={styles.tripCard}>
                     <Image
                       source={require("../../../../assets/images/trips/image_trip_history.jpg")}
                       style={styles.tripImage}
