@@ -84,10 +84,10 @@ const ProfileScreen = () => {
 
         <TouchableOpacity
           style={styles.infoItem}
-          onPress={() => navigation.navigate("TripHistory")}
+          onPress={() => navigation.navigate("PaymentHistory")}
         >
-          <Icon name="schedule" size={24} color="#2a9df4" />
-          <Text style={styles.infoText}>Lịch trình chuyến đi</Text>
+          <Icon name="payment" size={24} color="#2a9df4" />
+          <Text style={styles.infoText}>Lịch sử thanh toán</Text>
           <Icon
             name="chevron-right"
             size={24}

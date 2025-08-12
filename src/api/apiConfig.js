@@ -38,6 +38,7 @@ const API = {
 
   // api payment
   PAYMENT: `${BASE_URL}/api/v1/Ecq110InsertPayment`,
+  PAYMENT_CALLBACK: `${BASE_URL}/api/v1/Ecq110PaymentCallback`,
 
   // api service
   SERVICE: `${BASE_URL}/api/v1/Ecq110SelectService`,

@@ -26,6 +26,8 @@ import CreateTripScheduleScreen from "../screens/CustomerScreen/TripScreen/Creat
 import TripScheduleAiScreen from "../screens/CustomerScreen/TripScheduleScreen/TripScheduleAiScreen";
 import TripScheduleScreen from "../screens/CustomerScreen/TripScreen/TripScheduleScreen";
 import PaymentWebviewScreen from "../screens/CustomerScreen/PaymentScreen/PaymentWebviewScreen";
+import PaymentHistoryScreen from "../screens/CustomerScreen/PaymentHistoryScreen/PaymentHistoryScreen";
+import PremierScreen from "../screens/CustomerScreen/PremierScreen/PremierScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -58,11 +60,11 @@ function AuthStack() {
         component={AppTabs}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="TripHistory"
         component={TripHistoryScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
         name="CreateTrip"
         component={CreateTripScreen}
@@ -128,6 +130,11 @@ function AuthStack() {
         component={TripScheduleAiScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="PaymentHistory"
+        component={PaymentHistoryScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -142,10 +149,10 @@ function AppTabs() {
             iconName = focused ? "home" : "home-outline";
           else if (route.name === "Search")
             iconName = focused ? "search" : "search-outline";
-          else if (route.name === "Schedule")
+          else if (route.name === "TripHistory")
             iconName = focused ? "calendar" : "calendar-outline";
-          else if (route.name === "Notifications")
-            iconName = focused ? "notifications" : "notifications-outline";
+          else if (route.name === "PremierScreen")
+            iconName = focused ? "diamond" : "diamond-outline";
           else if (route.name === "Profile")
             iconName = focused ? "person" : "person-outline";
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -157,27 +164,42 @@ function AppTabs() {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Trang chủ",
+        }}
       />
       <Tab.Screen
         name="Search"
         component={HomeScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Tìm kiếm",
+        }}
       />
-      {/* <Tab.Screen
-        name="TripScheduleAi"
-        component={TripScheduleAiScreen}
-        options={{ headerShown: false }}
-      /> */}
       <Tab.Screen
-        name="Notifications"
-        component={HomeScreen}
-        options={{ headerShown: false }}
+        name="TripHistory"
+        component={TripHistoryScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Chuyến đi",
+        }}
+      />
+      <Tab.Screen
+        name="PremierScreen"
+        component={PremierScreen}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Nâng cấp",
+        }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarLabel: "Hồ sơ",
+        }}
       />
     </Tab.Navigator>
   );
@@ -205,6 +227,7 @@ function MainAppStack() {
       <Stack.Screen name="TripSchedule" component={TripScheduleScreen} />
       <Stack.Screen name="PaymentWebview" component={PaymentWebviewScreen} />
       <Stack.Screen name="TripScheduleAi" component={TripScheduleAiScreen} />
+      <Stack.Screen name="PaymentHistory" component={PaymentHistoryScreen} />
     </Stack.Navigator>
   );
 }

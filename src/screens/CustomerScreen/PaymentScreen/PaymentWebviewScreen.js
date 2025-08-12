@@ -29,6 +29,11 @@ export default function PaymentWebviewScreen() {
       setShowSuccessModal(true);
       setTimeout(() => {
         setShowSuccessModal(false);
+        // if (typeof onPaymentSuccess === "function") {
+        //   onPaymentSuccess();
+        // } else {
+        //   navigation.navigate("Home");
+        // }
         navigation.navigate("Home");
       }, 5000);
     }

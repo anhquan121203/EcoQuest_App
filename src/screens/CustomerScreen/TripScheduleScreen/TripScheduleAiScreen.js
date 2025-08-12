@@ -27,7 +27,7 @@ export default function TripScheduleAiScreen({ navigation }) {
           description: item.description,
           estimatedCost: item.estimatedCost || 0,
           startTime: item.startTime?.slice(0, 5), // HH:mm format
-          endTime: item.endTime?.slice(0, 5), 
+          endTime: item.endTime?.slice(0, 5),
           address: item.address,
           ...(item.serviceId ? { serviceId: item.serviceId } : {}),
         })),
@@ -40,7 +40,7 @@ export default function TripScheduleAiScreen({ navigation }) {
       Toast.show({
         type: "success",
         text1: "Thành công!",
-        text2: `Lịch trình đã được tạo!`,
+        text2: `Lịch trình gợi ý bằng AI đã được tạo!`,
       });
       navigation.navigate("TripDetail", { id: tripId });
     } catch (error) {
@@ -78,11 +78,23 @@ export default function TripScheduleAiScreen({ navigation }) {
         <Text>Không có dữ liệu AI</Text>
       )}
 
-      {schedules.length > 0 && (
-        <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-          <Text style={styles.confirmText}>Xác nhận & Lưu</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.confirmBtn, styles.flexBtn]}
+          onPress={() => navigation.navigate("TripDetail", { id: tripId })}
+        >
+          <Text style={styles.confirmText}>Quay lại</Text>
         </TouchableOpacity>
-      )}
+
+        {schedules.length > 0 && (
+          <TouchableOpacity
+            style={[styles.confirmBtn, styles.flexBtn]}
+            onPress={handleConfirm}
+          >
+            <Text style={styles.confirmText}>Xác nhận & Lưu</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </ScrollView>
   );
 }
@@ -149,5 +161,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     marginTop: 20,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10, 
+    marginTop: 20,
+  },
+  flexBtn: {
+    flex: 1, 
+  },
+  confirmBtn: {
+    backgroundColor: "#1976D2",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  confirmText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });

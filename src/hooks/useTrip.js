@@ -65,7 +65,7 @@ const useTrip = () => {
     dispatch(getTripScheduleByTripId(id));
   };
 
-  const  addNewtripScheduleWithAI = async (tripScheduleAiData) => {
+  const addNewtripScheduleWithAI = async (tripScheduleAiData) => {
     try {
       const resultAction = await dispatch(createTripScheduleAI(tripScheduleAiData));
 
@@ -76,6 +76,8 @@ const useTrip = () => {
       return { success: false, error };
     }
   }
+
+  
 
   return {
     trips,

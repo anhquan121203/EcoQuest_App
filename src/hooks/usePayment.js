@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPayment } from "../feartures/payment/paymentSlice";
+import { createPayment, paymentCallBack } from "../feartures/payment/paymentSlice";
 
 const usePayment = () => {
   const {
@@ -31,6 +31,16 @@ const usePayment = () => {
     }
   };
 
+  const paymentCallback = async (paymentData) => {
+    try {
+      // Gọi thunk và unwrap để lấy kết quả hoặc throw error
+      const data = await dispatch(paymentCallBack(paymentData)).then(unwrapResult);
+      return { success: true, data };
+    } catch (error) {
+      console.error("paymentCallback error:", error);
+      return { success: false, error };
+    }
+  };
 
   return {
     payments,
