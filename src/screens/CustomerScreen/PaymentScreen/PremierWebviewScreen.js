@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState } from "react";
 import {
   View,
   ActivityIndicator,
@@ -12,6 +12,7 @@ import { WebView } from "react-native-webview";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import usePayment from "../../../hooks/usePayment";
+import queryString from "query-string";
 
 export default function PremierWebviewScreen() {
   const navigation = useNavigation();
@@ -19,37 +20,41 @@ export default function PremierWebviewScreen() {
   const { checkoutUrl } = route.params || {};
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const {paymentPremierURLCallBack} = usePayment();
+  const { paymentPremierURLCallBack } = usePayment();
 
   const handleNavigationChange = (navState) => {
     const { url } = navState;
+
     if (
-      navState.url.includes("success") ||
-      navState.url.includes("paid") ||
-      navState.url.includes("payment-success") ||
-      navState.url.includes("returnUrl") ||
-      navState.url.includes("MOBILE_RETURN_URL")
+      url.includes("success") ||
+      url.includes("paid") ||
+      url.includes("payment-success") ||
+      url.includes("returnUrl") ||
+      url.includes("MOBILE_RETURN_URL")
     ) {
-      const params = queryString.parseUrl(url).query;
+      // Lấy phần query string sau '?'
+      const queryStringPart = url.split("?")[1] || "";
+      const params = {};
+      queryStringPart.split("&").forEach((part) => {
+        const [key, value] = part.split("=");
+        if (key) params[key] = decodeURIComponent(value);
+      });
+
       const tripId = params.tripId;
       const code = params.code;
       const cancel = params.cancel === "true";
 
-       console.log("Payment callback params:", { tripId, code, cancel });
+      console.log("Payment callback params:", { tripId, code, cancel });
 
-    // Call the callback API
-    paymentPremierURLCallBack({ tripId, code, cancel });
+      if (tripId && code) {
+        paymentPremierURLCallBack({ tripId, code, cancel });
+      }
 
       setShowSuccessModal(true);
       setTimeout(() => {
         setShowSuccessModal(false);
-        // if (typeof onPaymentSuccess === "function") {
-        //   onPaymentSuccess();
-        // } else {
-        //   navigation.navigate("Home");
-        // }
-        navigation.navigate("Tabs", { screen: "Home" });
-      }, 5000);
+        navigation.navigate("Tabs", { screen: "PremierScreen" });
+      }, 3000);
     }
   };
 
@@ -58,10 +63,7 @@ export default function PremierWebviewScreen() {
       "Xác nhận hủy",
       "Bạn có chắc chắn muốn hủy thanh toán không?",
       [
-        {
-          text: "Không",
-          style: "cancel",
-        },
+        { text: "Không", style: "cancel" },
         {
           text: "Có",
           style: "destructive",
@@ -69,9 +71,10 @@ export default function PremierWebviewScreen() {
             Toast.show({
               type: "info",
               text1: "🚫 Đã hủy thanh toán",
-              text2: "Bạn đã quay lại ứng dụng.",
+              text2: "Bạn đã quay lại tab Nâng cấp.",
             });
-            navigation.goBack();
+            // Hủy thanh toán → về tab PremierScreen
+            navigation.navigate("Tabs", { screen: "PremierScreen" });
           },
         },
       ],
@@ -94,7 +97,6 @@ export default function PremierWebviewScreen() {
         <Text style={styles.cancelText}>Hủy thanh toán</Text>
       </TouchableOpacity>
 
-      {/* Modal Thanh toán thành công */}
       <Modal visible={showSuccessModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -115,9 +117,7 @@ export default function PremierWebviewScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   cancelButton: {
     position: "absolute",
     bottom: 30,
@@ -128,11 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     elevation: 5,
   },
-  cancelText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  cancelText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -153,9 +149,5 @@ const styles = StyleSheet.create({
     color: "#28a745",
     marginBottom: 12,
   },
-  modalMessage: {
-    fontSize: 14,
-    textAlign: "center",
-    color: "#555",
-  },
+  modalMessage: { fontSize: 14, textAlign: "center", color: "#555" },
 });

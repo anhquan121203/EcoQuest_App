@@ -123,7 +123,7 @@ const paymentSlice = createSlice({
     payments: [],
     paymentCallback: {},
     premier: null,
-    premierCallback: {},
+    premierCallback: [],
     loading: false,
     error: null,
   },
@@ -181,7 +181,6 @@ const paymentSlice = createSlice({
 
       .addCase(paymentPremierCallback.fulfilled, (state, action) => {
         state.loading = false;
-        // Nếu cần cập nhật trạng thái thanh toán trong payments
         const index = state.premierCallback.findIndex(
           (p) => p.tripId === action.payload.tripId
         );
@@ -190,6 +189,8 @@ const paymentSlice = createSlice({
             ...state.premierCallback[index],
             ...action.payload,
           };
+        } else {
+          state.premierCallback.push(action.payload);
         }
       });
   },
