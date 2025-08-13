@@ -47,6 +47,7 @@ export default function TripDetailScreen() {
 
       if (result.success) {
         const checkoutUrl = result.data?.response?.checkoutUrl;
+        console.log("Checkout payment URL:", checkoutUrl);
 
         if (checkoutUrl) {
           Toast.show({
@@ -213,7 +214,7 @@ export default function TripDetailScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.rightButton}
+          style={styles.middleButton}
           onPress={handleCreateTripWithAI}
         >
           <Ionicons
@@ -225,9 +226,9 @@ export default function TripDetailScreen() {
           <Text style={styles.buttonText}>Tạo AI</Text>
         </TouchableOpacity>
 
-        {/* <TouchableOpacity style={styles.rightButton} onPress={handlePayment}>
+        <TouchableOpacity style={styles.rightButton} onPress={handlePayment}>
           <Text style={styles.paymentText}>Thanh toán</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -357,7 +358,7 @@ const styles = StyleSheet.create({
 
   rightButton: {
     flex: 1.2,
-    backgroundColor: "#0984e3",
+    backgroundColor: "red",
     padding: 12,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,

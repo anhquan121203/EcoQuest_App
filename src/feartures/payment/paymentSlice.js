@@ -48,11 +48,82 @@ export const paymentCallBack = createAsyncThunk(
   }
 );
 
+// history payment
+export const paymentHistory = createAsyncThunk(
+  "payment/paymentHistory",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.get(API.PAYMENT_HISTORY, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// payment premier
+export const paymentPremier = createAsyncThunk(
+  "payment/paymentPremier",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(
+        API.PAYMENT_PREMIER,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const paymentPremierCallback = createAsyncThunk(
+  "payment/paymentPremierCallback",
+  async ({ tripId, code, cancel }, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const payloadData = {
+        tripId,
+        code,
+        cancel,
+      };
+      const response = await apiClient.post(
+        API.PAYEMNT_PREMIER_CALLBACK,
+        payloadData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const paymentSlice = createSlice({
   name: "PAYMENT",
   initialState: {
     payments: [],
     paymentCallback: {},
+    premier: null,
+    premierCallback: {},
     loading: false,
     error: null,
   },
@@ -85,6 +156,41 @@ const paymentSlice = createSlice({
       .addCase(paymentCallBack.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // paymentHistory
+      .addCase(paymentHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(paymentHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.payments = action.payload.response || [];
+      })
+
+      .addCase(paymentHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // create payment premier
+      .addCase(paymentPremier.fulfilled, (state, action) => {
+        state.premier = action.payload;
+      })
+
+      .addCase(paymentPremierCallback.fulfilled, (state, action) => {
+        state.loading = false;
+        // Nếu cần cập nhật trạng thái thanh toán trong payments
+        const index = state.premierCallback.findIndex(
+          (p) => p.tripId === action.payload.tripId
+        );
+        if (index !== -1) {
+          state.premierCallback[index] = {
+            ...state.premierCallback[index],
+            ...action.payload,
+          };
+        }
       });
   },
 });

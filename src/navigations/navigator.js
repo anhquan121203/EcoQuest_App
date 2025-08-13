@@ -28,6 +28,7 @@ import TripScheduleScreen from "../screens/CustomerScreen/TripScreen/TripSchedul
 import PaymentWebviewScreen from "../screens/CustomerScreen/PaymentScreen/PaymentWebviewScreen";
 import PaymentHistoryScreen from "../screens/CustomerScreen/PaymentHistoryScreen/PaymentHistoryScreen";
 import PremierScreen from "../screens/CustomerScreen/PremierScreen/PremierScreen";
+import PremierWebviewScreen from "../screens/CustomerScreen/PaymentScreen/PremierWebviewScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -126,13 +127,13 @@ function AuthStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="TripScheduleAi"
-        component={TripScheduleAiScreen}
+        name="PremierWebview"
+        component={PremierWebviewScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="PaymentHistory"
-        component={PaymentHistoryScreen}
+        name="TripScheduleAi"
+        component={TripScheduleAiScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -226,6 +227,7 @@ function MainAppStack() {
       />
       <Stack.Screen name="TripSchedule" component={TripScheduleScreen} />
       <Stack.Screen name="PaymentWebview" component={PaymentWebviewScreen} />
+      <Stack.Screen name="PremierWebview" component={PremierWebviewScreen} />
       <Stack.Screen name="TripScheduleAi" component={TripScheduleAiScreen} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistoryScreen} />
     </Stack.Navigator>

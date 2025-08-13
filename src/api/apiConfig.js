@@ -39,6 +39,11 @@ const API = {
   // api payment
   PAYMENT: `${BASE_URL}/api/v1/Ecq110InsertPayment`,
   PAYMENT_CALLBACK: `${BASE_URL}/api/v1/Ecq110PaymentCallback`,
+  PAYMENT_HISTORY: `${BASE_URL}/api/v1/Ecq300SelectPaymentBookings`,
+
+  // payment premier
+  PAYMENT_PREMIER: `${BASE_URL}/api/v1/Ecq300PaymentPremierAccount`,
+  PAYEMNT_PREMIER_CALLBACK: `${BASE_URL}/api/v1/Ecq300PaymentPremierCallback`,
 
   // api service
   SERVICE: `${BASE_URL}/api/v1/Ecq110SelectService`,

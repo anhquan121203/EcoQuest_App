@@ -1,22 +1,17 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPayment, paymentCallBack } from "../feartures/payment/paymentSlice";
+import { createPayment, paymentCallBack, paymentHistory, paymentPremier, paymentPremierCallback } from "../feartures/payment/paymentSlice";
 
 const usePayment = () => {
   const {
     payments,
     loading,
     error,
+    premier,
+    premierCallback,
   } = useSelector((state) => state.payment);
   const dispatch = useDispatch();
 
-  
-
-  // create trip
-  // const addNewtrip = async (tripData) => {
-  //   dispatch(createTrip(tripData));
-  //   fetchTrips();
-  // }
 
   const addNewPayment = async (paymentData) => {
     try {
@@ -42,11 +37,47 @@ const usePayment = () => {
     }
   };
 
+    const listPaymentHistory = useCallback(
+    () => {
+      dispatch(paymentHistory());
+    },
+    [dispatch]
+  );
+
+  const paymentPremierURLCallBack = async ({ tripId, code, cancel }) => {
+    try {
+      const resultAction = await dispatch(paymentPremierCallback({ tripId, code, cancel }));
+      const data = unwrapResult(resultAction);
+      console.log("Premier callback response:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Premier callback error:", error);
+      return { success: false, error };
+    }
+  };
+
+  // premier payment
+   const createPremier = async () => {
+    try {
+      const resultAction = await dispatch(paymentPremier());
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("Payment premier:", error);
+      return { success: false, error };
+    }
+  };
+
   return {
     payments,
+    premier,
+    premierCallback,
     loading,
     error,
-    addNewPayment
+    addNewPayment,
+    listPaymentHistory,
+    createPremier,
+    paymentPremierURLCallBack
   };
 };
 
