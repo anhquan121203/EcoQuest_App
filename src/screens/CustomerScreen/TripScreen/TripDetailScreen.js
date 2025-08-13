@@ -13,6 +13,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import TripScheduleDetailModal from "./TripScheduleDetailModal";
 import usePayment from "../../../hooks/usePayment";
 import Toast from "react-native-toast-message";
+import useAuth from "../../../hooks/useAuth";
 
 export default function TripDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -22,6 +23,8 @@ export default function TripDetailScreen() {
   const navigation = useNavigation();
   const { payments, addNewPayment } = usePayment();
   const { addNewtripScheduleWithAI } = useTrip();
+
+  const { userType } = useAuth();
 
   useEffect(() => {
     if (id) {
@@ -113,7 +116,9 @@ export default function TripDetailScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.navigate("Tabs", { screen: "TripHistory" })}
+            onPress={() =>
+              navigation.navigate("Tabs", { screen: "TripHistory" })
+            }
           >
             <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
@@ -213,18 +218,40 @@ export default function TripDetailScreen() {
           <Text style={styles.buttonText}>Tạo lịch</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.middleButton}
-          onPress={handleCreateTripWithAI}
-        >
-          <Ionicons
-            name="sparkles-outline"
-            size={18}
-            color="#fff"
-            style={{ marginRight: 8 }}
-          />
-          <Text style={styles.buttonText}>Tạo AI</Text>
-        </TouchableOpacity>
+        {/* BUTTON AI */}
+        {userType === "1" || userType === "Basic" ? (
+          <TouchableOpacity
+            style={styles.middleButton}
+            onPress={() => {
+              Toast.show({
+                type: "info",
+                text1: "Tài khoản chưa nâng cấp",
+                text2: "Vui lòng nâng cấp lên Premier để sử dụng tính năng này",
+              });
+            }}
+          >
+            <Ionicons
+              name="sparkles-outline"
+              size={18}
+              color="#fff"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.buttonText}>Tạo AI</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.middleButton}
+            onPress={handleCreateTripWithAI}
+          >
+            <Ionicons
+              name="sparkles-outline"
+              size={18}
+              color="#fff"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.buttonText}>Tạo AI</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.rightButton} onPress={handlePayment}>
           <Text style={styles.paymentText}>Thanh toán</Text>

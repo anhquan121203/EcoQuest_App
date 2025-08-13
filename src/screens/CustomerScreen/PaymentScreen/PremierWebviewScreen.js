@@ -11,143 +11,91 @@ import {
 import { WebView } from "react-native-webview";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
-import usePayment from "../../../hooks/usePayment";
 import queryString from "query-string";
+import usePayment from "../../../hooks/usePayment";
 
 export default function PremierWebviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { checkoutUrl } = route.params || {};
-
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const { checkoutUrl } = route.params;
   const { paymentPremierURLCallBack } = usePayment();
 
-  const handleNavigationChange = (navState) => {
-    const { url } = navState;
+  const [loading, setLoading] = useState(true);
 
-    if (
-      url.includes("success") ||
-      url.includes("paid") ||
-      url.includes("payment-success") ||
-      url.includes("returnUrl") ||
-      url.includes("MOBILE_RETURN_URL")
-    ) {
-      // Lấy phần query string sau '?'
-      const queryStringPart = url.split("?")[1] || "";
-      const params = {};
-      queryStringPart.split("&").forEach((part) => {
-        const [key, value] = part.split("=");
-        if (key) params[key] = decodeURIComponent(value);
-      });
+  const handlePaymentCallback = async (url) => {
+    console.log("🔍 Callback URL detect:", url);
 
-      const tripId = params.tripId;
-      const code = params.code;
-      const cancel = params.cancel === "true";
+    const parsed = queryString.parseUrl(url);
+    const { tripId, code, cancel } = parsed.query;
 
-      console.log("Payment callback params:", { tripId, code, cancel });
+    console.log("✅ Payment callback params:", { cancel: cancel === "true", code, tripId });
 
-      if (tripId && code) {
-        paymentPremierURLCallBack({ tripId, code, cancel });
+    if (tripId && code) {
+      try {
+        const res = await paymentPremierURLCallBack({
+          tripId,
+          code,
+          cancel: cancel === "true",
+        });
+        console.log("Premier callback response:", res);
+
+        Toast.show({
+          type: "success",
+          text1: "Thanh toán thành công",
+        });
+
+        navigation.goBack();
+      } catch (err) {
+        console.error("Premier callback error:", err);
+        Toast.show({
+          type: "error",
+          text1: "Có lỗi khi xử lý thanh toán",
+        });
       }
-
-      setShowSuccessModal(true);
-      setTimeout(() => {
-        setShowSuccessModal(false);
-        navigation.navigate("Tabs", { screen: "PremierScreen" });
-      }, 3000);
+    } else {
+      console.warn(`⚠ Không lấy được tripId hoặc code từ URL: ${url}`);
     }
   };
 
-  const handleCancel = () => {
-    Alert.alert(
-      "Xác nhận hủy",
-      "Bạn có chắc chắn muốn hủy thanh toán không?",
-      [
-        { text: "Không", style: "cancel" },
-        {
-          text: "Có",
-          style: "destructive",
-          onPress: () => {
-            Toast.show({
-              type: "info",
-              text1: "🚫 Đã hủy thanh toán",
-              text2: "Bạn đã quay lại tab Nâng cấp.",
-            });
-            // Hủy thanh toán → về tab PremierScreen
-            navigation.navigate("Tabs", { screen: "PremierScreen" });
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+  // Bắt redirect ngay lập tức
+  const handleNavigationRequest = (request) => {
+    const { url } = request;
+    console.log("🌐 onShouldStartLoadWithRequest URL:", url);
+
+    if (url.includes("tripId=") && url.includes("code=")) {
+      handlePaymentCallback(url);
+      return false; // Chặn load trang mới
+    }
+
+    if (
+      url.startsWith("myapp://payment") ||
+      url.includes("localhost:3000/payment")
+    ) {
+      handlePaymentCallback(url);
+      return false;
+    }
+
+    return true;
   };
 
   return (
     <View style={styles.container}>
       <WebView
-        source={{ uri: checkoutUrl }}
-        onNavigationStateChange={handleNavigationChange}
-        startInLoadingState
-        renderLoading={() => (
-          <ActivityIndicator size="large" color="#4e73df" style={{ flex: 1 }} />
-        )}
+        source={{ uri: checkoutUrl  }}
+        onLoadEnd={() => setLoading(false)}
+        onShouldStartLoadWithRequest={handleNavigationRequest}
       />
-
-      <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-        <Text style={styles.cancelText}>Hủy thanh toán</Text>
-      </TouchableOpacity>
-
-      <Modal visible={showSuccessModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>🎉 Thanh toán thành công!</Text>
-            <Text style={styles.modalMessage}>
-              Bạn sẽ được chuyển về trang chủ sau vài giây...
-            </Text>
-            <ActivityIndicator
-              size="large"
-              color="#28a745"
-              style={{ marginTop: 20 }}
-            />
-          </View>
-        </View>
-      </Modal>
+      {loading && (
+        <ActivityIndicator
+          style={StyleSheet.absoluteFill}
+          size="large"
+          color="#000"
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  cancelButton: {
-    position: "absolute",
-    bottom: 30,
-    alignSelf: "center",
-    backgroundColor: "#ff4d4f",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 30,
-    elevation: 5,
-  },
-  cancelText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    elevation: 5,
-    width: 300,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#28a745",
-    marginBottom: 12,
-  },
-  modalMessage: { fontSize: 14, textAlign: "center", color: "#555" },
+  container: { flex: 1, backgroundColor: "#fff" },
 });

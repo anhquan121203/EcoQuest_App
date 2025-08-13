@@ -66,7 +66,7 @@ function AuthStack() {
         component={TripHistoryScreen}
         options={{ headerShown: false }}
       /> */}
-      <Stack.Screen
+      {/* <Stack.Screen
         name="CreateTrip"
         component={CreateTripScreen}
         options={{ headerShown: false }}
@@ -105,13 +105,13 @@ function AuthStack() {
         name="BlogDetail"
         component={BlogDetailScreen}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
+      /> */}
+      {/* <Stack.Screen
         name="TripDetail"
         component={TripDetailScreen}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
+      /> */}
+      {/* <Stack.Screen
         name="CreateTripSchedule"
         component={CreateTripScheduleScreen}
         options={{ headerShown: false }}
@@ -130,12 +130,12 @@ function AuthStack() {
         name="PremierWebview"
         component={PremierWebviewScreen}
         options={{ headerShown: false }}
-      />
-      <Stack.Screen
+      /> */}
+      {/* <Stack.Screen
         name="TripScheduleAi"
         component={TripScheduleAiScreen}
         options={{ headerShown: false }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 }

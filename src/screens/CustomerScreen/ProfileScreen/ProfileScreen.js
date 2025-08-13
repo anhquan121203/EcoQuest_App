@@ -17,7 +17,7 @@ import useAuth from "../../../hooks/useAuth";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const {firstName, lastName, avatar, email} = useAuth();
+  const {firstName, lastName, avatar, email, userType} = useAuth();
 
   const dispatch = useDispatch();
 
@@ -27,6 +27,15 @@ const ProfileScreen = () => {
     await AsyncStorage.removeItem("refresh_token");
     dispatch(logout()); 
   };
+
+  const renderType = (userType) =>  {
+    switch (userType) {
+      case "1":
+        return "Miễn phí";
+      default:
+        return "Nâng cao";
+    }
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -50,6 +59,7 @@ const ProfileScreen = () => {
         />
         <Text style={styles.name}>{firstName} {lastName}</Text>
         <Text style={styles.phone}>{email}</Text>
+        <Text style={styles.phone}>{renderType(userType)}</Text>
       </View>
       {/* </ImageBackground> */}
 

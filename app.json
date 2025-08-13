@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "my-app", 
+    "scheme": "myapp", 
     "deepLinking": true,
     "name": "my-app",
     "slug": "my-app",

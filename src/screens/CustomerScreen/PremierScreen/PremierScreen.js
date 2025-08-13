@@ -10,6 +10,7 @@ import {
 import usePayment from "../../../hooks/usePayment";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import useAuth from "../../../hooks/useAuth";
 
 const plans = [
   {
@@ -40,12 +41,15 @@ export default function PremierScreen() {
   const { createPremier } = usePayment();
   const navigation = useNavigation();
 
+  const { userType } = useAuth();
+
   const handlePremierPayment = async () => {
     try {
+      
       const result = await createPremier();
       if (result.success) {
         const checkoutUrl = result.data?.response?.checkoutUrl;
-        console.log(checkoutUrl)
+        console.log(checkoutUrl);
         if (checkoutUrl) {
           Toast.show({
             type: "success",
@@ -55,7 +59,7 @@ export default function PremierScreen() {
         } else {
           Toast.show({
             type: "error",
-            text1: "❌ Không tìm thấy đường dẫn thanh toán",
+            text1: "Tài khoản của bạn đã được nâng cấp thành công!",
           });
         }
       } else {
@@ -96,10 +100,18 @@ export default function PremierScreen() {
             </View>
             {plan.title === "Nâng cao" && (
               <TouchableOpacity
-                style={[styles.button, { backgroundColor: plan.colors[0] }]}
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: userType === "Premier" ? "#ccc" : plan.colors[0],
+                  },
+                ]}
                 onPress={handlePremierPayment}
+                disabled={userType === "Premier"}
               >
-                <Text style={styles.buttonText}>Đặt hàng ngay</Text>
+                <Text style={styles.buttonText}>
+                  {userType === "Premier" ? "Không khả dụng" : "Đặt hàng ngay"}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -117,7 +129,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
-    marginTop: 20,
+    marginTop: 70,
   },
   card: {
     width: 300,
