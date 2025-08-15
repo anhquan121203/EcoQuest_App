@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "myapp", 
+    "scheme": "myapp",
     "deepLinking": true,
     "name": "Eco Quest",
     "slug": "my-app",
@@ -23,19 +23,34 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-       "intentFilters": [
+      "intentFilters": [
         {
           "action": "VIEW",
           "data": {
             "scheme": "https",
             "host": "ecoquest.app"
           },
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
     "web": {
       "favicon": "./assets/chatbot.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "eedf0c45-238d-44f3-bf76-6a24058f286c"
+      }
+    },
+    "owner": "anhquan121203",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/eedf0c45-238d-44f3-bf76-6a24058f286c"
     }
   }
 }
