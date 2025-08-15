@@ -14,10 +14,13 @@ import TripScheduleDetailModal from "./TripScheduleDetailModal";
 import usePayment from "../../../hooks/usePayment";
 import Toast from "react-native-toast-message";
 import useAuth from "../../../hooks/useAuth";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Modal } from "react-native-paper";
 
 export default function TripDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [visible, setVisible] = useState(false);
 
   const route = useRoute();
   const { id } = route.params;
@@ -50,7 +53,7 @@ export default function TripDetailScreen() {
     );
   }
 
-   const getPaymentStatusLabel = (paymentStatus) => {
+  const getPaymentStatusLabel = (paymentStatus) => {
     switch (paymentStatus) {
       case "Cancelled":
         return { label: "Chưa thanh toán", backgroundColor: "#1890ff" };
@@ -129,8 +132,6 @@ export default function TripDetailScreen() {
     } catch (error) {}
   };
 
-
-
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
@@ -162,6 +163,45 @@ export default function TripDetailScreen() {
               </Text>
             </View>
           </ImageBackground>
+
+          {/* MENU DROPDOWN ========================================================================= */}
+          <TouchableOpacity
+            style={styles.settingButton}
+            onPress={() => setVisible(true)}
+          >
+            <Entypo name="dots-three-vertical" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Modal transparent visible={visible} animationType="fade">
+            {/* Overlay nền modal */}
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={() => setVisible(false)}
+            >
+              {/* Ngăn bấm overlay ảnh hưởng dropdown */}
+              <View style={styles.dropdownWrapper}>
+                <View style={styles.dropdown}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setVisible(false);
+                      navigation.navigate("UpdateTrip", { trip: selectedTrip });
+                    }}
+                  >
+                    <Text style={styles.item}>Cập nhật</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setVisible(false);
+                      console.log("Xóa");
+                    }}
+                  >
+                    <Text style={styles.item}>Xóa</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </View>
 
         <View style={styles.detailContainer}>
@@ -309,6 +349,42 @@ const styles = StyleSheet.create({
     padding: 5,
     zIndex: 100,
   },
+  // =========================================================
+  settingButton: {
+    position: "absolute",
+    top: 45,
+    right: 15,
+  },
+
+  // modalOverlay: {
+  //   flex: 1,
+  //   // backgroundColor: "rgba(0,0,0,0.2)",
+  //   justifyContent: "flex-start",
+  //   alignItems: "flex-end",
+  //   paddingTop: 30, 
+  //   paddingRight: 15,
+  // },
+
+  dropdownWrapper: {
+    width: 100, 
+    // marginLeft: 15,
+    right: -307,
+    marginTop: -50,
+  },
+
+  dropdown: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    width: "100%",
+  },
+
+  item: {
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+
+  // =========================================================
   headerImage: {
     height: 270,
     justifyContent: "flex-end",

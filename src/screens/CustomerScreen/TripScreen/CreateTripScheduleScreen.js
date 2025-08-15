@@ -19,6 +19,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 import moment from "moment";
+import useHotel from "../../../hooks/useHotel";
 
 export default function CreateTripScheduleScreen() {
   const navigation = useNavigation();
@@ -31,6 +32,8 @@ export default function CreateTripScheduleScreen() {
     loading: serviceLoading,
     error: serviceError,
   } = useService();
+
+  const {rooms, fetchRoomsByHotel} = useHotel();
 
   const [scheduleDate, setScheduleDate] = useState(selectedDate || "");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -146,7 +149,11 @@ export default function CreateTripScheduleScreen() {
         })),
       };
 
+      console.log("Payload gửi về Tạo lịch trình:", payload); 
+
       const res = await addNewtripSchedule(payload);
+
+      console.log("object", res);
       
       await tripScheduleByTripId(id);
 

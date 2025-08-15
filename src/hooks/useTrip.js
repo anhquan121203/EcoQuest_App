@@ -8,6 +8,7 @@ import {
   getTripById,
   getTripScheduleByTripId,
   listTrip,
+  updateTrip,
 } from "../feartures/trip/tripSlice";
 
 const useTrip = () => {
@@ -50,6 +51,19 @@ const useTrip = () => {
     }
   };
 
+  const updateTripById = async (updateData) => {
+    try {
+      const resultAction = await dispatch(updateTrip(updateData));
+      fetchTrips();
+      // unwrap kết quả để lấy data từ payload (RTK way)
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("addNewtrip error:", error);
+      return { success: false, error };
+    }
+  };
+
   // create trip schedule
   const addNewtripSchedule = async (tripScheduleData) => {
     try {
@@ -62,6 +76,8 @@ const useTrip = () => {
       return { success: false, error };
     }
   };
+
+  // update trip
 
   const tripScheduleByTripId = async (id) => {
     dispatch(getTripScheduleByTripId(id));
@@ -91,6 +107,8 @@ const useTrip = () => {
     }
   };
 
+
+
   return {
     trips,
     tripSchedules,
@@ -106,6 +124,7 @@ const useTrip = () => {
     addNewtripScheduleWithAI,
     createBookHotel,
     bookingHotelRooms,
+    updateTripById,
   };
 };
 

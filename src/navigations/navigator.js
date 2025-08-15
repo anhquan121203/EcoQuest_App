@@ -29,6 +29,8 @@ import PaymentWebviewScreen from "../screens/CustomerScreen/PaymentScreen/Paymen
 import PaymentHistoryScreen from "../screens/CustomerScreen/PaymentHistoryScreen/PaymentHistoryScreen";
 import PremierScreen from "../screens/CustomerScreen/PremierScreen/PremierScreen";
 import PremierWebviewScreen from "../screens/CustomerScreen/PaymentScreen/PremierWebviewScreen";
+import DestinationScreen from "../screens/CustomerScreen/DestinationScreen/DestinationScreen";
+import UpdateTripScreen from "../screens/CustomerScreen/TripScreen/UpdateTripScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -215,6 +217,7 @@ function MainAppStack() {
       <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
       <Stack.Screen name="AttractionDetails" component={AtractionDetails} />
       <Stack.Screen name="HotelDetails" component={HotelDetails} />
+      <Stack.Screen name="DestinationDetails" component={DestinationScreen} />
       <Stack.Screen name="HotelMore" component={HotelMore} />
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <Stack.Screen name="BlogScreen" component={BlogScreen} />
@@ -230,6 +233,9 @@ function MainAppStack() {
       <Stack.Screen name="PremierWebview" component={PremierWebviewScreen} />
       <Stack.Screen name="TripScheduleAi" component={TripScheduleAiScreen} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistoryScreen} />
+
+      {/* CRUD TRIP */}
+      <Stack.Screen name="UpdateTrip" component={UpdateTripScreen} />
     </Stack.Navigator>
   );
 }

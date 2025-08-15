@@ -21,7 +21,6 @@ const HomeScreen = () => {
   const { hotels, fetchHotels } = useHotel();
   const { destinations, fetchDestinations } = useDestination();
 
-
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -36,6 +35,10 @@ const HomeScreen = () => {
 
   const handleHotelDetails = (id) => {
     navigation.navigate("HotelDetails", { id });
+  };
+
+  const handleDestinationDetails = (id) => {
+    navigation.navigate("DestinationDetails", { id });
   };
 
   return (
@@ -194,7 +197,11 @@ const HomeScreen = () => {
                 : "https://via.placeholder.com/120x100.png?text=No+Image";
 
             return (
-              <TouchableOpacity style={styles.exploreCard} key={index}>
+              <TouchableOpacity
+                style={styles.exploreCard}
+                key={index}
+                onPress={() => handleDestinationDetails(item.destinationId)}
+              >
                 <Image source={{ uri: imageUrl }} style={styles.exploreImage} />
                 <View style={styles.exploreInfo}>
                   <Text style={styles.exploreTitle}>{item.name}</Text>

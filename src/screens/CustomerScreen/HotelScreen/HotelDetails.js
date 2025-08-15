@@ -15,6 +15,7 @@ import useHotel from "../../../hooks/useHotel";
 import MapView, { Marker } from "react-native-maps";
 import Swiper from "react-native-swiper";
 import useStreetMap from "../../../hooks/useStreetMap";
+import { Ionicons } from "@expo/vector-icons";
 
 const HotelDetails = () => {
   const route = useRoute();
@@ -69,7 +70,7 @@ const HotelDetails = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Text>🔙</Text>
+            <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
 
           <Swiper
@@ -141,15 +142,12 @@ const styles = StyleSheet.create({
   // header
   backButton: {
     position: "absolute",
-    top: 40,
+    top: 45,
     left: 20,
-    zIndex: 100,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0 , 0.3)",
     borderRadius: 50,
-    padding: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    cursor: "pointer",
+    padding: 5,
+    zIndex: 100,
   },
 
   swiper: { height: 350 },

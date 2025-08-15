@@ -40,7 +40,7 @@ export default function LoginScreen({ navigation }) {
           type: "success",
           text1: "🎉 Đăng nhập thành công!",
         });
-        navigation.navigate("Home");
+        navigation.navigate( "Home" );
       } else {
         Toast.show({
           type: "error",

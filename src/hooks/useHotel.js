@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getHotelById, listHotel } from "../feartures/hotels/hotelSlice";
 
 const useHotel = () => {
-  const { hotels, selectedHotel, loading, error } = useSelector(
+  const { hotels, selectedHotel, rooms, loading, error } = useSelector(
     (state) => state.hotel
   );
   const dispatch = useDispatch();
@@ -21,14 +21,23 @@ const useHotel = () => {
 
   // console.log(fetchAttractions)
 
-  
+   // 📌 Lấy danh sách phòng theo HotelId
+  const fetchRoomsByHotel = useCallback(
+    (hotelId) => {
+      dispatch(listRoomByHotel(hotelId));
+    },
+    [dispatch]
+  );
+
   return {
     hotels,
     selectedHotel,
+    rooms,
     loading,
     error,
     fetchHotels ,
-    hotelById
+    hotelById,
+    fetchRoomsByHotel,
   };
 };
 

@@ -9,23 +9,22 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { useSelector } from "react-redux";
-import useAttraction from "../../../hooks/useAttraction";
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Swiper from "react-native-swiper";
+import useDestination from "../../../hooks/useDestination";
 
-const AtractionDetails = () => {
+const DestinationScreen = () => {
   const route = useRoute();
   const { id } = route.params;
   const navigation = useNavigation();
 
-  const { selectedAttraction, attractionById, loading, error } =
-    useAttraction();
+  const { selectedDestination, destinationById, loading, error } =
+    useDestination();
 
   useEffect(() => {
     if (id) {
-      attractionById(id);
+      destinationById(id);
     }
   }, [id]);
 
@@ -45,7 +44,7 @@ const AtractionDetails = () => {
     );
   }
 
-  if (!selectedAttraction) {
+  if (!selectedDestination) {
     return (
       <View style={styles.container}>
         <Text>Không tìm thấy địa điểm.</Text>
@@ -53,9 +52,10 @@ const AtractionDetails = () => {
     );
   }
 
-  const fallbackImage = "https://img.freepik.com/free-vector/abstract-grunge-style-coming-soon-with-black-splatter_1017-26690.jpg";
-  const attracImages = selectedAttraction.attractionImages?.length
-    ? selectedAttraction.attractionImages
+  const fallbackImage =
+    "https://img.freepik.com/free-vector/abstract-grunge-style-coming-soon-with-black-splatter_1017-26690.jpg";
+  const desImages = selectedDestination.destinationImages?.length
+    ? selectedDestination.destinationImages
     : [fallbackImage];
 
   return (
@@ -69,14 +69,6 @@ const AtractionDetails = () => {
             <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
 
-          {/* <ImageBackground
-            source={require("../../../../assets/images/trips/image_trip_detail.jpg")}
-            style={styles.headerImage}
-            imageStyle={{
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-            }}
-          ></ImageBackground> */}
           <Swiper
             style={styles.swiper}
             // showsButtons={true}
@@ -84,7 +76,7 @@ const AtractionDetails = () => {
             dotColor="#ccc"
             activeDotColor="#000"
           >
-            {attracImages.map((img, index) => (
+            {desImages.map((img, index) => (
               <Image
                 key={index}
                 source={{ uri: img }}
@@ -100,29 +92,30 @@ const AtractionDetails = () => {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.title}>{selectedAttraction?.attractionName}</Text>
+          <Text style={styles.title}>{selectedDestination?.name}</Text>
           <Text style={styles.subtitle}>
-            📍 Nhà Nơi, Việt Nam • ⭐ 5.0 - (1289 Ngươi)
+            📍Việt Nam • ⭐ 5.0 - (1289 Ngươi)
           </Text>
           <Text style={styles.description}>
-            {selectedAttraction?.attractionType}
+            {selectedDestination?.description}
           </Text>
           <View style={styles.mapContainer}>
             <Text style={styles.mapTitle}>Địa điểm</Text>
-            <Text style={styles.mapName}>{selectedAttraction.address}</Text>
+            <Text style={styles.address}>
+              {selectedDestination?.addressLine +
+                ", " +
+                selectedDestination?.ward +
+                ", " +
+                selectedDestination?.district +
+                ", " +
+                selectedDestination?.province}
+            </Text>
             <Image
-              source={{ uri: "https://example.com/map-image.jpg" }}
+              source={{
+                uri: "https://justmaps.com/cdn/shop/products/ComingSoon-LaserCutWoodenMap_ea9246f9-9b19-48dc-9644-29751918889b.jpg?v=1575344472",
+              }}
               style={styles.mapImage}
             />
-            <Text style={styles.address}>
-              Tầng l, Khách sạn JW Marriott, Số 8 Đỗ Đức Dục, Nam Từ Liêm, Hà
-              Nội
-            </Text>
-            <Text style={styles.distance}>Điếm đến gần nhất</Text>
-            <Text style={styles.distanceItem}>⛳ Lăng Bác - 2.7 km</Text>
-            <Text style={styles.distanceItem}>
-              🏛 Nhà hát Lớn Hà Nội - 4.7 km
-            </Text>
           </View>
         </View>
       </View>
@@ -165,4 +158,4 @@ const styles = StyleSheet.create({
   distanceItem: { fontSize: 14, color: "#666" },
 });
 
-export default AtractionDetails;
+export default DestinationScreen;

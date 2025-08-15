@@ -37,11 +37,31 @@ export const getHotelById = createAsyncThunk(
   }
 );
 
+export const listRoomByHotel = createAsyncThunk(
+  "hotel/listRoomByHotel",
+  async (hotelId, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.get(API.HOTEL_BY_ID, {
+        params: { HotelId: hotelId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const hotelSlice = createSlice({
   name: "HOTEL",
   initialState: {
     hotels: [],
     selectedHotel: [],
+    rooms: [],
     loading: false,
     error: null,
   },
@@ -64,6 +84,20 @@ const hotelSlice = createSlice({
       .addCase(getHotelById.fulfilled, (state, action) => {
         state.selectedHotel = action.payload?.response || [];
         state.loading = false;
+      })
+
+      // Danh sách phòng
+      .addCase(listRoomByHotel.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listRoomByHotel.fulfilled, (state, action) => {
+        state.loading = false;
+        state.rooms = action.payload?.response || [];
+      })
+      .addCase(listRoomByHotel.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch rooms";
       });
   },
 });

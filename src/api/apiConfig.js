@@ -18,6 +18,7 @@ const API = {
   // api hotel
   HOTEL: `${BASE_URL}/api/v1/Ecq100SelectHotels`, 
   HOTEL_BY_ID: `${BASE_URL}/api/v1/Ecq100SelectHotel`,
+  ROOM_BY_HOTEL: `${BASE_URL}/api/v1/Ecq211SelectHotelRooms`,
 
   // api blog
   BLOG: `${BASE_URL}/api/v1/Ecq100SelectBlogs`,
@@ -32,6 +33,9 @@ const API = {
   TRIP: `${BASE_URL}/api/v1/Ecq110SelectTrips`,
   TRIP_BY_ID: `${BASE_URL}/api/v1/Ecq110SelectTrip`,
   CREATE_TRIP: `${BASE_URL}/api/v1/Ecq110InsertTrip`,
+  UPDATE_TRIP: `${BASE_URL}/api/v1/Ecq110UpdateTrip`,
+  DELETE_TRIP: `${BASE_URL}/api/v1/Ecq110DeleteTrip`,
+
   CREATE_TRIP_SCHEDULE: `${BASE_URL}/api/v1/Ecq110InsertTripSchedule`,
   GET_TRIP_SCHEDULE_BY_TRIPID: `${BASE_URL}/api/v1/Ecq110SelectTripSchedule`,
   CREATE_TRIP_SCHEDULE_AI: `${BASE_URL}/api/v1/Ecq110InsertTripScheduleWithAi`,
