@@ -7,24 +7,23 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import usePayment from "../../../hooks/usePayment";
-
+import useTrip from "../../../hooks/useTrip";
 
 export default function PaymentHistoryScreen({ navigation }) {
-  
   const { payments, loading, error, listPaymentHistory } = usePayment();
+  const { trips, fetchTrips } = useTrip();
 
   useEffect(() => {
     listPaymentHistory();
+    fetchTrips();
   }, []);
-
 
   const formatDate = (iso) => {
     try {
       const d = new Date(iso);
-      return d.toLocaleString("vi-VN", {
+      return d?.toLocaleString("vi-VN", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -48,45 +47,95 @@ export default function PaymentHistoryScreen({ navigation }) {
   };
 
   const renderStatus = (status) => {
-    const isPending = status?.toLowerCase() === "pending";
-    const bgColor = isPending ? styles.statusPending : styles.statusSuccess;
+    let bgColor = {};
+    let textColor = "#000";
+
+    // Map trạng thái sang tiếng Việt
+    const statusVNMap = {
+      pending: "Chờ thanh toán",
+      cancelled: "Đã hủy",
+      success: "Hoàn thành",
+      completed: "Đã thanh toán",
+    };
+
+    // Lấy tên tiếng Việt, nếu không có thì giữ nguyên
+    const statusVN = statusVNMap[status?.toLowerCase()] || status;
+
+    switch (status?.toLowerCase()) {
+      case "pending":
+        bgColor = { backgroundColor: "#FFF4E5" };
+        textColor = "#D97706";
+        break;
+      case "cancelled":
+        bgColor = { backgroundColor: "#FFE5E5" };
+        textColor = "#DC2626";
+        break;
+      case "success":
+      case "completed":
+        bgColor = { backgroundColor: "#E6FFFA" };
+        textColor = "#059669";
+        break;
+      default:
+        bgColor = { backgroundColor: "#F3F4F6" };
+        textColor = "#6B7280";
+    }
+
     return (
       <View style={[styles.statusWrap, bgColor]}>
-        <Text style={styles.statusText}>{status}</Text>
+        <Text style={[styles.statusText, { color: textColor }]}>
+          {statusVN}
+        </Text>
       </View>
     );
   };
 
-  const renderItem = ({ item }) => (
-  <TouchableOpacity style={styles.card} activeOpacity={0.7}>
-    <View style={styles.row}>
-      <View style={styles.colLeft}>
-        <Text style={styles.amount}>{formatCurrency(item.amount)}</Text>
-        <Text style={styles.method}>{item.method}</Text>
-      </View>
+  const renderItem = ({ item }) => {
+    const trip = trips.find((t) => t.tripId === item.tripId);
+    const tripName = trip ? trip.tripName : "Không xác định";
 
-      <View style={styles.colRight}>
-        {renderStatus(item.status)}
-        <Text style={styles.date}>{formatDate(item.paidAt)}</Text>
-      </View>
-    </View>
+    return (
+      <TouchableOpacity style={styles.card} activeOpacity={0.7}>
+        <View style={styles.row}>
+          <View style={styles.colLeft}>
+            <Text style={styles.amount}>{formatCurrency(item.amount)}</Text>
 
-    <View style={styles.metaRow}>
-      <Text style={styles.metaLabel}>Payment ID:</Text>
-      <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="middle">
-        {item.paymentId}
-      </Text>
-    </View>
+            <Text style={{ fontSize: 15, color: "#4B5563", marginTop: 2 }}>
+              Chuyến đi: {tripName}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: "#ff0000ff",
+                marginTop: 2,
+                fontWeight: "bold",
+              }}
+            >
+              Phương thức: {item.method}
+            </Text>
+          </View>
 
-    <View style={styles.metaRow}>
-      <Text style={styles.metaLabel}>Trip ID:</Text>
-      <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="middle">
-        {item.tripId}
-      </Text>
-    </View>
-  </TouchableOpacity>
-);
+          <View style={styles.colRight}>
+            {renderStatus(item.status)}
+            <Text style={styles.date}>{formatDate(item.paidAt)}</Text>
+          </View>
+        </View>
 
+        {/* <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Payment ID:</Text>
+          <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="middle">
+            {item.paymentId}
+          </Text>
+        </View>
+
+        <View style={styles.metaRow}>
+          <Text style={styles.metaLabel}>Trip ID:</Text>
+          <Text style={styles.metaValue} numberOfLines={1} ellipsizeMode="middle">
+            {item.tripId}
+          </Text>
+        </View> */}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,7 +143,7 @@ export default function PaymentHistoryScreen({ navigation }) {
         <View style={styles.headerTitle}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.navigate("Tabs", {screen: "Profile"})}
+            onPress={() => navigation.navigate("Tabs", { screen: "Profile" })}
           >
             <Ionicons
               name="chevron-back"
@@ -106,6 +155,7 @@ export default function PaymentHistoryScreen({ navigation }) {
           <Text style={styles.titleHeader}>Lịch sử thanh toán</Text>
         </View>
       </View>
+
       <Text style={styles.headerSubtitle}>{payments.length} giao dịch</Text>
 
       <FlatList
@@ -134,8 +184,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-
-  //   headerTitle: { fontSize: 20, fontWeight: '700' },
   headerSubtitle: {
     fontSize: 15,
     color: "#6B7280",
@@ -154,7 +202,6 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 1,
   },
-
   titleHeader: {
     fontSize: 20,
     fontWeight: "bold",
@@ -183,8 +230,6 @@ const styles = StyleSheet.create({
   method: { fontSize: 13, color: "#6B7280", marginTop: 4 },
   statusWrap: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
   statusText: { fontSize: 12, fontWeight: "600" },
-  statusPending: { backgroundColor: "#FFF4E5" },
-  statusSuccess: { backgroundColor: "#E6FFFA" },
   date: { fontSize: 12, color: "#9CA3AF", marginTop: 6 },
   metaRow: { flexDirection: "row", marginTop: 8 },
   metaLabel: { fontSize: 12, color: "#6B7280", width: 80 },

@@ -17,11 +17,13 @@ import useAuth from "../../../hooks/useAuth";
 
 export default function TripDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+
   const route = useRoute();
   const { id } = route.params;
   const { selectedTrip, tripById } = useTrip();
   const navigation = useNavigation();
-  const { payments, addNewPayment } = usePayment();
+  const { payments, addNewPayment, listPaymentHistory } = usePayment();
   const { addNewtripScheduleWithAI } = useTrip();
 
   const { userType } = useAuth();
@@ -32,6 +34,14 @@ export default function TripDetailScreen() {
     }
   }, [id]);
 
+  // Khi payments thay đổi -> tìm payment tương ứng với trip
+  useEffect(() => {
+    if (payments && selectedTrip) {
+      const found = payments.find((p) => p.tripId === selectedTrip.tripId);
+      setPaymentStatus(found ? found.status : "Chưa thanh toán");
+    }
+  }, [payments, selectedTrip]);
+
   if (!selectedTrip) {
     return (
       <View style={styles.container}>
@@ -39,6 +49,19 @@ export default function TripDetailScreen() {
       </View>
     );
   }
+
+   const getPaymentStatusLabel = (paymentStatus) => {
+    switch (paymentStatus) {
+      case "Cancelled":
+        return { label: "Chưa thanh toán", backgroundColor: "#1890ff" };
+      case "Pending":
+        return { label: "Chờ thanh toán", backgroundColor: "#fadb14" };
+      case "Completed":
+        return { label: "Đã thanh toán", backgroundColor: "#52c41a" };
+      default:
+        return { label: "Không xác định", backgroundColor: "#fb0b0bff" };
+    }
+  };
 
   const handlePayment = async () => {
     const paymentData = {
@@ -61,9 +84,8 @@ export default function TripDetailScreen() {
           navigation.navigate("PaymentWebview", { checkoutUrl });
         } else {
           Toast.show({
-            type: "error",
-            text1: "❌ Không tìm thấy đường dẫn thanh toán",
-            text2: "Vui lòng thử lại sau.",
+            type: "success",
+            text1: "Chuyến đi đã được thanh toán!",
           });
         }
       } else {
@@ -106,6 +128,8 @@ export default function TripDetailScreen() {
       });
     } catch (error) {}
   };
+
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -180,6 +204,17 @@ export default function TripDetailScreen() {
                 {selectedTrip.totalEstimatedCost?.toLocaleString()}đ
               </Text>
             </View>
+          </View>
+
+          {/* Trạng thái thanh toán */}
+          <View style={styles.card}>
+            <Ionicons name="card-outline" size={24} color="#0984e3" />
+            <Text style={styles.cardText}>
+              Thanh toán:{" "}
+              <Text style={{ fontWeight: "bold", color: "#333" }}>
+                {getPaymentStatusLabel(paymentStatus).label}
+              </Text>
+            </Text>
           </View>
         </View>
 

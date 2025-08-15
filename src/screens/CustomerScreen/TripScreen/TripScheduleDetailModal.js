@@ -68,7 +68,7 @@ export default function TripScheduleDetailModal({ visible, onClose, id }) {
                     ) : null}
                     {item.estimatedCost != null ? (
                       <Text style={styles.cost}>
-                        💰 {item.estimatedCost}
+                        💰 {item.estimatedCost?.toLocaleString("vi-VN")}
                       </Text>
                     ) : null}
                   </View>

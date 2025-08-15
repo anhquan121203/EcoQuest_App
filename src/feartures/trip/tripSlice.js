@@ -127,6 +127,25 @@ export const createTripScheduleAI = createAsyncThunk(
   }
 );
 
+// booking hotel room
+export const bookHotelRooms = createAsyncThunk(
+  "tripBooking/bookHotelRooms",
+  async (bookingData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(API.BOOKING_HOTEL_ROOM, bookingData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const tripSlice = createSlice({
   name: "TRIP",
   initialState: {
@@ -135,6 +154,7 @@ const tripSlice = createSlice({
     tripSchedulesWithAI: [],
     selectedTrip: [],
     selectedTripSchedule: [],
+    bookingHotelRooms: null,
     loading: false,
     error: null,
   },
@@ -177,7 +197,13 @@ const tripSlice = createSlice({
       // create trip schedule AI
       .addCase(createTripScheduleAI.fulfilled, (state, action) => {
         state.tripSchedulesWithAI.push(action.payload);
-      });
+      })
+
+      // booking hotel rooms
+      .addCase(bookHotelRooms.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookingHotelRooms = action.payload;
+      })
   },
 });
 

@@ -12,13 +12,16 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useTrip from "../../../hooks/useTrip";
+import usePayment from "../../../hooks/usePayment";
 
 export default function TripHistoryScreen() {
   const navigation = useNavigation();
   const { trips, loading, error, fetchTrips } = useTrip();
+  const { payments, addNewPayment, listPaymentHistory } = usePayment();
 
   useEffect(() => {
     fetchTrips();
+    listPaymentHistory();
   }, []);
 
   const handleTripDetail = (id) => {
@@ -133,7 +136,7 @@ export default function TripHistoryScreen() {
                       </Text>
                       <View style={styles.footerCard}>
                         <Text>
-                          💰 {item.totalEstimatedCost.toLocaleString("vi-VN")}{" "}
+                          💰 {item.totalEstimatedCost?.toLocaleString("vi-VN")}{" "}
                           VNĐ
                         </Text>
                         <Text style={[styles.status, { backgroundColor }]}>

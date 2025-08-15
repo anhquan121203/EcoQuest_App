@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  bookHotelRooms,
   createTrip,
   createTripSchedule,
   createTripScheduleAI,
@@ -15,6 +16,7 @@ const useTrip = () => {
     tripSchedules,
     selectedTrip,
     selectedTripSchedule,
+    bookingHotelRooms,
     loading,
     error,
   } = useSelector((state) => state.trip);
@@ -77,7 +79,17 @@ const useTrip = () => {
     }
   }
 
-  
+  // booking hotel rooms
+  const createBookHotel = async (bookingData) => {
+    try {
+      const resultAction = await dispatch(bookHotelRooms(bookingData));
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("bookHotelRooms error:", error);
+      return { success: false, error };
+    }
+  };
 
   return {
     trips,
@@ -92,6 +104,8 @@ const useTrip = () => {
     addNewtripSchedule,
     tripScheduleByTripId,
     addNewtripScheduleWithAI,
+    createBookHotel,
+    bookingHotelRooms,
   };
 };
 

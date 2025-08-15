@@ -28,16 +28,30 @@ export default function PremierWebviewScreen() {
     const parsed = queryString.parseUrl(url);
     const { tripId, code, cancel } = parsed.query;
 
-    console.log("✅ Payment callback params:", { cancel: cancel === "true", code, tripId });
+    console.log("✅ Payment callback params:", {
+      cancel: cancel === "true",
+      code,
+      tripId,
+    });
 
     if (tripId && code) {
+      // Nếu hủy thanh toán
+      if (cancel === "true") {
+        Toast.show({
+          type: "info",
+          text1: "Bạn đã hủy thanh toán",
+        });
+        navigation.goBack();
+        return; 
+      }
+
       try {
         const res = await paymentPremierURLCallBack({
           tripId,
           code,
           cancel: cancel === "true",
         });
-        console.log("Premier callback response:", res);
+        // console.log("Premier callback response:", res);
 
         Toast.show({
           type: "success",
@@ -46,7 +60,7 @@ export default function PremierWebviewScreen() {
 
         navigation.goBack();
       } catch (err) {
-        console.error("Premier callback error:", err);
+        // console.error("Premier callback error:", err);
         Toast.show({
           type: "error",
           text1: "Có lỗi khi xử lý thanh toán",
@@ -60,7 +74,7 @@ export default function PremierWebviewScreen() {
   // Bắt redirect ngay lập tức
   const handleNavigationRequest = (request) => {
     const { url } = request;
-    console.log("🌐 onShouldStartLoadWithRequest URL:", url);
+    // console.log("🌐 onShouldStartLoadWithRequest URL:", url);
 
     if (url.includes("tripId=") && url.includes("code=")) {
       handlePaymentCallback(url);
@@ -81,7 +95,7 @@ export default function PremierWebviewScreen() {
   return (
     <View style={styles.container}>
       <WebView
-        source={{ uri: checkoutUrl  }}
+        source={{ uri: checkoutUrl }}
         onLoadEnd={() => setLoading(false)}
         onShouldStartLoadWithRequest={handleNavigationRequest}
       />

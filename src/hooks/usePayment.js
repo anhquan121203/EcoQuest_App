@@ -27,16 +27,16 @@ const usePayment = () => {
     }
   };
 
-  const paymentCallback = async (paymentData) => {
-    try {
-      // Gọi thunk và unwrap để lấy kết quả hoặc throw error
-      const data = await dispatch(paymentCallBack(paymentData)).then(unwrapResult);
-      return { success: true, data };
-    } catch (error) {
-      console.error("paymentCallback error:", error);
-      return { success: false, error };
-    }
-  };
+  // const paymentCallback = async (paymentData) => {
+  //   try {
+  //     // Gọi thunk và unwrap để lấy kết quả hoặc throw error
+  //     const data = await dispatch(paymentCallBack(paymentData)).then(unwrapResult);
+  //     return { success: true, data };
+  //   } catch (error) {
+  //     console.error("paymentCallback error:", error);
+  //     return { success: false, error };
+  //   }
+  // };
 
     const listPaymentHistory = useCallback(
     () => {
@@ -44,6 +44,18 @@ const usePayment = () => {
     },
     [dispatch]
   );
+
+  const paymentURLCallBack = async ({ tripId, code, cancel }) => {
+    try {
+      const resultAction = await dispatch(paymentCallBack({ tripId, code, cancel }));
+      const data = unwrapResult(resultAction);
+      console.log("Payment callback response:", data);
+      return { success: true, data };
+    } catch (error) {
+      console.error("Payment callback error:", error);
+      return { success: false, error };
+    }
+  };
 
   const paymentPremierURLCallBack = async ({ tripId, code, cancel }) => {
     try {
@@ -76,6 +88,7 @@ const usePayment = () => {
     loading,
     error,
     addNewPayment,
+    paymentURLCallBack,
     listPaymentHistory,
     createPremier,
     paymentPremierURLCallBack

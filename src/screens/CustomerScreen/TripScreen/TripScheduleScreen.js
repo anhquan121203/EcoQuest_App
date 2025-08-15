@@ -117,7 +117,7 @@ export default function TripScheduleScreen({ navigation }) {
               <Text style={styles.titleText}>{item.title}</Text>
               <Text style={styles.desc}>{item.description}</Text>
               <Text style={styles.address}><Ionicons name="location-outline" size={16} color="#555" /> {item.address}</Text>
-              <Text style={styles.cost}>Chi phí: {item.estimatedCost.toLocaleString("vi-VN")} VNĐ</Text>
+              <Text style={styles.cost}>Chi phí: {item.estimatedCost?.toLocaleString("vi-VN")} VNĐ</Text>
             </View>
           ))
         ) : (

@@ -14,28 +14,30 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../feartures/auth/authSlice";
 import useAuth from "../../../hooks/useAuth";
+import defaultAvatar from "../../../../assets/images/profile/default_avatar.jpg";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const {firstName, lastName, avatar, email, userType} = useAuth();
+  const { firstName, lastName, avatar, email, userType } = useAuth();
 
   const dispatch = useDispatch();
 
-
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("access_token"); 
+    await AsyncStorage.removeItem("access_token");
     await AsyncStorage.removeItem("refresh_token");
-    dispatch(logout()); 
+    dispatch(logout());
   };
 
-  const renderType = (userType) =>  {
+  const renderType = (userType) => {
     switch (userType) {
-      case "1":
+      case "Basic":
         return "Miễn phí";
-      default:
+      case "Premier":
         return "Nâng cao";
+      default:
+        return "Miễn phí";
     }
-  }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -53,11 +55,13 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <Image
           source={{
-            uri: "https://cdn.dribbble.com/userupload/14028171/file/original-3a31127b9b84f9bc5f75737a4720f699.jpg?resize=752x&vertical=center",
+            uri: avatar || "https://i.imgur.com/4KZc5bH.png",
           }} // Replace with your avatar URL
           style={styles.avatar}
         />
-        <Text style={styles.name}>{firstName} {lastName}</Text>
+        <Text style={styles.name}>
+          {firstName} {lastName}
+        </Text>
         <Text style={styles.phone}>{email}</Text>
         <Text style={styles.phone}>{renderType(userType)}</Text>
       </View>
