@@ -1,6 +1,10 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getHotelById, listHotel } from "../feartures/hotels/hotelSlice";
+import {
+  getHotelById,
+  listHotel,
+  listRoomByHotel,
+} from "../feartures/hotels/hotelSlice";
 
 const useHotel = () => {
   const { hotels, selectedHotel, rooms, loading, error } = useSelector(
@@ -8,20 +12,15 @@ const useHotel = () => {
   );
   const dispatch = useDispatch();
 
-  const fetchHotels = useCallback(
-    () => {
-      dispatch(listHotel());
-    },
-    [dispatch]
-  );
+  const fetchHotels = useCallback(() => {
+    dispatch(listHotel());
+  }, [dispatch]);
 
   const hotelById = async (id) => {
     dispatch(getHotelById(id));
-  }
+  };
 
-  // console.log(fetchAttractions)
-
-   // 📌 Lấy danh sách phòng theo HotelId
+  // Lấy danh sách phòng theo HotelId
   const fetchRoomsByHotel = useCallback(
     (hotelId) => {
       dispatch(listRoomByHotel(hotelId));
@@ -35,7 +34,7 @@ const useHotel = () => {
     rooms,
     loading,
     error,
-    fetchHotels ,
+    fetchHotels,
     hotelById,
     fetchRoomsByHotel,
   };

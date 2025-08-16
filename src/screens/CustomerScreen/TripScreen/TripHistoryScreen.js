@@ -59,12 +59,6 @@ export default function TripHistoryScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        {/* <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.navigate("Tabs", { screen: "Profile" })}
-        >
-          <Ionicons name="chevron-back" size={24} color="#fff" />
-        </TouchableOpacity> */}
 
         <ImageBackground
           source={require("../../../../assets/images/trips/bg-trip.png")}

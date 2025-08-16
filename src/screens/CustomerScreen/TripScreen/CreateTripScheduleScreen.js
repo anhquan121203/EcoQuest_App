@@ -1,5 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -25,15 +25,15 @@ export default function CreateTripScheduleScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { id, selectedDate, startDate, endDate } = route.params || {};
-  const { addNewtripSchedule, tripScheduleByTripId } = useTrip();
+  const { addNewtripSchedule, tripScheduleByTripId, fetchTrips, trips } =
+    useTrip();
   const {
     serviceByType,
     selectedService,
     loading: serviceLoading,
     error: serviceError,
   } = useService();
-
-  const {rooms, fetchRoomsByHotel} = useHotel();
+  const { rooms, fetchRoomsByHotel, loading } = useHotel();
 
   const [scheduleDate, setScheduleDate] = useState(selectedDate || "");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -49,6 +49,7 @@ export default function CreateTripScheduleScreen() {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [selectedServiceType, setSelectedServiceType] = useState("");
+  const [selectedRoomId, setSelectedRoomId] = useState("");
 
   const allowedStartTime = "00:00";
   const allowedEndTime = "23:00";
@@ -59,10 +60,21 @@ export default function CreateTripScheduleScreen() {
   }, [selectedServiceType]);
 
   useEffect(() => {
+    fetchTrips();
+  });
+
+  useEffect(() => {
     if (id) {
       tripScheduleByTripId(id);
     }
   }, [id]);
+
+  const handleSelectService = (value) => {
+    setServiceId(value);
+    if (selectedServiceType === 1 && value) {
+      fetchRoomsByHotel(value);
+    }
+  };
 
   const formatTime = (date) => {
     if (!date) return "";
@@ -149,12 +161,12 @@ export default function CreateTripScheduleScreen() {
         })),
       };
 
-      console.log("Payload gửi về Tạo lịch trình:", payload); 
+      console.log("Payload gửi về Tạo lịch trình:", payload);
 
       const res = await addNewtripSchedule(payload);
 
       console.log("object", res);
-      
+
       await tripScheduleByTripId(id);
 
       Toast.show({
@@ -173,6 +185,17 @@ export default function CreateTripScheduleScreen() {
       });
     }
   };
+
+  // Lọc danh sách theo destinationId
+  const trip = trips.find((t) => t.tripId === id); // id là tripId hiện tại
+  const destinationIds = trip.destinations.map((d) => d.destinationId);
+
+  const filteredServices = React.useMemo(() => {
+  return selectedService.filter(service =>
+    destinationIds.includes(service.destinationId)
+  );
+}, [selectedService, destinationIds]);
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -308,14 +331,17 @@ export default function CreateTripScheduleScreen() {
       <Picker
         selectedValue={selectedServiceType}
         style={styles.inputRow}
-        onValueChange={(value) => setSelectedServiceType(value)}
+        onValueChange={(value) => setSelectedServiceType(Number(value))}
       >
         <Picker.Item label="Khách sạn" value={1} />
         <Picker.Item label="Nhà hàng" value={2} />
         <Picker.Item label="Địa điểm" value={3} />
       </Picker>
 
-      <Text style={styles.label}>Chọn dịch vụ</Text>
+      <Text style={styles.label}>
+        {selectedServiceType === 1 ? "Chọn khách sạn" : "Chọn dịch vụ"}
+      </Text>
+
       {serviceLoading ? (
         <ActivityIndicator size="small" color="#2196f3" />
       ) : (
@@ -323,10 +349,15 @@ export default function CreateTripScheduleScreen() {
           <Picker
             selectedValue={serviceId}
             style={styles.inputRow}
-            onValueChange={(value) => setServiceId(value)}
+            onValueChange={handleSelectService}
           >
-            <Picker.Item label="Chọn dịch vụ" value={""} />
-            {selectedService.map((item) => (
+            <Picker.Item
+              label={
+                selectedServiceType === 1 ? "Chọn khách sạn" : "Chọn dịch vụ"
+              }
+              value={""}
+            />
+            {filteredServices.map((item) => (
               <Picker.Item
                 key={item.serviceId}
                 label={item.serviceName}
@@ -335,6 +366,7 @@ export default function CreateTripScheduleScreen() {
             ))}
           </Picker>
 
+          {/* Hiển thị chi tiết dịch vụ hoặc khách sạn */}
           {serviceId && (
             <View
               style={{
@@ -348,7 +380,11 @@ export default function CreateTripScheduleScreen() {
                 .filter((item) => item.serviceId === serviceId)
                 .map((item) => (
                   <View key={item.serviceId}>
-                    <Text style={styles.label}>Tên dịch vụ:</Text>
+                    <Text style={styles.label}>
+                      {selectedServiceType === 1
+                        ? "Tên khách sạn:"
+                        : "Tên dịch vụ:"}
+                    </Text>
                     <Text>{item.serviceName}</Text>
 
                     <Text style={styles.label}>Địa chỉ:</Text>
@@ -360,13 +396,36 @@ export default function CreateTripScheduleScreen() {
                 ))}
             </View>
           )}
-        </>
-      )}
 
-      {serviceError && (
-        <Text style={{ color: "red", marginTop: 5 }}>
-          ❌ Lỗi khi tải dịch vụ: {serviceError}
-        </Text>
+          {/* Nếu là khách sạn thì show rooms */}
+          {selectedServiceType === 1 && rooms.length > 0 ? (
+            rooms.map((room) => (
+              <TouchableOpacity
+                key={room.roomId}
+                style={{
+                  padding: 8,
+                  marginVertical: 5,
+                  borderWidth: 1,
+                  borderColor:
+                    selectedRoomId === room.roomId ? "#2196f3" : "#ccc",
+                  borderRadius: 6,
+                  backgroundColor:
+                    selectedRoomId === room.roomId ? "#e3f2fd" : "#fff",
+                }}
+                onPress={() => {
+                  setSelectedRoomId(room.roomId);
+                  setServiceId(room.roomId); // ✅ gửi roomId về BE
+                }}
+              >
+                <Text>Phòng: {room.roomType}</Text>
+                <Text>Số người: {room.maxGuests}</Text>
+                <Text>Giá: {room.pricePerNight} VNĐ</Text>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text>Chưa có phòng nào.</Text>
+          )}
+        </>
       )}
 
       {/* Nút thêm vào danh sách */}

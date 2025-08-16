@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../../api/apiClient";
 import API from "../../api/apiConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Async thunks
 export const listHotel = createAsyncThunk(
@@ -42,14 +43,16 @@ export const listRoomByHotel = createAsyncThunk(
   async (hotelId, { rejectWithValue }) => {
     try {
       const token = await AsyncStorage.getItem("access_token");
-      const response = await apiClient.get(API.HOTEL_BY_ID, {
-        params: { HotelId: hotelId },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      return response.data;
+      const response = await apiClient.get(
+        `${API.ROOM_BY_HOTEL}?HotelId=${hotelId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data.response; 
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -93,7 +96,7 @@ const hotelSlice = createSlice({
       })
       .addCase(listRoomByHotel.fulfilled, (state, action) => {
         state.loading = false;
-        state.rooms = action.payload?.response || [];
+        state.rooms = action.payload || [];
       })
       .addCase(listRoomByHotel.rejected, (state, action) => {
         state.loading = false;

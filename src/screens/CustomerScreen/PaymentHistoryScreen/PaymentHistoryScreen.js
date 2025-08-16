@@ -107,15 +107,15 @@ export default function PaymentHistoryScreen({ navigation }) {
                 fontSize: 14,
                 color: "#ff0000ff",
                 marginTop: 2,
-                fontWeight: "bold",
               }}
             >
               Phương thức: {item.method}
             </Text>
+            {renderStatus(item.status)}
           </View>
 
           <View style={styles.colRight}>
-            {renderStatus(item.status)}
+            
             <Text style={styles.date}>{formatDate(item.paidAt)}</Text>
           </View>
         </View>
@@ -160,7 +160,7 @@ export default function PaymentHistoryScreen({ navigation }) {
 
       <FlatList
         data={payments}
-        keyExtractor={(item) => item.paymentId}
+        keyExtractor={(item, index) => item.paymentId || index.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={() => (

@@ -26,7 +26,7 @@ export default function TripDetailScreen() {
   const { id } = route.params;
   const { selectedTrip, tripById } = useTrip();
   const navigation = useNavigation();
-  const { payments, addNewPayment, listPaymentHistory } = usePayment();
+  const { payments, addNewPayment, listPaymentHistory, sendBackPayment } = usePayment();
   const { addNewtripScheduleWithAI } = useTrip();
 
   const { userType } = useAuth();

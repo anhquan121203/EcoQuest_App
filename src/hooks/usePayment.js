@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPayment, paymentCallBack, paymentHistory, paymentPremier, paymentPremierCallback } from "../feartures/payment/paymentSlice";
+import { createPayment, paymentCallBack, paymentHistory, paymentPremier, paymentPremierCallback, rePayment } from "../feartures/payment/paymentSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 
 const usePayment = () => {
@@ -27,16 +27,19 @@ const usePayment = () => {
     }
   };
 
-  // const paymentCallback = async (paymentData) => {
-  //   try {
-  //     // Gọi thunk và unwrap để lấy kết quả hoặc throw error
-  //     const data = await dispatch(paymentCallBack(paymentData)).then(unwrapResult);
-  //     return { success: true, data };
-  //   } catch (error) {
-  //     console.error("paymentCallback error:", error);
-  //     return { success: false, error };
-  //   }
-  // };
+const sendBackPayment = async (paymentData) => {
+    try {
+      const resultAction = await dispatch(rePayment(paymentData));
+
+      // unwrap kết quả để lấy data từ payload (RTK way)
+      const data = await resultAction.payload;
+      return { success: true, data };
+    } catch (error) {
+      console.error("sendBackPayment error:", error);
+      return { success: false, error };
+    }
+  };
+
 
     const listPaymentHistory = useCallback(
     () => {
@@ -91,7 +94,8 @@ const usePayment = () => {
     paymentURLCallBack,
     listPaymentHistory,
     createPremier,
-    paymentPremierURLCallBack
+    paymentPremierURLCallBack,
+    sendBackPayment
   };
 };
 

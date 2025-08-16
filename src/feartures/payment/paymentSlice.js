@@ -117,6 +117,24 @@ export const paymentPremierCallback = createAsyncThunk(
   }
 );
 
+export const rePayment = createAsyncThunk(
+  "payment/rePayment",
+  async (paymentData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(API.RE_PAYMENT, paymentData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const paymentSlice = createSlice({
   name: "PAYMENT",
   initialState: {
@@ -130,8 +148,13 @@ const paymentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // create trip
+      // create payment
       .addCase(createPayment.fulfilled, (state, action) => {
+        state.payments.push(action.payload);
+      })
+
+      // re payment
+      .addCase(rePayment.fulfilled, (state, action) => {
         state.payments.push(action.payload);
       })
 

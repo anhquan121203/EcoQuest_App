@@ -23,20 +23,20 @@ export default function PaymentWebviewScreen() {
   const [loading, setLoading] = useState(true);
 
   const handlePaymentCallback = async (url) => {
-    console.log("🔍 Callback payment URL detect:", url);
+    console.log("🔍 Callback URL detect:", url);
 
     const parsed = queryString.parseUrl(url);
     const { tripId, code, cancel } = parsed.query;
 
     console.log("✅ Payment callback params:", {
-      cancel: cancel === "true",
+      cancel,
       code,
       tripId,
     });
 
     if (tripId && code) {
       // Nếu hủy thanh toán
-      if (cancel === "true") {
+      if (cancel === "true" || status === "CANCELLED") {
         Toast.show({
           type: "info",
           text1: "Bạn đã hủy thanh toán",
@@ -51,7 +51,7 @@ export default function PaymentWebviewScreen() {
           code,
           cancel: cancel === "true",
         });
-        console.log("Premier callback response:", res);
+        console.log("Payment callback response:", res);
 
         Toast.show({
           type: "success",
@@ -60,7 +60,7 @@ export default function PaymentWebviewScreen() {
 
         navigation.goBack();
       } catch (err) {
-        console.error("Premier callback error:", err);
+        console.error("Payment callback error:", err);
         Toast.show({
           type: "error",
           text1: "Có lỗi khi xử lý thanh toán",
