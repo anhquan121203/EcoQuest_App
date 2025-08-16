@@ -18,8 +18,8 @@ const plans = [
     title: "Miễn phí",
     features: [
       { text: "Xem thông tin địa điểm du lịch", included: true },
-      { text: "Lưu yêu thích địa điểm", included: true },
-      { text: "Hỗ trợ lịch trình cá nhân", included: false },
+      { text: "Tạo lịch trình đơn giản", included: true },
+      { text: "Hỗ trợ lịch trình AI", included: false },
       { text: "Hướng dẫn viên trực tuyến", included: false },
     ],
     colors: ["#ff5f6d", "#ffc371"],
@@ -29,9 +29,9 @@ const plans = [
     title: "Nâng cao",
     features: [
       { text: "Xem thông tin địa điểm du lịch", included: true },
-      { text: "Lưu yêu thích địa điểm", included: true },
-      { text: "Hỗ trợ lịch trình cá nhân", included: false },
-      { text: "Hướng dẫn viên trực tuyến", included: false },
+      { text: "Tạo lịch trình nâng cao", included: true },
+      { text: "Hỗ trợ lịch trình AI", included: true },
+      { text: "Hướng dẫn viên trực tuyến", included: true },
     ],
     colors: ["#36d1dc", "#5b86e5"],
   },
