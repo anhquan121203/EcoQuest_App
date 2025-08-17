@@ -107,7 +107,7 @@ export default function TripHistoryScreen() {
 
               return (
                 <TouchableOpacity
-                  key={item.tripId}
+                  key={item.tripId || index} 
                   onPress={() => handleTripDetail(item.tripId)}
                 >
                   <View style={styles.tripCard}>

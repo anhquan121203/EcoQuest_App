@@ -1,5 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -31,12 +31,15 @@ export default function CreateTripScheduleScreen() {
     serviceByType,
     selectedService,
     loading: serviceLoading,
-    error: serviceError,
   } = useService();
   const { rooms, fetchRoomsByHotel, loading } = useHotel();
 
-  const [scheduleDate, setScheduleDate] = useState(selectedDate || "");
+  // giữ scheduleDate dạng Date object
+  const [scheduleDate, setScheduleDate] = useState(
+    selectedDate ? moment(selectedDate, "YYYY-MM-DD").toDate() : null
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [estimatedCost, setEstimatedCost] = useState("");
@@ -61,7 +64,7 @@ export default function CreateTripScheduleScreen() {
 
   useEffect(() => {
     fetchTrips();
-  });
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -91,22 +94,24 @@ export default function CreateTripScheduleScreen() {
       !estimatedCost ||
       !address ||
       !startTime ||
-      !endTime
+      !endTime ||
+      !scheduleDate
     ) {
       Alert.alert("Lỗi", "Vui lòng điền đầy đủ thông tin.");
       return;
     }
 
+    // Validate ngày nằm trong khoảng chuyến đi
     if (
-      moment(scheduleDate).isBefore(moment(startDate, "DD/MM/YYYY")) ||
-      moment(scheduleDate).isAfter(moment(endDate, "DD/MM/YYYY"))
+      moment(scheduleDate).isBefore(moment(startDate, "DD/MM/YYYY"), "day") ||
+      moment(scheduleDate).isAfter(moment(endDate, "DD/MM/YYYY"), "day")
     ) {
       Alert.alert("Lỗi", "Ngày lịch trình phải nằm trong thời gian chuyến đi.");
       return;
     }
 
     const newSchedule = {
-      scheduleDate,
+      scheduleDate: moment(scheduleDate).format("YYYY-MM-DD"), // format BE
       title,
       description,
       estimatedCost: parseFloat(estimatedCost),
@@ -136,7 +141,6 @@ export default function CreateTripScheduleScreen() {
   // ✅ Gửi toàn bộ lịch trình về BE
   const handleSubmitAllSchedules = async () => {
     if (tripSchedules.length === 0) {
-      // Alert.alert("Lỗi", "Bạn chưa thêm lịch trình nào.");
       Toast.show({
         type: "error",
         text1: "Lỗi!",
@@ -149,14 +153,13 @@ export default function CreateTripScheduleScreen() {
       const payload = {
         tripId: id,
         tripScheduleDetails: tripSchedules.map((sch) => ({
-          scheduleDate: sch.scheduleDate,
+          scheduleDate: sch.scheduleDate, // đã format YYYY-MM-DD
           title: sch.title,
           description: sch.description,
-          startTime: sch.startTime, // HH:mm
-          endTime: sch.endTime, // HH:mm
+          startTime: sch.startTime,
+          endTime: sch.endTime,
           address: sch.address,
           estimatedCost: parseFloat(sch.estimatedCost),
-          // Chỉ gửi serviceId nếu có
           ...(sch.serviceId ? { serviceId: sch.serviceId } : {}),
         })),
       };
@@ -164,7 +167,6 @@ export default function CreateTripScheduleScreen() {
       console.log("Payload gửi về Tạo lịch trình:", payload);
 
       const res = await addNewtripSchedule(payload);
-
       console.log("object", res);
 
       await tripScheduleByTripId(id);
@@ -174,7 +176,6 @@ export default function CreateTripScheduleScreen() {
         text1: "Thành công!",
         text2: `${tripSchedules.length} lịch trình đã được tạo!`,
       });
-      // console.log("Thông tin lích trình:", payload);
 
       navigation.goBack();
     } catch (error) {
@@ -187,15 +188,14 @@ export default function CreateTripScheduleScreen() {
   };
 
   // Lọc danh sách theo destinationId
-  const trip = trips.find((t) => t.tripId === id); // id là tripId hiện tại
-  const destinationIds = trip.destinations.map((d) => d.destinationId);
+  const trip = trips.find((t) => t.tripId === id);
+  const destinationIds = trip?.destinations?.map((d) => d.destinationId) || [];
 
   const filteredServices = React.useMemo(() => {
-  return selectedService.filter(service =>
-    destinationIds.includes(service.destinationId)
-  );
-}, [selectedService, destinationIds]);
-
+    return selectedService.filter((service) =>
+      destinationIds.includes(service.destinationId)
+    );
+  }, [selectedService, destinationIds]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -222,6 +222,7 @@ export default function CreateTripScheduleScreen() {
         </Text>
       </View>
 
+      {/* Ngày lịch trình */}
       <Text style={styles.label}>Ngày lịch trình</Text>
       <TouchableOpacity
         style={[styles.input, { justifyContent: "center" }]}
@@ -237,14 +238,14 @@ export default function CreateTripScheduleScreen() {
       {showDatePicker && (
         <DateTimePicker
           mode="date"
-          value={scheduleDate ? new Date(scheduleDate) : new Date(startDate)}
+          value={scheduleDate || moment(startDate, "DD/MM/YYYY").toDate()}
           minimumDate={moment(startDate, "DD/MM/YYYY").toDate()}
           maximumDate={moment(endDate, "DD/MM/YYYY").toDate()}
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={(_, date) => {
             setShowDatePicker(false);
             if (date) {
-              setScheduleDate(moment(date).format("YYYY-MM-DD"));
+              setScheduleDate(date); // giữ Date object
             }
           }}
         />
@@ -422,9 +423,9 @@ export default function CreateTripScheduleScreen() {
                 <Text>Giá: {room.pricePerNight} VNĐ</Text>
               </TouchableOpacity>
             ))
-          ) : (
+          ) : selectedServiceType === 1 ? (
             <Text>Chưa có phòng nào.</Text>
-          )}
+          ) : null}
         </>
       )}
 

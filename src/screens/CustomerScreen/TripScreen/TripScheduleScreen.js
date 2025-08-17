@@ -66,6 +66,19 @@ export default function TripScheduleScreen({ navigation }) {
         selectedDate
     ) || [];
 
+  const translateServiceType = (serviceType) => {
+    switch (serviceType) {
+      case "Hotel":
+        return "Khách sạn";
+      case "Restaurant":
+        return "Nhà hàng";
+      case "attraction":
+        return "Địa điểm";
+      default:
+        return serviceType;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -116,8 +129,12 @@ export default function TripScheduleScreen({ navigation }) {
               </Text>
               <Text style={styles.titleText}>{item.title}</Text>
               <Text style={styles.desc}>{item.description}</Text>
-              <Text style={styles.address}><Ionicons name="location-outline" size={16} color="#555" /> {item.address}</Text>
-              <Text style={styles.cost}>Chi phí: {item.estimatedCost?.toLocaleString("vi-VN")} VNĐ</Text>
+              <Text style={styles.address}>
+                Loại dịch vụ: {translateServiceType(item.serviceType)}
+              </Text>
+              <Text style={styles.cost}>
+                Chi phí: {item.estimatedCost?.toLocaleString("vi-VN")} VNĐ
+              </Text>
             </View>
           ))
         ) : (

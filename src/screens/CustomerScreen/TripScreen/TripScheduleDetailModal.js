@@ -61,7 +61,7 @@ export default function TripScheduleDetailModal({ visible, onClose, id }) {
                       </Text>
                     ) : null}
                     {item.location ? (
-                      <Text style={styles.location}>📍 {item.location}</Text>
+                      <Text style={styles.location}>📍 {item.serviceType}</Text>
                     ) : null}
                     {item.serviceType ? (
                       <Text style={styles.service}>🏷️ {item.serviceType}</Text>

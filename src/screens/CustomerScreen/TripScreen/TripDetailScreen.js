@@ -268,7 +268,7 @@ export default function TripDetailScreen() {
           onPress={() => setModalVisible(true)}
           style={{
             alignSelf: "center",
-            marginTop: 10,
+            marginTop: -10,
             padding: 10,
             backgroundColor: "#2a9df4",
             borderRadius: 8,

@@ -164,12 +164,9 @@ export default function PostBlogScreen() {
             <Image key={index} source={{ uri: img.uri }} style={styles.image} />
           ))}
 
-        <Button
-          title="Đăng bài viết"
-          onPress={handlePost}
-          color="#007BFF"
-          style={styles.buttonPost}
-        />
+        <View style={styles.buttonPost}>
+          <Button title="Đăng bài viết" onPress={handlePost} color="#007BFF" />
+        </View>
       </View>
     </ScrollView>
   );
@@ -234,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   buttonPost: {
-    marginBottom: 60,
-    padding: 20,
+    marginBottom: 70,
+    // padding: 20,
   },
 });

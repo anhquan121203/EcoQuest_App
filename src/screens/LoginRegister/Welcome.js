@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: width - 20,
-    height: 520,
+    height: 500,
     borderRadius: 20,
     marginTop: 60,
   },
@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 10,
+    marginTop: -10,
   },
   buttonText: {
     color: "#fff",
