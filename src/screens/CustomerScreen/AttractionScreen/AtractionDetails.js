@@ -14,6 +14,7 @@ import useAttraction from "../../../hooks/useAttraction";
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Swiper from "react-native-swiper";
+import MapView, { Marker } from "react-native-maps";
 
 const AtractionDetails = () => {
   const route = useRoute();
@@ -53,7 +54,8 @@ const AtractionDetails = () => {
     );
   }
 
-  const fallbackImage = "https://img.freepik.com/free-vector/abstract-grunge-style-coming-soon-with-black-splatter_1017-26690.jpg";
+  const fallbackImage =
+    "https://img.freepik.com/free-vector/abstract-grunge-style-coming-soon-with-black-splatter_1017-26690.jpg";
   const attracImages = selectedAttraction.attractionImages?.length
     ? selectedAttraction.attractionImages
     : [fallbackImage];
@@ -102,27 +104,51 @@ const AtractionDetails = () => {
         <View style={styles.content}>
           <Text style={styles.title}>{selectedAttraction?.attractionName}</Text>
           <Text style={styles.subtitle}>
-            📍 Nhà Nơi, Việt Nam • ⭐ 5.0 - (1289 Ngươi)
+            📍{selectedAttraction.address}
           </Text>
           <Text style={styles.description}>
             {selectedAttraction?.attractionType}
           </Text>
           <View style={styles.mapContainer}>
             <Text style={styles.mapTitle}>Địa điểm</Text>
-            <Text style={styles.mapName}>{selectedAttraction.address}</Text>
-            <Image
-              source={{ uri: "https://example.com/map-image.jpg" }}
-              style={styles.mapImage}
+            <Text style={{fontSize: 15}}>{selectedAttraction.address}</Text>
+
+            <Text styles={{ marginTop: 5, marginBottom: 5 }}>
+              Thôn An Sơn, Hòa Vang, Đà Nẵng, Việt Nam
+            </Text>
+          </View>
+          <MapView
+            style={styles.map}
+            provider={MapView.PROVIDER_GOOGLE} // ⚡ bắt buộc nếu muốn Google Maps
+            initialRegion={{
+              latitude: 15.997,
+              longitude: 107.9884,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: 15.997,
+                longitude: 107.9884,
+              }}
+              title="Bà Nà Hills"
+              description="Sun World Bà Nà Hills, Đà Nẵng"
             />
-            <Text style={styles.address}>
-              Tầng l, Khách sạn JW Marriott, Số 8 Đỗ Đức Dục, Nam Từ Liêm, Hà
-              Nội
+          </MapView>
+
+          <View style={styles.mapContainer}>
+            <Text style={styles.mapTitle}>Địa điểm gần nhất</Text>
+            <Text style={styles.mapName}>
+              Chùa Linh Ứng Bà Nà - ngay trong khu du lịch.
             </Text>
-            <Text style={styles.distance}>Điếm đến gần nhất</Text>
-            <Text style={styles.distanceItem}>⛳ Lăng Bác - 2.7 km</Text>
-            <Text style={styles.distanceItem}>
-              🏛 Nhà hát Lớn Hà Nội - 4.7 km
+            <Text style={styles.mapName}>
+              Cầu Vàng (Golden Bridge) - cách cáp treo khoảng 1 km
             </Text>
+            <Text style={styles.mapName}>
+              Fantasy Park - khu vui chơi trong nhà tại Bà Nà Hills.
+            </Text>
+            
           </View>
         </View>
       </View>
@@ -160,9 +186,21 @@ const styles = StyleSheet.create({
   mapContainer: { marginTop: 10 },
   mapTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 5 },
   mapImage: { width: "100%", height: 150, marginBottom: 5 },
-  address: { fontSize: 14, color: "#666" },
+  address: { fontSize: 14, color: "#666", marginBottom: 10 },
   distance: { fontSize: 16, fontWeight: "bold", marginTop: 10 },
   distanceItem: { fontSize: 14, color: "#666" },
+  map: {
+    width: "100%",
+    height: 200,
+    marginBottom: 10,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  mapName: {
+    fontSize: 15,
+    marginBottom: 5,
+    paddingHorizontal: 10,
+  },
 });
 
 export default AtractionDetails;

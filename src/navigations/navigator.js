@@ -31,6 +31,7 @@ import PremierScreen from "../screens/CustomerScreen/PremierScreen/PremierScreen
 import PremierWebviewScreen from "../screens/CustomerScreen/PaymentScreen/PremierWebviewScreen";
 import DestinationScreen from "../screens/CustomerScreen/DestinationScreen/DestinationScreen";
 import UpdateTripScreen from "../screens/CustomerScreen/TripScreen/UpdateTripScreen";
+import SearchScreen from "../screens/CustomerScreen/SearchScreen/SearchScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -150,7 +151,7 @@ function AppTabs() {
           let iconName;
           if (route.name === "Home")
             iconName = focused ? "home" : "home-outline";
-          else if (route.name === "Search")
+          else if (route.name === "SearchScreen")
             iconName = focused ? "search" : "search-outline";
           else if (route.name === "TripHistory")
             iconName = focused ? "calendar" : "calendar-outline";
@@ -173,8 +174,8 @@ function AppTabs() {
         }}
       />
       <Tab.Screen
-        name="Search"
-        component={HomeScreen}
+        name="SearchScreen"
+        component={SearchScreen}
         options={{
           headerShown: false,
           tabBarLabel: "Tìm kiếm",

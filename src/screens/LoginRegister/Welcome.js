@@ -22,7 +22,7 @@ export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../../assets/images/login/1.png")}
+        source={require("../../../assets/images/login/welcome_banner.png")}
         style={styles.image}
         resizeMode="cover"
       />
@@ -55,8 +55,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: width - 40,
-    height: width - 0,
+    width: width - 20,
+    height: 520,
     borderRadius: 20,
     marginTop: 60,
   },
@@ -68,13 +68,14 @@ const styles = StyleSheet.create({
   logo: {
     width: 150,
     height: 150,
-    marginTop: -40,
+    marginTop: -50,
     // marginBottom: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: "600",
     color: "#000",
+    marginTop: -20,
     marginBottom: 10,
   },
   subtitle: {
