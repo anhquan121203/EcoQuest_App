@@ -61,14 +61,14 @@ export default function TripScheduleDetailModal({ visible, onClose, id }) {
                       </Text>
                     ) : null}
                     {item.location ? (
-                      <Text style={styles.location}>📍 {item.location}</Text>
+                      <Text style={styles.location}>📍 {item.serviceType}</Text>
                     ) : null}
                     {item.serviceType ? (
                       <Text style={styles.service}>🏷️ {item.serviceType}</Text>
                     ) : null}
                     {item.estimatedCost != null ? (
                       <Text style={styles.cost}>
-                        💰 {item.estimatedCost}
+                        💰 {item.estimatedCost?.toLocaleString("vi-VN")}
                       </Text>
                     ) : null}
                   </View>

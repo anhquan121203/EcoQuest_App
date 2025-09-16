@@ -61,7 +61,7 @@ export default function CreateTripScreen() {
     setShowStartPicker(false);
     if (selectedDate) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // bỏ giờ phút để so sánh chuẩn
+      today.setHours(0, 0, 0, 0);
 
       if (selectedDate < today) {
         Toast.show({
@@ -106,6 +106,34 @@ export default function CreateTripScreen() {
   };
 
   const handleCreateTrip = async () => {
+    if (!tripName.trim()) {
+      Toast.show({ type: "error", text1: "❗ Vui lòng nhập tên chuyến đi" });
+      return;
+    }
+    if (!startDate || !endDate) {
+      Toast.show({
+        type: "error",
+        text1: "❗ Vui lòng chọn ngày bắt đầu và kết thúc",
+      });
+      return;
+    }
+    if (!numberOfPeople || Number(numberOfPeople) <= 0) {
+      Toast.show({ type: "error", text1: "❗ Số lượng người phải lớn hơn 0" });
+      return;
+    }
+    if (!totalEstimatedCost || Number(totalEstimatedCost) <= 0) {
+      Toast.show({ type: "error", text1: "❗ Số tiền dự kiến phải lớn hơn 0" });
+      return;
+    }
+    if (!startingPointAddress.trim()) {
+      Toast.show({ type: "error", text1: "❗ Vui lòng nhập điểm khởi hành" });
+      return;
+    }
+    if (!destinationId) {
+      Toast.show({ type: "error", text1: "❗ Vui lòng chọn điểm đến" });
+      return;
+    }
+
     const tripData = {
       tripName,
       startDate,
@@ -205,7 +233,7 @@ export default function CreateTripScreen() {
             mode="date"
             display="default"
             onChange={onStartDateChange}
-            minimumDate={new Date()} 
+            minimumDate={new Date()}
           />
         )}
 
@@ -215,7 +243,7 @@ export default function CreateTripScreen() {
             mode="date"
             display="default"
             onChange={onEndDateChange}
-            minimumDate={rawStartDate} 
+            minimumDate={rawStartDate}
           />
         )}
         <View style={styles.inputRow}>

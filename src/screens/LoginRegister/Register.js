@@ -66,6 +66,7 @@ export default function RegisterScreen({ navigation }) {
     setLoading(true);
     try {
       const res = await registerUser({ email, password, firstName, lastName });
+      // console.log("Dăng ký thành công:", res);
       if ((res.status === 200 || res.status === 201) && res.data?.success) {
         Toast.show({
           type: "success",
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 30,
     color: "#333",
-    textAlign: "center",
+    textAlign: "left",
   },
   label: {
     fontSize: 14,

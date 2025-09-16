@@ -13,20 +13,37 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import TripScheduleDetailModal from "./TripScheduleDetailModal";
 import usePayment from "../../../hooks/usePayment";
 import Toast from "react-native-toast-message";
+import useAuth from "../../../hooks/useAuth";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Modal } from "react-native-paper";
 
 export default function TripDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [visible, setVisible] = useState(false);
+
   const route = useRoute();
   const { id } = route.params;
   const { selectedTrip, tripById } = useTrip();
   const navigation = useNavigation();
-  const { payments, addNewPayment } = usePayment();
+  const { payments, addNewPayment, listPaymentHistory, sendBackPayment } = usePayment();
+  const { addNewtripScheduleWithAI } = useTrip();
+
+  const { userType } = useAuth();
 
   useEffect(() => {
     if (id) {
       tripById(id);
     }
   }, [id]);
+
+  // Khi payments thay đổi -> tìm payment tương ứng với trip
+  useEffect(() => {
+    if (payments && selectedTrip) {
+      const found = payments.find((p) => p.tripId === selectedTrip.tripId);
+      setPaymentStatus(found ? found.status : "Chưa thanh toán");
+    }
+  }, [payments, selectedTrip]);
 
   if (!selectedTrip) {
     return (
@@ -35,6 +52,19 @@ export default function TripDetailScreen() {
       </View>
     );
   }
+
+  const getPaymentStatusLabel = (paymentStatus) => {
+    switch (paymentStatus) {
+      case "Cancelled":
+        return { label: "Chưa thanh toán", backgroundColor: "#1890ff" };
+      case "Pending":
+        return { label: "Chờ thanh toán", backgroundColor: "#fadb14" };
+      case "Completed":
+        return { label: "Đã thanh toán", backgroundColor: "#52c41a" };
+      default:
+        return { label: "Không xác định", backgroundColor: "#fb0b0bff" };
+    }
+  };
 
   const handlePayment = async () => {
     const paymentData = {
@@ -46,6 +76,7 @@ export default function TripDetailScreen() {
 
       if (result.success) {
         const checkoutUrl = result.data?.response?.checkoutUrl;
+        console.log("Checkout payment URL:", checkoutUrl);
 
         if (checkoutUrl) {
           Toast.show({
@@ -56,9 +87,8 @@ export default function TripDetailScreen() {
           navigation.navigate("PaymentWebview", { checkoutUrl });
         } else {
           Toast.show({
-            type: "error",
-            text1: "❌ Không tìm thấy đường dẫn thanh toán",
-            text2: "Vui lòng thử lại sau.",
+            type: "success",
+            text1: "Chuyến đi đã được thanh toán!",
           });
         }
       } else {
@@ -79,27 +109,100 @@ export default function TripDetailScreen() {
     }
   };
 
+  // create trip withh AI
+
+  const handleCreateTripWithAI = async () => {
+    try {
+      const payload = {
+        tripId: selectedTrip.tripId,
+      };
+
+      const res = await addNewtripScheduleWithAI(payload);
+      Toast.show({
+        type: "success",
+        text1: "Thành công!",
+        text2: `Lịch trình đã được tạo!`,
+      });
+      // console.log("Thông tin lích trình:", payload);
+
+      navigation.navigate("TripScheduleAi", {
+        aiData: res,
+        tripId: selectedTrip.tripId,
+      });
+    } catch (error) {}
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        <ImageBackground
-          source={require("../../../../assets/images/trips/image_trip_detail.jpg")}
-          style={styles.headerImage}
-          imageStyle={{
-            borderBottomLeftRadius: 20,
-            borderBottomRightRadius: 20,
-          }}
-        >
-          <View style={styles.overlay}>
-            <Text style={styles.tripName}>{selectedTrip.tripName}</Text>
-            <Text style={styles.userName}>
-              Người tạo: {selectedTrip.firstName} {selectedTrip.lastName}
-            </Text>
-          </View>
-        </ImageBackground>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() =>
+              navigation.navigate("Tabs", { screen: "TripHistory" })
+            }
+          >
+            <Ionicons name="chevron-back" size={24} color="#fff" />
+          </TouchableOpacity>
+
+          <ImageBackground
+            source={require("../../../../assets/images/trips/image_trip_detail.jpg")}
+            style={styles.headerImage}
+            imageStyle={{
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
+            }}
+          >
+            <View style={styles.overlay}>
+              <Text style={styles.tripName}>{selectedTrip.tripName}</Text>
+              <Text style={styles.userName}>
+                Người tạo: {selectedTrip.firstName} {selectedTrip.lastName}
+              </Text>
+            </View>
+          </ImageBackground>
+
+          {/* MENU DROPDOWN ========================================================================= */}
+          <TouchableOpacity
+            style={styles.settingButton}
+            onPress={() => setVisible(true)}
+          >
+            <Entypo name="dots-three-vertical" size={24} color="black" />
+          </TouchableOpacity>
+
+          <Modal transparent visible={visible} animationType="fade">
+            {/* Overlay nền modal */}
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              activeOpacity={1}
+              onPress={() => setVisible(false)}
+            >
+              {/* Ngăn bấm overlay ảnh hưởng dropdown */}
+              <View style={styles.dropdownWrapper}>
+                <View style={styles.dropdown}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setVisible(false);
+                      navigation.navigate("UpdateTrip", { trip: selectedTrip });
+                    }}
+                  >
+                    <Text style={styles.item}>Cập nhật</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setVisible(false);
+                      console.log("Xóa");
+                    }}
+                  >
+                    <Text style={styles.item}>Xóa</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        </View>
 
         <View style={styles.detailContainer}>
           <View style={styles.card}>
@@ -142,6 +245,17 @@ export default function TripDetailScreen() {
               </Text>
             </View>
           </View>
+
+          {/* Trạng thái thanh toán */}
+          <View style={styles.card}>
+            <Ionicons name="card-outline" size={24} color="#0984e3" />
+            <Text style={styles.cardText}>
+              Thanh toán:{" "}
+              <Text style={{ fontWeight: "bold", color: "#333" }}>
+                {getPaymentStatusLabel(paymentStatus).label}
+              </Text>
+            </Text>
+          </View>
         </View>
 
         <TripScheduleDetailModal
@@ -154,7 +268,7 @@ export default function TripDetailScreen() {
           onPress={() => setModalVisible(true)}
           style={{
             alignSelf: "center",
-            marginTop: 10,
+            marginTop: -10,
             padding: 10,
             backgroundColor: "#2a9df4",
             borderRadius: 8,
@@ -168,6 +282,7 @@ export default function TripDetailScreen() {
 
       {/* Nút cố định dưới cùng */}
       <View style={styles.fixedBottomButtons}>
+        {/* navigate towis trang TripScheduleScreen */}
         <TouchableOpacity
           style={styles.leftButton}
           onPress={() =>
@@ -178,13 +293,40 @@ export default function TripDetailScreen() {
           <Text style={styles.buttonText}>Tạo lịch</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.middleButton}
-          
-        >
-          <Ionicons name="sparkles-outline" size={18} color="#fff" style={{marginRight: 8}}/>
-          <Text style={styles.buttonText}>Tạo AI</Text>
-        </TouchableOpacity>
+        {/* BUTTON AI */}
+        {userType === "1" || userType === "Basic" ? (
+          <TouchableOpacity
+            style={styles.middleButton}
+            onPress={() => {
+              Toast.show({
+                type: "info",
+                text1: "Tài khoản chưa nâng cấp",
+                text2: "Vui lòng nâng cấp lên Premier để sử dụng tính năng này",
+              });
+            }}
+          >
+            <Ionicons
+              name="sparkles-outline"
+              size={18}
+              color="#fff"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.buttonText}>Tạo AI</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.middleButton}
+            onPress={handleCreateTripWithAI}
+          >
+            <Ionicons
+              name="sparkles-outline"
+              size={18}
+              color="#fff"
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.buttonText}>Tạo AI</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.rightButton} onPress={handlePayment}>
           <Text style={styles.paymentText}>Thanh toán</Text>
@@ -198,6 +340,51 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#f8f9fc",
   },
+  backButton: {
+    position: "absolute",
+    top: 45,
+    left: 20,
+    backgroundColor: "rgba(0, 0, 0 , 0.3)",
+    borderRadius: 50,
+    padding: 5,
+    zIndex: 100,
+  },
+  // =========================================================
+  settingButton: {
+    position: "absolute",
+    top: 45,
+    right: 15,
+  },
+
+  // modalOverlay: {
+  //   flex: 1,
+  //   // backgroundColor: "rgba(0,0,0,0.2)",
+  //   justifyContent: "flex-start",
+  //   alignItems: "flex-end",
+  //   paddingTop: 30, 
+  //   paddingRight: 15,
+  // },
+
+  dropdownWrapper: {
+    width: 100, 
+    // marginLeft: 15,
+    right: -307,
+    marginTop: -50,
+  },
+
+  dropdown: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    width: "100%",
+  },
+
+  item: {
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+
+  // =========================================================
   headerImage: {
     height: 270,
     justifyContent: "flex-end",
@@ -306,10 +493,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 10,
   },
-  
+
   rightButton: {
     flex: 1.2,
-    backgroundColor: "#e74c3c",
+    backgroundColor: "red",
     padding: 12,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,

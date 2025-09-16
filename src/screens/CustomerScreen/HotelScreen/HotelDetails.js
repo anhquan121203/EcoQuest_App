@@ -15,6 +15,7 @@ import useHotel from "../../../hooks/useHotel";
 import MapView, { Marker } from "react-native-maps";
 import Swiper from "react-native-swiper";
 import useStreetMap from "../../../hooks/useStreetMap";
+import { Ionicons } from "@expo/vector-icons";
 
 const HotelDetails = () => {
   const route = useRoute();
@@ -23,8 +24,6 @@ const HotelDetails = () => {
   const { selectedHotel, hotelById, loading, error } = useHotel();
   const address = selectedHotel?.address;
   const { coordinates } = useStreetMap(address);
-
-
 
   useEffect(() => {
     if (id) {
@@ -70,7 +69,7 @@ const HotelDetails = () => {
             onPress={() => navigation.goBack()}
             style={styles.backButton}
           >
-            <Text>🔙</Text>
+            <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
 
           <Swiper
@@ -103,32 +102,24 @@ const HotelDetails = () => {
 
             <Text style={styles.mapTitle}>Bản đồ</Text>
 
-            {coordinates ? (
-              <MapView
-                style={styles.map}
-                initialRegion={{
-                  ...coordinates,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: 15.997, // 🎯 Bà Nà Hills
+                longitude: 107.9884,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+              }}
+            >
+              <Marker
+                coordinate={{
+                  latitude: 15.997,
+                  longitude: 107.9884,
                 }}
-              >
-                <Marker
-                  coordinate={coordinates}
-                  title={selectedHotel.hotelName}
-                  description={selectedHotel.address}
-                />
-              </MapView>
-            ) : (
-              <Text style={{ color: "#999", fontStyle: "italic" }}>
-                Không thể hiển thị bản đồ.
-              </Text>
-            )}
-
-            <Text style={styles.distance}>Điểm đến gần nhất</Text>
-            <Text style={styles.distanceItem}>⛳ Lăng Bác - 2.7 km</Text>
-            <Text style={styles.distanceItem}>
-              🏛 Nhà hát Lớn Hà Nội - 4.7 km
-            </Text>
+                title="Bà Nà Hills"
+                description="Sun World Bà Nà Hills, Đà Nẵng"
+              />
+            </MapView>
           </View>
         </View>
       </View>
@@ -142,15 +133,12 @@ const styles = StyleSheet.create({
   // header
   backButton: {
     position: "absolute",
-    top: 40,
+    top: 45,
     left: 20,
-    zIndex: 100,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0 , 0.3)",
     borderRadius: 50,
-    padding: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    cursor: "pointer",
+    padding: 5,
+    zIndex: 100,
   },
 
   swiper: { height: 350 },

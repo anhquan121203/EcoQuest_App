@@ -61,6 +61,48 @@ export const createTrip = createAsyncThunk(
   }
 );
 
+// update trip
+export const updateTrip = createAsyncThunk(
+  "trip/updateTrip",
+  async (updateData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.put(API.UPDATE_TRIP, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// update trip
+export const deleteTrip = createAsyncThunk(
+  "trip/deleteTrip",
+  async (tripId, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.patch(API.DELETE_TRIP, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        data: { tripId }, 
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
+// ========================================================================================================================================
+// ========================================================================================================================================
 // create trip schedule
 export const createTripSchedule = createAsyncThunk(
   "trip/createTripSchedule",
@@ -107,12 +149,35 @@ export const getTripScheduleByTripId = createAsyncThunk(
 // create trip schedule with  AI
 export const createTripScheduleAI = createAsyncThunk(
   "trip/createTripScheduleAI",
-  async (tripScheduleData, { rejectWithValue }) => {
+  async (tripScheduleAiData, { rejectWithValue }) => {
     try {
       const token = await AsyncStorage.getItem("access_token");
       const response = await apiClient.post(
         API.CREATE_TRIP_SCHEDULE_AI,
-        tripScheduleData,
+        tripScheduleAiData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// booking hotel room
+export const bookHotelRooms = createAsyncThunk(
+  "tripBooking/bookHotelRooms",
+  async (bookingData, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.post(
+        API.BOOKING_HOTEL_ROOM,
+        bookingData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -132,8 +197,10 @@ const tripSlice = createSlice({
   initialState: {
     trips: [],
     tripSchedules: [],
+    tripSchedulesWithAI: [],
     selectedTrip: [],
     selectedTripSchedule: [],
+    bookingHotelRooms: null,
     loading: false,
     error: null,
   },
@@ -163,6 +230,19 @@ const tripSlice = createSlice({
         state.trips.push(action.payload);
       })
 
+      .addCase(updateTrip.fulfilled, (state, action) => {
+        const updatedTrip = action.payload?.response;
+        if (updatedTrip) {
+          const index = state.trips.findIndex(
+            (t) => t.tripId === updatedTrip.tripId
+          );
+          if (index !== -1) {
+            state.trips[index] = updatedTrip;
+          }
+        }
+      })
+
+      // ================================================================================================================
       // create trip schedule
       .addCase(createTripSchedule.fulfilled, (state, action) => {
         state.tripSchedules.push(action.payload);
@@ -175,7 +255,13 @@ const tripSlice = createSlice({
 
       // create trip schedule AI
       .addCase(createTripScheduleAI.fulfilled, (state, action) => {
-        state.tripSchedules.push(action.payload);
+        state.tripSchedulesWithAI.push(action.payload);
+      })
+
+      // booking hotel rooms
+      .addCase(bookHotelRooms.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookingHotelRooms = action.payload;
       });
   },
 });

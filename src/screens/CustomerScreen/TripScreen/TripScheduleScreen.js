@@ -66,6 +66,19 @@ export default function TripScheduleScreen({ navigation }) {
         selectedDate
     ) || [];
 
+  const translateServiceType = (serviceType) => {
+    switch (serviceType) {
+      case "Hotel":
+        return "Khách sạn";
+      case "Restaurant":
+        return "Nhà hàng";
+      case "attraction":
+        return "Địa điểm";
+      default:
+        return serviceType;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -112,12 +125,16 @@ export default function TripScheduleScreen({ navigation }) {
           schedulesForSelectedDate.map((item, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.time}>
-                {item.startTime} - {item.endTime}
+                🕐 {item.startTime} - {item.endTime}
               </Text>
               <Text style={styles.titleText}>{item.title}</Text>
               <Text style={styles.desc}>{item.description}</Text>
-              <Text style={styles.address}>📍 {item.address}</Text>
-              <Text style={styles.cost}>Chi phí: {item.estimatedCost} VNĐ</Text>
+              <Text style={styles.address}>
+                Loại dịch vụ: {translateServiceType(item.serviceType)}
+              </Text>
+              <Text style={styles.cost}>
+                Chi phí: {item.estimatedCost?.toLocaleString("vi-VN")} VNĐ
+              </Text>
             </View>
           ))
         ) : (
@@ -131,7 +148,12 @@ export default function TripScheduleScreen({ navigation }) {
       <TouchableOpacity
         style={styles.createButton}
         onPress={() => {
-          navigation.navigate("CreateTripSchedule", { id, selectedDate });
+          navigation.navigate("CreateTripSchedule", {
+            id,
+            selectedDate,
+            startDate: selectedTrip.startDate,
+            endDate: selectedTrip.endDate,
+          });
         }}
       >
         <Text style={styles.createText}>Tạo lịch trình mới</Text>
@@ -144,7 +166,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f7eafd",
+    backgroundColor: "#f8f9fc",
   },
 
   // header**********************************

@@ -9,24 +9,22 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
-import { useSelector } from "react-redux";
-import useAttraction from "../../../hooks/useAttraction";
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Swiper from "react-native-swiper";
-import MapView, { Marker } from "react-native-maps";
+import useDestination from "../../../hooks/useDestination";
 
-const AtractionDetails = () => {
+const DestinationScreen = () => {
   const route = useRoute();
   const { id } = route.params;
   const navigation = useNavigation();
 
-  const { selectedAttraction, attractionById, loading, error } =
-    useAttraction();
+  const { selectedDestination, destinationById, loading, error } =
+    useDestination();
 
   useEffect(() => {
     if (id) {
-      attractionById(id);
+      destinationById(id);
     }
   }, [id]);
 
@@ -46,7 +44,7 @@ const AtractionDetails = () => {
     );
   }
 
-  if (!selectedAttraction) {
+  if (!selectedDestination) {
     return (
       <View style={styles.container}>
         <Text>Không tìm thấy địa điểm.</Text>
@@ -54,12 +52,10 @@ const AtractionDetails = () => {
     );
   }
 
-  const localImage = require("../../../../assets/image_default.jpg");
-
   const fallbackImage =
     "https://img.freepik.com/free-vector/abstract-grunge-style-coming-soon-with-black-splatter_1017-26690.jpg";
-  const attracImages = selectedAttraction.attractionImages?.length
-    ? selectedAttraction.attractionImages
+  const desImages = selectedDestination.destinationImages?.length
+    ? selectedDestination.destinationImages
     : [fallbackImage];
 
   return (
@@ -73,14 +69,6 @@ const AtractionDetails = () => {
             <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
 
-          {/* <ImageBackground
-            source={require("../../../../assets/images/trips/image_trip_detail.jpg")}
-            style={styles.headerImage}
-            imageStyle={{
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-            }}
-          ></ImageBackground> */}
           <Swiper
             style={styles.swiper}
             // showsButtons={true}
@@ -88,7 +76,7 @@ const AtractionDetails = () => {
             dotColor="#ccc"
             activeDotColor="#000"
           >
-            {attracImages.map((img, index) => (
+            {desImages.map((img, index) => (
               <Image
                 key={index}
                 source={{ uri: img }}
@@ -104,53 +92,30 @@ const AtractionDetails = () => {
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.title}>{selectedAttraction?.attractionName}</Text>
+          <Text style={styles.title}>{selectedDestination?.name}</Text>
           <Text style={styles.subtitle}>
-            📍{selectedAttraction.address}
+            📍Việt Nam • ⭐ 5.0 - (1289 Ngươi)
           </Text>
           <Text style={styles.description}>
-            {selectedAttraction?.attractionType}
+            {selectedDestination?.description}
           </Text>
           <View style={styles.mapContainer}>
             <Text style={styles.mapTitle}>Địa điểm</Text>
-            <Text style={{fontSize: 15}}>{selectedAttraction.address}</Text>
-
-            <Text styles={{ marginTop: 5, marginBottom: 5 }}>
-              Thôn An Sơn, Hòa Vang, Đà Nẵng, Việt Nam
+            <Text style={styles.address}>
+              {selectedDestination?.addressLine +
+                ", " +
+                selectedDestination?.ward +
+                ", " +
+                selectedDestination?.district +
+                ", " +
+                selectedDestination?.province}
             </Text>
-          </View>
-          <MapView
-            style={styles.map}
-            provider={MapView.PROVIDER_GOOGLE} // ⚡ bắt buộc nếu muốn Google Maps
-            initialRegion={{
-              latitude: 15.997,
-              longitude: 107.9884,
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: 15.997,
-                longitude: 107.9884,
+            <Image
+              source={{
+                uri: "https://justmaps.com/cdn/shop/products/ComingSoon-LaserCutWoodenMap_ea9246f9-9b19-48dc-9644-29751918889b.jpg?v=1575344472",
               }}
-              title="Bà Nà Hills"
-              description="Sun World Bà Nà Hills, Đà Nẵng"
+              style={styles.mapImage}
             />
-          </MapView>
-
-          <View style={styles.mapContainer}>
-            <Text style={styles.mapTitle}>Địa điểm gần nhất</Text>
-            <Text style={styles.mapName}>
-              Chùa Linh Ứng Bà Nà - ngay trong khu du lịch.
-            </Text>
-            <Text style={styles.mapName}>
-              Cầu Vàng (Golden Bridge) - cách cáp treo khoảng 1 km
-            </Text>
-            <Text style={styles.mapName}>
-              Fantasy Park - khu vui chơi trong nhà tại Bà Nà Hills.
-            </Text>
-            
           </View>
         </View>
       </View>
@@ -188,21 +153,9 @@ const styles = StyleSheet.create({
   mapContainer: { marginTop: 10 },
   mapTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 5 },
   mapImage: { width: "100%", height: 150, marginBottom: 5 },
-  address: { fontSize: 14, color: "#666", marginBottom: 10 },
+  address: { fontSize: 14, color: "#666" },
   distance: { fontSize: 16, fontWeight: "bold", marginTop: 10 },
   distanceItem: { fontSize: 14, color: "#666" },
-  map: {
-    width: "100%",
-    height: 200,
-    marginBottom: 10,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  mapName: {
-    fontSize: 15,
-    marginBottom: 5,
-    paddingHorizontal: 10,
-  },
 });
 
-export default AtractionDetails;
+export default DestinationScreen;

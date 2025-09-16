@@ -12,13 +12,16 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import useTrip from "../../../hooks/useTrip";
+import usePayment from "../../../hooks/usePayment";
 
 export default function TripHistoryScreen() {
   const navigation = useNavigation();
   const { trips, loading, error, fetchTrips } = useTrip();
+  const { payments, addNewPayment, listPaymentHistory } = usePayment();
 
   useEffect(() => {
     fetchTrips();
+    listPaymentHistory();
   }, []);
 
   const handleTripDetail = (id) => {
@@ -56,12 +59,6 @@ export default function TripHistoryScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="chevron-back" size={24} color="#fff" />
-        </TouchableOpacity>
 
         <ImageBackground
           source={require("../../../../assets/images/trips/bg-trip.png")}
@@ -75,12 +72,12 @@ export default function TripHistoryScreen() {
 
       <ScrollView style={styles.scrollContent}>
         {/* Ongoing Trip */}
-        <Text style={styles.sectionTitle}>Ongoing Trip</Text>
+        <Text style={styles.sectionTitle}>Danh sách chuyến đi</Text>
 
         {trips && trips.length > 0 ? (
           trips
             .slice()
-            .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             .map((item, index) => {
               let label = "";
               let backgroundColor = "";
@@ -110,12 +107,12 @@ export default function TripHistoryScreen() {
 
               return (
                 <TouchableOpacity
-                  key={item.tripId}
+                  key={item.tripId || index} 
                   onPress={() => handleTripDetail(item.tripId)}
                 >
-                  <View style={styles.tripCard} key={index}>
+                  <View style={styles.tripCard}>
                     <Image
-                      source={require("../../../../assets/image_trip_history.jpg")}
+                      source={require("../../../../assets/images/trips/image_trip_history.jpg")}
                       style={styles.tripImage}
                     />
                     <View style={styles.tripInfo}>
@@ -126,13 +123,16 @@ export default function TripHistoryScreen() {
                           size={14}
                           color="#2196F3"
                         />
-                        <Text style={styles.locationText}>Thailand</Text>
+                        <Text style={styles.locationText}>Việt Nam</Text>
                       </View>
                       <Text style={styles.dateText}>
                         {item.startDate} - {item.endDate}
                       </Text>
                       <View style={styles.footerCard}>
-                        <Text>{item.totalEstimatedCost}</Text>
+                        <Text>
+                          💰 {item.totalEstimatedCost?.toLocaleString("vi-VN")}{" "}
+                          VNĐ
+                        </Text>
                         <Text style={[styles.status, { backgroundColor }]}>
                           {label}
                         </Text>
@@ -153,46 +153,6 @@ export default function TripHistoryScreen() {
         >
           <Text style={styles.buttonText}>+ Tạo chuyến đi</Text>
         </TouchableOpacity>
-
-        {/* Past Trips
-        <Text style={styles.sectionPastTrip}>Past Trips</Text>
-        <View style={styles.pastTrips}>
-          {[
-            {
-              title: "Love Tokyo '18",
-              image:
-                "https://cdn.cheapoguides.com/wp-content/uploads/sites/2/2023/09/fuji-cherry-GettyImages-1060517676-1024x600.jpeg",
-              time: "3 months ago",
-            },
-            {
-              title: "London 2018",
-              image:
-                "https://wallpapercat.com/w/full/3/5/f/292593-3840x2160-desktop-4k-london-wallpaper.jpg",
-              time: "6 months ago",
-            },
-            {
-              title: "Santorini 2017",
-              image:
-                "https://plus.unsplash.com/premium_photo-1661964149725-fbf14eabd38c?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2FudG9yaW5pfGVufDB8fDB8fHww",
-              time: "2 years ago",
-            },
-            {
-              title: "Busan",
-              image:
-                "https://wallpapers.com/images/featured/busan-b85vqxi55ve53gk7.jpg",
-              time: "2 years ago",
-            },
-          ].map((trip, index) => (
-            <View style={styles.pastTripCard} key={index}>
-              <Image
-                source={{ uri: trip.image }}
-                style={styles.pastTripImage}
-              />
-              <Text style={styles.pastTripTitle}>{trip.title}</Text>
-              <Text style={styles.pastTripDate}>{trip.time}</Text>
-            </View>
-          ))}
-        </View> */}
       </ScrollView>
     </View>
   );
@@ -212,7 +172,7 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: "absolute",
-    top: 20,
+    top: 45,
     left: 20,
     backgroundColor: "rgba(0, 0, 0 , 0.3)",
     borderRadius: 50,
@@ -245,7 +205,7 @@ const styles = StyleSheet.create({
   },
   settingButton: {
     position: "absolute",
-    top: 20,
+    top: 45,
     right: 20,
   },
 

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import apiClient from "../../api/apiClient";
 import API from "../../api/apiConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Async thunks
 export const listHotel = createAsyncThunk(
@@ -37,11 +38,33 @@ export const getHotelById = createAsyncThunk(
   }
 );
 
+export const listRoomByHotel = createAsyncThunk(
+  "hotel/listRoomByHotel",
+  async (hotelId, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem("access_token");
+      const response = await apiClient.get(
+        `${API.ROOM_BY_HOTEL}?HotelId=${hotelId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data.response; 
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const hotelSlice = createSlice({
   name: "HOTEL",
   initialState: {
     hotels: [],
     selectedHotel: [],
+    rooms: [],
     loading: false,
     error: null,
   },
@@ -64,6 +87,20 @@ const hotelSlice = createSlice({
       .addCase(getHotelById.fulfilled, (state, action) => {
         state.selectedHotel = action.payload?.response || [];
         state.loading = false;
+      })
+
+      // Danh sách phòng
+      .addCase(listRoomByHotel.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listRoomByHotel.fulfilled, (state, action) => {
+        state.loading = false;
+        state.rooms = action.payload || [];
+      })
+      .addCase(listRoomByHotel.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch rooms";
       });
   },
 });

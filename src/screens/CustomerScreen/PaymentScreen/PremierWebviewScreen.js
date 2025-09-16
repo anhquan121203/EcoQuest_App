@@ -14,11 +14,11 @@ import Toast from "react-native-toast-message";
 import queryString from "query-string";
 import usePayment from "../../../hooks/usePayment";
 
-export default function PaymentWebviewScreen() {
+export default function PremierWebviewScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { checkoutUrl } = route.params;
-  const { paymentURLCallBack } = usePayment();
+  const { paymentPremierURLCallBack } = usePayment();
 
   const [loading, setLoading] = useState(true);
 
@@ -29,29 +29,29 @@ export default function PaymentWebviewScreen() {
     const { tripId, code, cancel } = parsed.query;
 
     console.log("✅ Payment callback params:", {
-      cancel,
+      cancel: cancel === "true",
       code,
       tripId,
     });
 
     if (tripId && code) {
       // Nếu hủy thanh toán
-      if (cancel === "true" || status === "CANCELLED") {
+      if (cancel === "true") {
         Toast.show({
           type: "info",
           text1: "Bạn đã hủy thanh toán",
         });
         navigation.goBack();
-        return;
+        return; 
       }
 
       try {
-        const res = await paymentURLCallBack({
+        const res = await paymentPremierURLCallBack({
           tripId,
           code,
           cancel: cancel === "true",
         });
-        console.log("Payment callback response:", res);
+        // console.log("Premier callback response:", res);
 
         Toast.show({
           type: "success",
@@ -60,7 +60,7 @@ export default function PaymentWebviewScreen() {
 
         navigation.goBack();
       } catch (err) {
-        console.error("Payment callback error:", err);
+        // console.error("Premier callback error:", err);
         Toast.show({
           type: "error",
           text1: "Có lỗi khi xử lý thanh toán",
@@ -74,7 +74,7 @@ export default function PaymentWebviewScreen() {
   // Bắt redirect ngay lập tức
   const handleNavigationRequest = (request) => {
     const { url } = request;
-    console.log("🌐 onShouldStartLoadWithRequest URL:", url);
+    // console.log("🌐 onShouldStartLoadWithRequest URL:", url);
 
     if (url.includes("tripId=") && url.includes("code=")) {
       handlePaymentCallback(url);

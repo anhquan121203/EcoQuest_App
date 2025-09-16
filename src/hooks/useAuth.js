@@ -46,6 +46,7 @@ const useAuth = () => {
     dob: user?.birthDate,
     gender: user?.gender,
     email: user?.email,
+    userType: user?.userType,
     user,
     refreshUserData: fetchUserData,
   };

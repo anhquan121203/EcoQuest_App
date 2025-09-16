@@ -1,49 +1,51 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
-import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import dayjs from "dayjs";
-import { Button } from "react-native-paper";
+import { useRoute } from "@react-navigation/native";
+import useTrip from "../../../hooks/useTrip";
+import Toast from "react-native-toast-message";
 
-const dateFormat = "YYYY/MM/DD";
+export default function TripScheduleAiScreen({ navigation }) {
+  const route = useRoute();
+  const { aiData, tripId } = route.params || {};
+  const schedules = aiData?.data?.response || [];
+  const { addNewtripSchedule } = useTrip();
 
-export default function TripScheduleAiScreen() {
-  const [location, setLocation] = useState("");
-  const [dates, setDates] = useState("");
-  const [groupSize, setGroupSize] = useState("");
-  const [specialRequest, setSpecialRequest] = useState("");
-  const [foodService, setFoodService] = useState("");
-  const [otherService, setOtherService] = useState("");
-  const [budget, setBudget] = useState("");
+  const handleConfirm = async () => {
+    try {
+      const payload = {
+        tripId: tripId,
+        tripScheduleDetails: schedules.map((item) => ({
+          scheduleDate: item.scheduleDate,
+          title: item.title,
+          description: item.description,
+          estimatedCost: item.estimatedCost || 0,
+          startTime: item.startTime?.slice(0, 5), // HH:mm format
+          endTime: item.endTime?.slice(0, 5),
+          address: item.address,
+          ...(item.serviceId ? { serviceId: item.serviceId } : {}),
+        })),
+      };
 
-  const [startDate, setStartDate] = useState(
-    dayjs("2015/01/01", dateFormat).toDate()
-  );
-  const [endDate, setEndDate] = useState(
-    dayjs("2015/01/01", dateFormat).toDate()
-  );
+      console.log("AI Data:", payload);
+      const res = await addNewtripSchedule(payload);
+      console.log(" Response:", res);
 
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
-
-  const handleStartChange = (event, selectedDate) => {
-    setShowStartPicker(false);
-    if (selectedDate) {
-      setStartDate(selectedDate);
-    }
-  };
-
-  const handleEndChange = (event, selectedDate) => {
-    setShowEndPicker(false);
-    if (selectedDate) {
-      setEndDate(selectedDate);
+      Toast.show({
+        type: "success",
+        text1: "Thành công!",
+        text2: `Lịch trình gợi ý bằng AI đã được tạo!`,
+      });
+      navigation.navigate("TripDetail", { id: tripId });
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Lỗi", "Có lỗi khi gửi dữ liệu");
     }
   };
 
@@ -52,130 +54,47 @@ export default function TripScheduleAiScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 50 }}
     >
-      <Text style={styles.title}>Chọn lịch trình của bạn 🧳</Text>
+      <Text style={styles.title}>Lịch trình của bạn 🧳</Text>
 
-      {/* Thông tin chuyến đi */}
-      <Text style={styles.section}>Thông tin chuyến đi</Text>
+      {schedules.length > 0 ? (
+        schedules.map((item, index) => (
+          <View key={index} style={styles.card}>
+            <Text style={styles.date}>{item.scheduleDate}</Text>
+            <Text style={styles.titleText}>{item.title}</Text>
+            <Text style={styles.desc}>{item.description}</Text>
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="location-outline" size={20} color="#2a9df4" />
-        <TextInput
-          placeholder="Nơi muốn du lịch..."
-          style={styles.input}
-          value={location}
-          onChangeText={setLocation}
-        />
-      </View>
+            <Text style={styles.info}>
+              ⏰ {item.startTime} - {item.endTime}
+            </Text>
+            <Text style={styles.info}>📍 {item.address}</Text>
+            <Text style={styles.info}>
+              💰 {item.estimatedCost?.toLocaleString()}đ
+            </Text>
+            <Text style={styles.reason}>{item.reasonEstimatedCost}</Text>
+            <Text style={styles.type}>🔖 Loại dịch vụ: {item.serviceType}</Text>
+          </View>
+        ))
+      ) : (
+        <Text>Không có dữ liệu AI</Text>
+      )}
 
-      {/* Start Date - End Date ***************************************************/}
-      <View >
-        <Text variant="titleMedium" style={styles.section}>
-          Chọn khoảng ngày:
-        </Text>
-
-        <Button
-          mode="outlined"
-          icon="calendar"
-          onPress={() => setShowStartPicker(true)}
-          style={{ marginBottom: 10 }}
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.confirmBtn, styles.flexBtn]}
+          onPress={() => navigation.navigate("TripDetail", { id: tripId })}
         >
-          Ngày bắt đầu: {dayjs(startDate).format(dateFormat)}
-        </Button>
+          <Text style={styles.confirmText}>Quay lại</Text>
+        </TouchableOpacity>
 
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate}
-            mode="date"
-            display="default"
-            onChange={handleStartChange}
-          />
-        )}
-
-        <Button
-          mode="outlined"
-          icon="calendar"
-          onPress={() => setShowEndPicker(true)}
-          style={{ marginBottom: 10 }}
-        >
-          Ngày kết thúc: {dayjs(endDate).format(dateFormat)}
-        </Button>
-
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate}
-            mode="date"
-            display="default"
-            minimumDate={startDate}
-            onChange={handleEndChange}
-          />
+        {schedules.length > 0 && (
+          <TouchableOpacity
+            style={[styles.confirmBtn, styles.flexBtn]}
+            onPress={handleConfirm}
+          >
+            <Text style={styles.confirmText}>Xác nhận & Lưu</Text>
+          </TouchableOpacity>
         )}
       </View>
-
-      {/* Nhóm tham gia */}
-      <Text style={styles.section}>Chi tiết nhóm tham gia</Text>
-
-      <View style={styles.inputContainer}>
-        <Ionicons name="people-outline" size={20} color="#2a9df4" />
-        <TextInput
-          placeholder="Số lượng người tham gia..."
-          style={styles.input}
-          value={groupSize}
-          onChangeText={setGroupSize}
-          keyboardType="numeric"
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="feedback" size={20} color="#2a9df4" />
-        <TextInput
-          placeholder="Yêu cầu đặc biệt (VD: ăn chay...)"
-          style={styles.input}
-          value={specialRequest}
-          onChangeText={setSpecialRequest}
-        />
-      </View>
-
-      {/* Dịch vụ bổ sung */}
-      <Text style={styles.section}>Dịch vụ bổ sung</Text>
-
-      <View style={styles.inputContainer}>
-        <FontAwesome5 name="utensils" size={20} color="#2a9df4" />
-        <TextInput
-          placeholder="Thêm dịch vụ ăn uống"
-          style={styles.input}
-          value={foodService}
-          onChangeText={setFoodService}
-        />
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Ionicons name="construct-outline" size={20} color="#2a9df4" />
-        <TextInput
-          placeholder="Dịch vụ khác"
-          style={styles.input}
-          value={otherService}
-          onChangeText={setOtherService}
-        />
-      </View>
-
-      {/* Chi phí dự phòng */}
-      <Text style={styles.section}>Chi phí dự phòng</Text>
-
-      <View style={styles.inputContainer}>
-        <Ionicons name="wallet-outline" size={20} color="#2a9df4" />
-        <TextInput
-          placeholder="Chi phí dự trù"
-          style={styles.input}
-          value={budget}
-          onChangeText={setBudget}
-          keyboardType="numeric"
-        />
-      </View>
-
-      {/* Nút tính toán */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Tính toán chuyến đi</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -186,7 +105,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#f9fcff",
   },
-
   title: {
     fontSize: 20,
     fontWeight: "bold",
@@ -194,46 +112,73 @@ const styles = StyleSheet.create({
     color: "#333",
     marginTop: 20,
   },
-
-  section: {
-    fontWeight: "600",
-    fontSize: 16,
-    marginTop: 20,
-    marginBottom: 6,
-    color: "#444",
-  },
-
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#2a9df4",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 10,
+  card: {
     backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
-
-  input: {
-    flex: 1,
-    marginLeft: 10,
+  date: {
     fontSize: 14,
-    color: "#333",
+    fontWeight: "600",
+    color: "#0984e3",
+    marginBottom: 4,
   },
-
-  button: {
-    marginTop: 24,
-    backgroundColor: "#2a9df4",
+  titleText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#2d3436",
+  },
+  desc: {
+    fontSize: 14,
+    color: "#636e72",
+    marginVertical: 4,
+  },
+  info: {
+    fontSize: 13,
+    color: "#555",
+    marginTop: 2,
+  },
+  reason: {
+    fontSize: 12,
+    color: "#888",
+    marginTop: 6,
+    fontStyle: "italic",
+  },
+  type: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#6c5ce7",
+  },
+  confirmBtn: {
+    backgroundColor: "#00b894",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10, 
+    marginTop: 20,
+  },
+  flexBtn: {
+    flex: 1, 
+  },
+  confirmBtn: {
+    backgroundColor: "#1976D2",
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
-    elevation: 3,
   },
-
-  buttonText: {
+  confirmText: {
     color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
+    fontWeight: "600",
   },
 });

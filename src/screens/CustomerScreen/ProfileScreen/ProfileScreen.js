@@ -14,18 +14,29 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../feartures/auth/authSlice";
 import useAuth from "../../../hooks/useAuth";
+import defaultAvatar from "../../../../assets/images/profile/default_avatar.jpg";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const {firstName, lastName, avatar, email} = useAuth();
+  const { firstName, lastName, avatar, email, userType } = useAuth();
 
   const dispatch = useDispatch();
 
-
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("access_token"); 
+    await AsyncStorage.removeItem("access_token");
     await AsyncStorage.removeItem("refresh_token");
-    dispatch(logout()); 
+    dispatch(logout());
+  };
+
+  const renderType = (userType) => {
+    switch (userType) {
+      case "Basic":
+        return "Miễn phí";
+      case "Premier":
+        return "Nâng cao";
+      default:
+        return "Miễn phí";
+    }
   };
 
   return (
@@ -43,11 +54,16 @@ const ProfileScreen = () => {
           <Icon name="more-vert" size={24} color="#fff" />
         </TouchableOpacity>
         <Image
-          source={require("../../../../assets/chatbot.png")}
+          source={{
+            uri: avatar || "https://i.imgur.com/4KZc5bH.png",
+          }} // Replace with your avatar URL
           style={styles.avatar}
         />
-        <Text style={styles.name}>{firstName} {lastName}</Text>
+        <Text style={styles.name}>
+          {firstName} {lastName}
+        </Text>
         <Text style={styles.phone}>{email}</Text>
+        <Text style={styles.phone}>{renderType(userType)}</Text>
       </View>
       {/* </ImageBackground> */}
 
@@ -82,10 +98,10 @@ const ProfileScreen = () => {
 
         <TouchableOpacity
           style={styles.infoItem}
-          onPress={() => navigation.navigate("TripHistory")}
+          onPress={() => navigation.navigate("PaymentHistory")}
         >
-          <Icon name="schedule" size={24} color="#2a9df4" />
-          <Text style={styles.infoText}>Lịch trình chuyến đi</Text>
+          <Icon name="payment" size={24} color="#2a9df4" />
+          <Text style={styles.infoText}>Lịch sử thanh toán</Text>
           <Icon
             name="chevron-right"
             size={24}

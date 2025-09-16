@@ -40,7 +40,7 @@ export default function LoginScreen({ navigation }) {
           type: "success",
           text1: "🎉 Đăng nhập thành công!",
         });
-        navigation.navigate("Home");
+        navigation.navigate( "Home" );
       } else {
         Toast.show({
           type: "error",
@@ -86,7 +86,7 @@ export default function LoginScreen({ navigation }) {
                 />
               </View>
 
-              <Text style={[styles.label, { marginTop: 20 }]}>Password</Text>
+              <Text style={[styles.label, { marginTop: 20 }]}>Mật khẩu</Text>
               <View style={styles.inputRow}>
                 <Ionicons name="lock-closed-outline" size={18} color="#aaa" />
                 <TextInput
