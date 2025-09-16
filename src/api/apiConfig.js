@@ -1,6 +1,5 @@
-const BASE_URL = 'http://160.250.246.33:5269';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
-const BASE_LOCAL = "https://27ae-183-80-111-9.ngrok-free.app"
 
 const API = {
   BASE_URL,
